@@ -13,6 +13,8 @@ import { Link } from "@/i18n/navigation";
 import { logoutAction } from "@/lib/auth/actions";
 import { clearOperatorSessionAction } from "@/lib/operators/actions";
 import { getOperatorIdFromCookie } from "@/lib/operators/session";
+import { getClinicEntitlements } from "@/lib/entitlements";
+import { ClinicTelemetry } from "@/components/analytics/clinic-telemetry";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -43,6 +45,10 @@ export default async function DashboardPage({ params }: Props) {
     | null
     | undefined;
 
+  const entitlements = profile?.clinic_id
+    ? await getClinicEntitlements(supabase, profile.clinic_id)
+    : null;
+
   const operatorId = await getOperatorIdFromCookie();
   let operatorName: string | null = null;
   if (operatorId) {
@@ -56,6 +62,13 @@ export default async function DashboardPage({ params }: Props) {
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-6 px-4 py-10">
+      {profile?.clinic_id && profile.role ? (
+        <ClinicTelemetry
+          userId={user!.id}
+          clinicId={profile.clinic_id}
+          role={profile.role}
+        />
+      ) : null}
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
@@ -86,6 +99,13 @@ export default async function DashboardPage({ params }: Props) {
               ? new Date(clinic.trial_ends_at).toLocaleDateString(locale)
               : "—"}
           </p>
+          {entitlements ? (
+            <p>
+              {t("plan")}: {entitlements.planCode}
+              {entitlements.freePeriodOverride ? " · free 2026" : ""}
+            </p>
+          ) : null}
+          <p>{t("featuresHint")}</p>
           <p>{t("nextSteps")}</p>
           <p>
             <Link

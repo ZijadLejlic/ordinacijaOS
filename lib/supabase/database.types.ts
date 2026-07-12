@@ -438,6 +438,11 @@ export type Database = {
         Args: { p_email: string }
         Returns: boolean
       }
+      check_login_lockout: {
+        Args: { p_email: string }
+        Returns: undefined
+      }
+      clear_login_lockout: { Args: never; Returns: undefined }
       create_clinic_for_owner: {
         Args: {
           p_clinic_name: string
@@ -454,6 +459,10 @@ export type Database = {
         }
         Returns: string
       }
+      custom_access_token_hook: {
+        Args: { event: Json }
+        Returns: Json
+      }
       current_app_role: {
         Args: never
         Returns: Database["public"]["Enums"]["app_role"]
@@ -469,6 +478,10 @@ export type Database = {
         Returns: boolean
       }
       owner_mfa_ok: { Args: never; Returns: boolean }
+      record_failed_login: {
+        Args: { p_email: string }
+        Returns: undefined
+      }
       peek_clinic_invite: {
         Args: { p_token_hash: string }
         Returns: {

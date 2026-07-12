@@ -1,10 +1,51 @@
 {
-  "Home": {
-    "title": "OrdinacijaOS",
-    "tagline": "Softver za stomatološke ordinacije",
-    "status": "Temelj je spreman. Kreiraj nalog vlasnika i ordinaciju.",
-    "signup": "Registracija",
-    "login": "Prijava"
+  "Marketing": {
+    "nav": {
+      "pricing": "Cijene",
+      "login": "Prijava",
+      "signup": "Registracija"
+    },
+    "footer": {
+      "legalSoon": "Privacy / Terms uskoro"
+    },
+    "hero": {
+      "headline": "Kalendar, kartoni i fakture — u jednom mjestu.",
+      "support": "Cloud softver za stomatološke ordinacije. Multi-tenant od dana 1.",
+      "ctaPrimary": "Započni besplatno",
+      "ctaSecondary": "Vidi pakete",
+      "trialNote": "Free Professional do 31.12.2026. Bez kartice."
+    },
+    "pricing": {
+      "title": "Paketi",
+      "subtitle": "Cijene u EUR, prikaz sa PDV-om. Free trial 2026 = Professional.",
+      "price": "{amount}€/mj",
+      "custom": "60€+/mj",
+      "cta": "Registruj se",
+      "vatNote": "Stripe naplata od 1.1.2027. Do tada evidencija uplata u app.",
+      "limits": {
+        "doctors": "Doktori: {count}",
+        "users": "Korisnici: {count}",
+        "locations": "Lokacije: {count}"
+      },
+      "plans": {
+        "starter": {
+          "name": "Starter",
+          "blurb": "Solo i male ordinacije."
+        },
+        "professional": {
+          "name": "Professional",
+          "blurb": "MVP default i free trial."
+        },
+        "premium_ai": {
+          "name": "Premium AI",
+          "blurb": "AI + napredniji moduli."
+        },
+        "enterprise": {
+          "name": "Enterprise",
+          "blurb": "Portal, mini site, lab."
+        }
+      }
+    }
   },
   "Auth": {
     "signupTitle": "Kreiraj ordinaciju",
@@ -23,6 +64,8 @@
     "loginLink": "Prijavi se",
     "signupLink": "Registruj se",
     "invalid": "Provjeri unesene podatke.",
+    "invalidCredentials": "Pogrešan email ili lozinka.",
+    "locked": "Previše neuspjelih pokušaja. Pokušaj ponovo za 15 minuta.",
     "confirmEmail": "Provjeri email i potvrdi nalog, zatim se prijavi.",
     "missingClinic": "Nalog nema povezanu ordinaciju. Registruj se kao vlasnik."
   },
@@ -50,9 +93,11 @@
     "clinicFallback": "Ordinacija",
     "status": "Status",
     "trialEnds": "Trial do",
-    "nextSteps": "Sljedeće: onboarding checklist i marketing skeleton.",
+    "nextSteps": "Faza 1 gotova osim super-admin skeletona.",
     "manageUsers": "Korisnici, pozivnice i PIN operatori →",
-    "switchOperator": "Promijeni operatora (PIN)"
+    "switchOperator": "Promijeni operatora (PIN)",
+    "plan": "Paket",
+    "featuresHint": "Feature gateovi se čitaju iz plana (D42)."
   },
   "Users": {
     "title": "Korisnici",
@@ -107,6 +152,9 @@
       "forbidden": "Samo vlasnik može upravljati korisnicima.",
       "userLimit": "Dostignut je limit korisnika na planu. Nadogradite paket.",
       "doctorLimit": "Dostignut je limit doktora na planu. Nadogradite paket.",
+      "locationLimit": "Dostignut je limit lokacija na planu. Nadogradite paket.",
+      "imageLimit": "Dostignut je limit slika po pacijentu. Nadogradite paket.",
+      "featureDisabled": "Ova funkcija nije uključena u vašem paketu.",
       "emailTaken": "Ovaj email već ima nalog.",
       "inviteExists": "Već postoji pending pozivnica za ovaj email.",
       "inviteFailed": "Pozivnica nije spremljena.",

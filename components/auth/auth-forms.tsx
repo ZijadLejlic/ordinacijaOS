@@ -24,6 +24,8 @@ function mapAuthError(
   if (!state) return null;
   if (state.message === "confirmEmail") return t("confirmEmail");
   if (state.error === "invalid") return t("invalid");
+  if (state.error === "invalidCredentials") return t("invalidCredentials");
+  if (state.error === "locked") return t("locked");
   if (state.error === "missingClinic") return t("missingClinic");
   if (state.error) return state.error;
   return null;

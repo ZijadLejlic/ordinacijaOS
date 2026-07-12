@@ -30,17 +30,19 @@
 
 Helpers (SECURITY DEFINER, `search_path = public`, execute samo `authenticated`):
 
-- `current_clinic_id()`
-- `current_app_role()`
+- `current_clinic_id()` — JWT `app_metadata.clinic_id` pa fallback na `profiles`
+- `current_app_role()` — JWT `app_metadata.app_role` pa fallback na `profiles`
 - `is_clinic_owner()`
 - `owner_mfa_ok()` — D11: owner s verified MFA mora `aal2` (RLS restrictive)
 - `create_clinic_for_owner(name, full_name, trial_ends_at?)` — signup: clinic + owner + default location + trial subscription (Professional)
 
-Clinic-scoped policies koriste `clinic_id = current_clinic_id()`. Owner-only write gdje PRD traži (settings, invites, locations, operators).
+**JWT hook (B5):** `custom_access_token_hook` upisuje `clinic_id` + `app_role` u `app_metadata` pri izdavanju tokena. Funkcija je u bazi; **mora se ručno uključiti** u dashboardu: Authentication → Hooks → Custom Access Token → `public.custom_access_token_hook`. Bez toga helperi i dalje rade preko `profiles` fallbacka.
+
+Clinic-scoped policies koriste `clinic_id = (select current_clinic_id())`. Owner write politike su odvojene po `INSERT`/`UPDATE`/`DELETE` (ne `ALL`) da izbjegnu dupli permissive SELECT. `profiles` zadržava dvije UPDATE politike (self + owner). Self `with_check` je pojednostavljen — `role`/`is_active`/`clinic_id` immutability ide kroz `profiles_guard_sensitive_columns` trigger (izbjegava RLS rekurziju).
 
 Advisor note: linter WARN-a da su ovi SECURITY DEFINER callable od `authenticated` — **namjerno** (signup RPC + RLS helpers). `anon` execute je revoked.
 
-**Test:** tenant isolation automated tests = release blocker (PRD §8.1) — još nije implementirano.
+**Test:** tenant isolation automated tests = release blocker (PRD §8.1) — `lib/security/tenant-isolation.test.ts` + CI workflow `.github/workflows/security.yml`.
 
 ---
 
@@ -95,7 +97,7 @@ Kolone su **namjera**; tipovi/constrainti se finalizuju u migraciji. `…` = TBD
 | `role` | `owner` \| `doctor` \| `assistant` \| `reception` \| `accountant` \| (`technician` Enterprise) |
 | `full_name` | |
 | `is_active` | |
-| MFA / lockout fields | Owner TOTP preko Supabase Auth MFA (`auth.mfa_factors`); app gate + `owner_mfa_ok()` RLS (D11). Auth login lockout (D13) TBD. |
+| MFA / lockout fields | Owner TOTP preko Supabase Auth MFA (`auth.mfa_factors`); app gate + `owner_mfa_ok()` RLS (D11). Auth login lockout (D13): `check_login_lockout` / `record_failed_login` / `clear_login_lockout` RPC + `loginAction`. |
 | `pin_failed_count` / `pin_locked_until` | D10 desk PIN lock (5 fails → 15 min) |
 
 #### `clinic_operators`
@@ -147,6 +149,8 @@ RPCs (service_role): `peek_clinic_invite`, `accept_clinic_invite`. Owner app: `e
 #### `clinic_subscriptions`
 
 Evidencija paketa / budući Stripe (D5). Do 2027 bez charge — i dalje red za plan + trial.
+
+**RLS:** `SELECT` + `UPDATE` samo owner (`clinic_subscriptions_select_owner`, `clinic_subscriptions_update_owner`). **Nema `INSERT` policy** — namjerno: red se kreira isključivo kroz `create_clinic_for_owner` (SECURITY DEFINER) ili `service_role` (platform admin D41). Sljedeći developer ne treba dodavati INSERT policy bez eksplicitnog product odluke.
 
 | Kolona | Napomena |
 |---|---|
@@ -230,6 +234,8 @@ Hard block + upsell (D8), ne samo soft warning:
 | Slike/RTG po pacijentu | 10 | 20 | 30 | 40 |
 
 Free trial 2026 entitlements = Professional, minus SMS/AI/portal (PRD §4.3).
+App layer: `lib/entitlements/features.ts` applies free-period overrides until `2027-01-01`.
+Location create must call `assertCanCreateLocation`; image upload must call `assertCanAddPatientImage`.
 
 ---
 
@@ -266,6 +272,12 @@ Free trial 2026 entitlements = Professional, minus SMS/AI/portal (PRD §4.3).
 | `phase1_auth_email_exists` | `auth_email_exists(email)` for invite pre-check (service_role) |
 | `phase1_pin_operators_d10` | PIN RPCs (bcrypt), column revoke `pin_hash`, desk lock fields, shared-role trigger |
 | `phase1_pin_operators_revoke_anon` | revoke anon EXECUTE on D10 RPCs |
+| `code_review_a1_profiles_self_update_lock` | A1: `profiles_update_self` immutability + `profiles_guard_sensitive_columns` trigger; column UPDATE grants |
+| `code_review_a2_plan_limit_enforcement` | A2: `enforce_invite_limits` / `enforce_location_limits` BEFORE INSERT triggers (D8 hard block) |
+| `code_review_a1_a2_revoke_trigger_execute` | Revoke RPC EXECUTE on trigger-only functions (security advisor) |
+| `code_review_b2_login_lockout` | B2/D13: `check_login_lockout`, `record_failed_login`, `clear_login_lockout` |
+| `code_review_b4_rls_performance` | B4: select-wrapped RLS, FK indexes, dedupe invite index, split owner write policies |
+| `code_review_b5_jwt_custom_claims` | B5: `custom_access_token_hook` + JWT-first helper reads with profiles fallback |
 
 ---
 
@@ -278,3 +290,6 @@ Free trial 2026 entitlements = Professional, minus SMS/AI/portal (PRD §4.3).
 | 2026-07-12 | Owner MFA (D11): `owner_mfa_ok` + restrictive RLS |
 | 2026-07-12 | D9 invites: token hash flow RPCs + pending unique index + `auth_email_exists` |
 | 2026-07-12 | D10 PIN operators: bcrypt RPCs, pin_hash not selectable, desk lock |
+| 2026-07-13 | Documented app-layer entitlement helpers (no new migration) |
+| 2026-07-13 | CODE-REVIEW A1/A2: profiles self-update lock, DB plan limit triggers, tenant-isolation test suite |
+| 2026-07-13 | CODE-REVIEW B2/B4/B5: login lockout, RLS performance pass, JWT custom claims hook (dashboard enable pending) |

@@ -1,10 +1,51 @@
 {
-  "Home": {
-    "title": "OrdinacijaOS",
-    "tagline": "Software for dental clinics",
-    "status": "Foundation is ready. Create an owner account and clinic.",
-    "signup": "Sign up",
-    "login": "Log in"
+  "Marketing": {
+    "nav": {
+      "pricing": "Pricing",
+      "login": "Log in",
+      "signup": "Sign up"
+    },
+    "footer": {
+      "legalSoon": "Privacy / Terms coming soon"
+    },
+    "hero": {
+      "headline": "Scheduling, charts, and invoices — in one place.",
+      "support": "Cloud software for dental clinics. Multi-tenant from day one.",
+      "ctaPrimary": "Start free",
+      "ctaSecondary": "See plans",
+      "trialNote": "Free Professional until 31 Dec 2026. No card required."
+    },
+    "pricing": {
+      "title": "Plans",
+      "subtitle": "Prices in EUR, shown with VAT. Free trial 2026 = Professional.",
+      "price": "€{amount}/mo",
+      "custom": "€60+/mo",
+      "cta": "Sign up",
+      "vatNote": "Stripe billing from 1 Jan 2027. Until then, payment records in-app only.",
+      "limits": {
+        "doctors": "Doctors: {count}",
+        "users": "Users: {count}",
+        "locations": "Locations: {count}"
+      },
+      "plans": {
+        "starter": {
+          "name": "Starter",
+          "blurb": "Solo and small clinics."
+        },
+        "professional": {
+          "name": "Professional",
+          "blurb": "MVP default and free trial."
+        },
+        "premium_ai": {
+          "name": "Premium AI",
+          "blurb": "AI plus advanced modules."
+        },
+        "enterprise": {
+          "name": "Enterprise",
+          "blurb": "Portal, mini site, lab."
+        }
+      }
+    }
   },
   "Auth": {
     "signupTitle": "Create your clinic",
@@ -23,6 +64,8 @@
     "loginLink": "Log in",
     "signupLink": "Sign up",
     "invalid": "Check the form fields.",
+    "invalidCredentials": "Incorrect email or password.",
+    "locked": "Too many failed attempts. Try again in 15 minutes.",
     "confirmEmail": "Check your email to confirm, then log in.",
     "missingClinic": "This account has no clinic. Sign up as an owner."
   },
@@ -50,9 +93,11 @@
     "clinicFallback": "Clinic",
     "status": "Status",
     "trialEnds": "Trial ends",
-    "nextSteps": "Next: onboarding checklist and marketing skeleton.",
+    "nextSteps": "Phase 1 done except super-admin skeleton.",
     "manageUsers": "Users, invites, and PIN operators →",
-    "switchOperator": "Switch operator (PIN)"
+    "switchOperator": "Switch operator (PIN)",
+    "plan": "Plan",
+    "featuresHint": "Feature gates are read from the plan (D42)."
   },
   "Users": {
     "title": "Users",
@@ -107,6 +152,9 @@
       "forbidden": "Only the owner can manage users.",
       "userLimit": "User plan limit reached. Upgrade your plan.",
       "doctorLimit": "Doctor plan limit reached. Upgrade your plan.",
+      "locationLimit": "Location plan limit reached. Upgrade your plan.",
+      "imageLimit": "Image-per-patient plan limit reached. Upgrade your plan.",
+      "featureDisabled": "This feature is not included in your plan.",
       "emailTaken": "This email already has an account.",
       "inviteExists": "A pending invite already exists for this email.",
       "inviteFailed": "Could not save the invite.",

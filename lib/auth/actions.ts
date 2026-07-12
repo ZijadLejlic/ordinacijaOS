@@ -23,6 +23,12 @@ export type AuthActionState = {
   message?: string;
 } | null;
 
+function mapLoginRpcError(message: string | undefined): string | null {
+  const raw = (message ?? "").toLowerCase();
+  if (raw.includes("locked")) return "locked";
+  return null;
+}
+
 export async function signupAction(
   _prev: AuthActionState,
   formData: FormData,
@@ -86,11 +92,23 @@ export async function loginAction(
 
   const supabase = await createClient();
   const locale = await getLocale();
+  const email = parsed.data.email;
+
+  const { error: lockError } = await supabase.rpc("check_login_lockout", {
+    p_email: email,
+  });
+  const lockCode = mapLoginRpcError(lockError?.message);
+  if (lockCode) {
+    return { error: lockCode };
+  }
 
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
   if (error) {
-    return { error: error.message };
+    await supabase.rpc("record_failed_login", { p_email: email });
+    return { error: "invalidCredentials" };
   }
+
+  await supabase.rpc("clear_login_lockout");
 
   const {
     data: { user },

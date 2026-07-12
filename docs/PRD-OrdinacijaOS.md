@@ -574,15 +574,15 @@ Online naplata usluga pacijentima (avans preko portala): **nadogradnja poslije**
 
 ### Faza 1 — Foundation
 
-> Progress (2026-07-12): **1–3** done (repo, RLS schema, auth+MFA+invites+PIN). **4** partial (plans seeded + invite limit hard-block). **5–7** not started.
+> Progress (2026-07-13): **1–4** done (repo, RLS, auth+MFA+invites+PIN, entitlements feature gates + location/image helpers). **5** not started (super-admin). **6–7** done (marketing skeleton, Sentry+PostHog wiring).
 
 1. ~~Greenfield repo (Next.js, Supabase, i18n BS/EN, shadcn)~~
 2. ~~Multi-tenant schema + RLS~~
 3. ~~Auth, owner 2FA, invites, PIN operators~~
-4. Plans / entitlements *(seed + invite limits; full feature gates TBD)*
+4. ~~Plans / entitlements~~ *(feature gates + free-2026 overrides; location/image hard-block helpers; invite limits)*
 5. Super-admin skeleton
-6. Marketing site skeleton + signup
-7. Sentry + PostHog (bez PII)
+6. ~~Marketing site skeleton + signup~~
+7. ~~Sentry + PostHog (bez PII)~~ *(SDK wired; aktivno kad su DSN/key u env)*
 
 ### Faza 2 — Core clinical & finance
 
@@ -630,7 +630,7 @@ Online naplata usluga pacijentima (avans preko portala): **nadogradnja poslije**
 - [x] Owner može uraditi signup bez kartice i dobiti clinic s `trial_ends_at=2026-12-31`
 - [x] Owner pozove doktora i recepciju emailom; oni postave lozinku i uđu s ispravnom rolom
 - [x] Shared reception: PIN switch radi; audit bilježi operatora
-- [ ] Plan limiti hard-blockaju 6. doktora / 11. usera / 3. lokaciju na Pro *(user/doctor hard-block na invite; location limit još nije)*
+- [x] Plan limiti hard-blockaju 6. doktora / 11. usera / 3. lokaciju na Pro *(helpers: invite users/doctors + `assertCanCreateLocation`; location UI create još nije; image helper spreman za storage modul)*
 - [ ] Pacijent karton: alergije, dokumenti, RTG WebP, FDI odontogram, plan terapije
 - [ ] Termin se kreira s default trajanjem usluge; overlap istog doktora je blokiran
 - [ ] Faktura PDF s brojem, PDV, logom; uplata partial/paid; plan rata
@@ -642,7 +642,7 @@ Online naplata usluga pacijentima (avans preko portala): **nadogradnja poslije**
 - [ ] Klinika A ne može pročitati podatke klinike B (automatski test)
 - [ ] Storage objekti nisu javno listable; samo signed URL
 - [ ] Full responsive: login, kalendar, karton, faktura na mobilnom
-- [ ] Marketing: pricing vidljiv, CTA signup, Privacy/Terms/DPA linkovi, cookie banner
+- [x] Marketing: pricing vidljiv, CTA signup, Privacy/Terms/DPA linkovi, cookie banner *(skeleton: landing + pricing + signup CTA; Privacy/Terms/cookie banner TBD)*
 
 ### 12.2 E2E prioritet (CI release blockers)
 

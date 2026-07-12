@@ -11,14 +11,56 @@ export type PlanLimits = {
   images_per_patient: number | null;
 };
 
+export type StaffUsage = { users: number; doctors: number };
+
 export type LimitCheck =
-  | { ok: true; limits: PlanLimits; usage: { users: number; doctors: number } }
+  | { ok: true; limits: PlanLimits; usage: StaffUsage }
   | {
       ok: false;
       code: "userLimit" | "doctorLimit";
       limits: PlanLimits;
-      usage: { users: number; doctors: number };
+      usage: StaffUsage;
     };
+
+export type LocationLimitCheck =
+  | { ok: true; limits: PlanLimits; usage: { locations: number } }
+  | {
+      ok: false;
+      code: "locationLimit";
+      limits: PlanLimits;
+      usage: { locations: number };
+    };
+
+export type ImageLimitCheck =
+  | {
+      ok: true;
+      limits: PlanLimits;
+      usage: { images: number };
+    }
+  | {
+      ok: false;
+      code: "imageLimit";
+      limits: PlanLimits;
+      usage: { images: number };
+    };
+
+async function getClinicPlanLimits(
+  supabase: Client,
+  clinicId: string,
+): Promise<PlanLimits> {
+  const { data: clinic, error: clinicError } = await supabase
+    .from("clinics")
+    .select("plan_id, plans(limits_json)")
+    .eq("id", clinicId)
+    .single();
+
+  if (clinicError || !clinic) {
+    throw new Error(clinicError?.message ?? "Clinic not found");
+  }
+
+  const plan = clinic.plans as { limits_json: Json } | null;
+  return parseLimitsJson(plan?.limits_json ?? {});
+}
 
 function asLimit(value: Json | undefined): number | null {
   if (value === null || value === undefined) return null;
@@ -53,18 +95,7 @@ export async function assertCanInviteStaff(
     p_clinic_id: clinicId,
   });
 
-  const { data: clinic, error: clinicError } = await supabase
-    .from("clinics")
-    .select("plan_id, plans(limits_json)")
-    .eq("id", clinicId)
-    .single();
-
-  if (clinicError || !clinic) {
-    throw new Error(clinicError?.message ?? "Clinic not found");
-  }
-
-  const plan = clinic.plans as { limits_json: Json } | null;
-  const limits = parseLimitsJson(plan?.limits_json ?? {});
+  const limits = await getClinicPlanLimits(supabase, clinicId);
 
   const [{ data: profiles }, { data: invites }] = await Promise.all([
     supabase
@@ -102,4 +133,60 @@ export async function assertCanInviteStaff(
   }
 
   return { ok: true, limits, usage };
+}
+
+/**
+ * Hard-block location count before create (D8).
+ * Call from location create Server Action when that module ships.
+ */
+export async function assertCanCreateLocation(
+  supabase: Client,
+  clinicId: string,
+): Promise<LocationLimitCheck> {
+  const limits = await getClinicPlanLimits(supabase, clinicId);
+
+  const { count, error } = await supabase
+    .from("clinic_locations")
+    .select("id", { count: "exact", head: true })
+    .eq("clinic_id", clinicId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const locations = count ?? 0;
+  const usage = { locations };
+
+  if (limits.locations !== null && locations >= limits.locations) {
+    return { ok: false, code: "locationLimit", limits, usage };
+  }
+
+  return { ok: true, limits, usage };
+}
+
+/**
+ * Hard-block images/RTG per patient (D22).
+ * Pass current image count for the patient — storage module will supply it.
+ */
+export function assertCanAddPatientImage(
+  limits: PlanLimits,
+  currentImageCount: number,
+): ImageLimitCheck {
+  const usage = { images: currentImageCount };
+
+  if (
+    limits.images_per_patient !== null &&
+    currentImageCount >= limits.images_per_patient
+  ) {
+    return { ok: false, code: "imageLimit", limits, usage };
+  }
+
+  return { ok: true, limits, usage };
+}
+
+export async function getClinicLimits(
+  supabase: Client,
+  clinicId: string,
+): Promise<PlanLimits> {
+  return getClinicPlanLimits(supabase, clinicId);
 }

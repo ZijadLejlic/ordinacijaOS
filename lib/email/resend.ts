@@ -9,7 +9,14 @@ function appUrl() {
 }
 
 function fromAddress() {
-  return process.env.EMAIL_FROM ?? "OrdinacijaOS <onboarding@resend.dev>";
+  const from = process.env.EMAIL_FROM;
+  if (!from) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("Missing EMAIL_FROM");
+    }
+    return "OrdinacijaOS <onboarding@resend.dev>";
+  }
+  return from;
 }
 
 export type StaffInviteEmailInput = {

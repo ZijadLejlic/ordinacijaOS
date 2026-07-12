@@ -45,6 +45,9 @@ Zaključati **kako** gradimo OrdinacijaOS (stack, patterni, granice), da agent/d
 | Validacija | Zod |
 | Deploy target | TBD |
 | Auth (Faza 1) | Email/password signup+login; `create_clinic_for_owner` RPC; owner TOTP MFA (D11); staff invites D9 (`/settings/users`, `/invite/[token]`); PIN operators D10 (`/pin`, bcrypt via pgcrypto RPCs); Resend; plan limit hard-block via `lib/entitlements/` |
+| Entitlements (Faza 1) | `lib/entitlements/` — `getClinicEntitlements` / `assertFeature` from `plan_entitlements`; free-2026 override (SMS/AI/portal off); `assertCanInviteStaff`, `assertCanCreateLocation`, `assertCanAddPatientImage` |
+| Marketing (Faza 1) | `(marketing)/` landing + `/pricing` + signup CTA; display prices mirror PRD §4.1 |
+| Observability (Faza 1) | Sentry (`instrumentation*.ts`, optional DSN); PostHog (`lib/analytics/posthog.ts`, EU host, no patient PII) |
 
 Env template: `.env.example` → kopirati u `.env.local`.
 
@@ -160,8 +163,8 @@ Iz PRD §10 / Decision Log — posebno u 2026 free MVP:
 
 ## 9. Observability
 
-- Sentry: greške
-- PostHog: `clinic_id`, `role`, event names — **bez** patient PII (D33)
+- Sentry: greške; tag `clinic_id` / `role` via `setClinicErrorContext` (bez patient PII)
+- PostHog: `clinic_id`, `role`, event names — **bez** patient PII (D33); EU host default; disabled bez `NEXT_PUBLIC_POSTHOG_KEY`
 - Support: email `support@` (D44)
 
 ---
@@ -187,3 +190,4 @@ Prati PRD §11. Tech doc se širi po fazama; ne specifikovati Enterprise module 
 | 2026-07-12 | Scaffold: Next 16 + next-intl + shadcn base-nova + Supabase clients |
 | 2026-07-12 | D9 staff invites: Resend + entitlements hard-block + `/settings/users` + `/invite/[token]` |
 | 2026-07-12 | D10 PIN operators: bcrypt RPCs, `/pin` gate, audit operator_id, Vitest smoke |
+| 2026-07-13 | Entitlements feature gates + location/image helpers; marketing skeleton; Sentry+PostHog wiring |

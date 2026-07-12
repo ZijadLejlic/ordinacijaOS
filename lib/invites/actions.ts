@@ -414,6 +414,16 @@ export async function resetUserPasswordAction(
     return { error: linkError?.message ?? "resetFailed" };
   }
 
+  await supabase.from("audit_events").insert({
+    clinic_id: profile.clinic_id,
+    actor_user_id: user!.id,
+    event_name: "user.password_reset_requested",
+    payload_json: {
+      profile_id: profileId,
+      status: "requested",
+    },
+  });
+
   const clinicName = await loadClinicName(supabase, profile.clinic_id);
 
   try {
@@ -424,17 +434,20 @@ export async function resetUserPasswordAction(
       resetUrl: linkData.properties.action_link,
     });
   } catch (err) {
+    await supabase.from("audit_events").insert({
+      clinic_id: profile.clinic_id,
+      actor_user_id: user!.id,
+      event_name: "user.password_reset_requested",
+      payload_json: {
+        profile_id: profileId,
+        status: "email_failed",
+        error: err instanceof Error ? err.message : "emailFailed",
+      },
+    });
     return {
       error: err instanceof Error ? err.message : "emailFailed",
     };
   }
-
-  await supabase.from("audit_events").insert({
-    clinic_id: profile.clinic_id,
-    actor_user_id: user!.id,
-    event_name: "user.password_reset_requested",
-    payload_json: { profile_id: profileId },
-  });
 
   revalidatePath(`/${locale}/settings/users`);
   return { message: "resetSent" };

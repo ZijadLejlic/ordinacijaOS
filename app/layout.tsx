@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,9 +12,17 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const marketingDisplay = Fraunces({
+  variable: "--font-marketing-display",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
-  title: "OrdinacijaOS",
-  description: "Multi-tenant dental SaaS",
+  title: {
+    default: "OrdinacijaOS",
+    template: "%s · OrdinacijaOS",
+  },
+  description: "Cloud softver za stomatološke ordinacije",
 };
 
 export default function RootLayout({
@@ -23,8 +31,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html
+      className={`${geistSans.variable} ${geistMono.variable} ${marketingDisplay.variable} h-full antialiased`}
+    >
+      <body className="flex min-h-full flex-col">{children}</body>
     </html>
   );
 }
