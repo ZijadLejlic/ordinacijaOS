@@ -1,0 +1,16 @@
+---
+description: Multi-tenant isolation, RLS, PII, roles — never bypass clinic boundaries
+alwaysApply: true
+---
+
+# Multi-tenant & security
+
+- Every business row has `clinic_id`. Users see only their clinic (RLS). No cross-clinic membership in v1 (D7).
+- Never put Supabase **service role** keys in client code. Service role = server only; super-admin impersonation must be audited (D41).
+- Never bypass RLS “for convenience”. Fix policies / use correct client instead.
+- Roles: respect RBAC from PRD (owner / doctor / reception / etc.). Owner MFA required; others not (D11).
+- Storage paths: `clinic_id / patient_id / ...`; private buckets + signed URLs (D21).
+- Analytics/logs: **no patient names**; use `clinic_id`, role, event names (D33).
+- GDPR hard delete only with owner approval flow (D35).
+- Peer amounts visibility is a clinic setting — do not assume doctors see all money (D17).
+- Plan limits are hard blocks + upsell (D8), not soft warnings only.

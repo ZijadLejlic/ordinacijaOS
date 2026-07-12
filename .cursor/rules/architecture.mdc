@@ -1,0 +1,15 @@
+---
+description: Next.js / OrdinacijaOS architecture — server-first, Server Actions, App Router
+globs: app/**/*.{ts,tsx}, lib/**/*.{ts,tsx}, utils/**/*.{ts,tsx}, middleware.ts
+alwaysApply: false
+---
+
+# Architecture
+
+- This is Next.js App Router with breaking changes vs older Next — read `node_modules/next/dist/docs/` before non-trivial APIs.
+- Server-first: RSC by default; Client Components only for forms, widgets, interactive UI.
+- Dashboard mutations → **Server Actions** (no internal REST CRUD for app mutations).
+- Route Handlers only for: streaming, PDF download, webhooks, similar edge cases.
+- Validate inputs with Zod on server boundaries.
+- Follow existing folder conventions; do not introduce new architectural patterns without updating Tech docs.
+- Multi-tenant: every business query/mutation is scoped by `clinic_id`.

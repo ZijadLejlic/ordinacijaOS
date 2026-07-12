@@ -1,0 +1,783 @@
+# PRD — OrdinacijaOS
+
+## Multi-tenant Dental SaaS za stomatološke ordinacije
+
+> **Napomena:** Ovo je izvorni poslovni dokument (PRD + SoW-lite) za greenfield proizvod **OrdinacijaOS**. Nije dio Avicena single-clinic projekta. Tehnička arhitektura ide u budući `Tech-OrdinacijaOS.md`; database schema u budući `DB-OrdinacijaOS.md` (novi repo). Ovaj fajl se kasnije kopira u greenfield repozitorij.
+
+---
+
+## 0. Kontrola dokumenta
+
+| Polje | Vrijednost |
+|---|---|
+| Naziv projekta | OrdinacijaOS |
+| Verzija dokumenta | 1.0 |
+| Datum | 10. juli 2026. |
+| Status | Odobreno za implementaciju (discovery zaključen) |
+| Tip dokumenta | PRD + SoW-lite |
+| Proizvod | Cloud SaaS za stomatološke ordinacije |
+| Izvođač | Platform owner / developer |
+| Repozitorij | Greenfield (novi repo; nije Avicena) |
+| Domen | TBD (kupovina nakon finalnog imena brenda) |
+| Primarni market | Balkan → zatim globalno |
+| UI jezici (start) | BS (default), EN |
+| Valuta prikaza | EUR (cijene prikazane sa PDV-om) |
+
+---
+
+## 0.1 Decision Log (zaključano)
+
+Odluke su finalne za v1 planiranje. Agent/developer **ne nagađa** mimo ovog loga.
+
+| # | Tema | Odluka |
+|---|---|---|
+| D1 | Proizvod | Greenfield SaaS **OrdinacijaOS**; Avicena samo UX/pattern referenca |
+| D2 | MVP paket | **Professional** (25€/mj prikaz); branding uključen |
+| D3 | Van MVP u free periodu | Bez AI, bez SMS/WhatsApp, bez patient portala |
+| D4 | Free trial | Self-signup, bez plaćanja; svi nalozi kreirani do 31.12.2026 = free do kraja 2026 |
+| D5 | Billing start | Stripe online plaćanje od **1.1.2027**; do tada samo evidencija uplata u app |
+| D6 | Nakon isteka free | 7 dana read-only → export → brisanje |
+| D7 | Tenant model | 1 user = 1 klinika; owner vidi sve lokacije klinike |
+| D8 | Professional limiti | ≤5 doktora, ≤10 korisnika, ≤2 lokacije; **hard block** + upsell alert |
+| D9 | Staff nalozi | Invite-by-email (magic link) → set password → role |
+| D10 | Shared desk | Reception/assistant: shared nalog + **PIN quick switch** operatora |
+| D11 | 2FA | Obavezno samo za **owner**; ostali ne |
+| D12 | Session | TTL **7 dana**; owner može force logout svih sesija klinike |
+| D13 | Lockout | 5 failed logins → notifikacija owneru |
+| D14 | Kalendar | Termin vezan za **doktora**; stolice nisu u MVP; hard block overlap |
+| D15 | Trajanje termina | Default po usluzi + ručna korekcija |
+| D16 | Cjenovnik / lokacije | Owner checkbox: isti cjenovnik na svim lokacijama ili odvojen |
+| D17 | Peer amounts | Per-clinic setting: doktori vide/ne vide tuđe KM |
+| D18 | Odontogram | Obavezan; **FDI** notacija; vezan uz tretmane/posjete |
+| D19 | Plan terapije | Jednostavan entitet u MVP (planned / in_progress / done / cancelled) |
+| D20 | Potpis saglasnosti | Draw signature na uređaju |
+| D21 | Storage | Private bucket + signed URLs; WebP kompresija; limiti po paketu |
+| D22 | Image limits | Starter 10 / Professional 20 / Premium 30 / Enterprise 40 (+10 po tieru) po pacijentu |
+| D23 | Email šabloni | Jedan default set BS/EN; klinika edituje tekst |
+| D24 | CRM light | Sistem notifikacije (birthday/recall/kontrola); **recepcija šalje** |
+| D25 | Waitlist | Automatski predloži sljedećeg kad se termin otkaže |
+| D26 | Online booking / mini site | Samo **Enterprise** (subdomain landing + kalendar slobodnih termina bez imena) |
+| D27 | Lab / technician | Samo najveći paket (Enterprise) |
+| D28 | Fiskalna kasa | Nije u app; fakture/PDF/računi jesu |
+| D29 | Finansije MVP | Fakture, PDV linije, serijski broj, uplate, dugovanja, rate/kalkulator, rashodi, Excel export |
+| D30 | Import | CSV pacijenti + usluge |
+| D31 | AI (kasnije) | Samo podaci te klinike; draft + doktor potvrđuje; opt-in u settings; klinika plaća usage; transcript 90 dana |
+| D32 | Metered | SMS, WhatsApp, AI, storage overage — klinika plaća (+15% platform fee ili own keys) |
+| D33 | Analytics | PostHog **bez** imena pacijenata (clinic_id, role, event) |
+| D34 | Data residency | EU-only (Supabase EU) |
+| D35 | GDPR delete | Hard delete iz baze uz **owner approval** |
+| D36 | Access log kartona | Ne (samo change audit) |
+| D37 | Jezici start | BS + EN |
+| D38 | Marketing site | Full (SEO, blog, pricing, signup CTA, reviews, case studies) |
+| D39 | Deploy model | Modul ide na produkciju čim je gotov; free period = testiranje s partnerima |
+| D40 | Responsive | Full responsive obavezno |
+| D41 | Super-admin | Impersonacija + audit; entitlements; billing flags |
+| D42 | Entitlements | Tabela `plans` → `features[]` (ne hardcode u UI) |
+| D43 | Onboarding | In-app 3 stepa prvo; PDF/video kasnije |
+| D44 | Support | Email na support@ (Resend na kupljenom domenu) |
+| D45 | Clinic close | Export → 7 dana grace → hard delete |
+| D46 | Phone default | +387 format default; owner može promijeniti country default (HR/SRB…) |
+| D47 | TZ default | `Europe/Sarajevo`; owner može promijeniti |
+| D48 | Godišnja pretplata (2027+) | 2 mjeseca gratis vs mjesečno |
+| D49 | Buyer | Primarno **vlasnik ordinacije** |
+| D50 | Security stance | Alat za evidenciju; medicinske odluke donosi doktor |
+| D51 | Cross-clinic membership | v1 ostaje **1 user = 1 klinika** (D7). **Poslije razmotriti**: `clinic_memberships` + aktivna klinika / switcher (npr. doktor u više ordinacija) |
+
+---
+
+## 1. Executive summary
+
+**OrdinacijaOS** je moderni cloud SaaS za stomatološke ordinacije. Cilj nije samo digitalni karton, nego pomoći ordinaciji da radi efikasnije i zaradi više: kalendar, kartoni, odontogram, fakture, dashboard, email podsjetnici, CRM light, branding.
+
+Razlikovanje od postojećih rješenja (alpinDent i slični):
+
+- bolji UX/UI
+- multi-tenant cloud od dana 1
+- jasni paketi i entitlements
+- put ka AI, portalu, marketingu i mini websiteu (kasnije paketi)
+- self-serve registracija i owner-managed staff
+
+**Do 31.12.2026:** svi koji se registruju dobijaju **Professional-level free trial** (bez AI, SMS, portala). Platform owner u tom periodu registruje firmu i priprema Stripe.
+
+**Od 1.1.2027:** online pretplata (Stripe). Neplaćeni nalozi: 7 dana read-only → export → brisanje.
+
+**MVP definicija uspjeha do kraja 2026:** Professional core moduli rade u produkciji; 2–3 design partner ordinacije aktivno testiraju; marketing site konvertuje na signup.
+
+---
+
+## 2. Poslovni ciljevi i KPI
+
+### 2.1 Ciljevi
+
+1. Omogućiti self-serve onboarding ordinacije za &lt;15 minuta.
+2. Zamijeniti papir/Excel/stari softver za dnevni rad (pacijenti, termini, fakture).
+3. Dati vlasniku jasan uvid u prihod, popunjenost i trendove.
+4. Izgraditi trust: tenant isolation, GDPR, audit, EU hosting.
+5. Pripremiti naplativ SaaS od 1.1.2027 bez major rewrite-a.
+
+### 2.2 KPI (2026 free period)
+
+| KPI | Cilj |
+|---|---|
+| Design partner ordinacije aktivne | ≥2–3 |
+| Time-to-first-appointment (nova klinika) | ≤30 min nakon signup-a |
+| Tenant isolation regressions | 0 u produkciji |
+| Signup → completed onboarding | ≥60% |
+| Critical E2E (signup, termin, faktura PDF) | 100% green prije svakog release-a koji dira te flow-ove |
+| Uptime | ≥99.5% |
+
+### 2.3 KPI (2027+ naplata)
+
+| KPI | Cilj |
+|---|---|
+| Conversion free→paid (jan 2027 cohort) | pratiti; target ≥40% partnera |
+| Monthly churn | &lt;5% |
+| Support first response | &lt;1 radni dan |
+
+---
+
+## 3. Personas i RBAC
+
+### 3.1 Uloge
+
+| Rola | Opis | Paket |
+|---|---|---|
+| `owner` | Vlasnik; finansije, useri, settings, branding, GDPR approve | Svi |
+| `doctor` | Pacijenti, karton, odontogram, plan terapije, svoji termini, tretmani | Svi |
+| `assistant` | Raspored, priprema pacijenata; shared + PIN | Pro+ |
+| `reception` | Termini, osnovni podaci, slanje reminder/CRM poruka; shared + PIN | Svi |
+| `accountant` | Finansije (fakture, uplate, rashodi, export) | Pro+ |
+| `technician` | Lab nalozi | **Samo Enterprise** |
+| `platform_admin` | Super-admin (van clinic UI) | Interni |
+
+### 3.2 Matrica pristupa (MVP Professional)
+
+| Modul | owner | doctor | assistant | reception | accountant |
+|---|---|---|---|---|---|
+| Dashboard KPI | Da | Ograničeno | Ne | Ograničeno | Finansijski |
+| Pacijenti / karton | Da | Da | Read/assist | Osnovno | Ne |
+| Odontogram / plan terapije | Da | Da | Read | Ne | Ne |
+| Kalendar | Da | Svoji (+ filter) | Da | Svi | Ne |
+| Fakture / uplate | Da | Ne* | Ne | Ne | Da |
+| Rashodi / Excel | Da | Ne | Ne | Ne | Da |
+| Email šabloni | Da | Ne | Ne | Read/send | Ne |
+| CRM notifikacije / waitlist | Da | Ne | Ne | Da | Ne |
+| Korisnici / invite | Da | Ne | Ne | Ne | Ne |
+| Settings / branding | Da | Ne | Ne | Ne | Ne |
+| Import CSV | Da | Ne | Ne | Ne | Da (usluge) |
+| Audit log UI | Da | Ne | Ne | Ne | Ne |
+
+\* Doktor može vidjeti iznose na **vlastitim** unosima; tuđi KM zavise od clinic settinga `doctors_see_peer_amounts`.
+
+### 3.3 Staff invite flow (zaključano)
+
+Moderni self-serve model:
+
+1. Owner završi signup → kreira se `clinic` + `owner` profil.
+2. Owner ide na **Settings → Korisnici → Pozovi**.
+3. Unosi email, puno ime, rolu; sistem šalje **magic link** (Resend).
+4. Pozvani postavlja lozinku i ulazi.
+5. Sistem enforce-a plan limite prije slanja invite-a (hard block + upsell).
+6. Owner može: deaktivirati, ponovo poslati invite, reset lozinke, force logout.
+
+**Shared reception / assistant:**
+
+- Jedan invited user nalog (broji se u limitu korisnika).
+- Owner definiše **operatore** (ime + PIN).
+- Nakon logina, obavezan PIN switch; aktivni operator se piše u audit (`actor_user_id` + `operator_id`).
+
+```text
+Owner_signup → Clinic_created → Invite_staff_email
+  → Magic_link_set_password → Role_assigned
+  → Optional_PIN_operators → Enforce_plan_limits
+```
+
+### 3.4 Auth pravila
+
+- Owner: username/email + password + **TOTP 2FA obavezno**.
+- Ostali: email + password (iz invite flow-a); 2FA nije obavezna.
+- Session refresh TTL: **7 dana**.
+- 5 uzastopnih failed login pokušaja na nalog → email/in-app notifikacija owneru; privremeni lock (npr. 15 min) na taj nalog.
+- Owner: **Force logout all clinic sessions**.
+
+---
+
+## 4. Paketi i entitlements
+
+### 4.1 Cjenovnik (prikazati na marketing siteu odmah)
+
+| Paket | Cijena | Namjena |
+|---|---|---|
+| Starter | 15€/mj | Male / solo ordinacije |
+| **Professional** | **25€/mj** | MVP i free trial default |
+| Premium AI | 35€/mj | AI + napredna analitika + inventar+ |
+| Custom / Enterprise | 60€/mj+ | Portal, mini site, lab, neograničeno, marketing |
+
+Godišnje (od 2027): ekvivalent **10 mjeseci** (2 gratis).
+
+Cijene u EUR, prikaz **sa PDV-om**. Tačan poreski tretman usklađuje se kad firma bude registrovana.
+
+### 4.2 Limiti (enforce hard)
+
+| Resurs | Starter | Professional | Premium AI | Enterprise |
+|---|---|---|---|---|
+| Doktori | 2 | 5 | 10 | Unlimited |
+| Korisnici | 3 | 10 | 25 | Unlimited |
+| Lokacije | 1 | 2 | 5 | Unlimited |
+| Slike/RTG po pacijentu | 10 | 20 | 30 | 40 |
+
+Prekoračenje: **nije dozvoljeno**. UI alert: “Za ovo treba veći paket”.
+
+### 4.3 Feature matrix (entitlements)
+
+| Feature key | Starter | Pro | Premium | Enterprise |
+|---|---|---|---|---|
+| `patients_chart` | ✓ | ✓ | ✓ | ✓ |
+| `odontogram` | ✓ | ✓ | ✓ | ✓ |
+| `treatment_plan` | ✓ | ✓ | ✓ | ✓ |
+| `calendar_basic` | ✓ | ✓ | ✓ | ✓ |
+| `calendar_advanced` | — | ✓ | ✓ | ✓ |
+| `invoices` | ✓ | ✓ | ✓ | ✓ |
+| `expenses_reports_excel` | — | ✓ | ✓ | ✓ |
+| `installments_calculator` | — | ✓ | ✓ | ✓ |
+| `email_reminders` | ✓ | ✓ | ✓ | ✓ |
+| `branding_custom` | — | ✓ | ✓ | ✓ |
+| `crm_light` | — | ✓ | ✓ | ✓ |
+| `waitlist_auto` | — | ✓ | ✓ | ✓ |
+| `consent_draw_sign` | — | ✓ | ✓ | ✓ |
+| `inventory_basic` | — | ✓ | ✓ | ✓ |
+| `sms_whatsapp` | — | metered* | metered* | metered* |
+| `ai_copilot` | — | — | opt-in metered | opt-in metered |
+| `patient_portal` | — | — | — | ✓ |
+| `mini_website` | — | — | — | ✓ |
+| `online_booking` | — | — | — | ✓ |
+| `lab_technician` | — | — | — | ✓ |
+| `marketing_campaigns` | — | — | — | ✓ |
+
+\* SMS/WhatsApp dostupni od Pro naviše kao **metered** add-on (nije u free MVP periodu dok se ne uključi naplata kanala).
+
+**Free trial 2026:** entitlements = **Professional**, minus `sms_whatsapp`, `ai_copilot`, `patient_portal` (portal ionako Enterprise).
+
+### 4.4 Metered billing (2027+)
+
+Dodatno se plaća (prikazati cijene + **+15%** platform fee), ili owner poveže **vlastite** API/Stripe keys i snosi trošak direktno:
+
+- SMS
+- WhatsApp
+- AI tokeni
+- Storage overage
+
+Prije slanja/metered akcije: UI pokazuje **procjenu troška** gdje je moguće.
+
+---
+
+## 5. Multi-tenant i data model (high-level)
+
+### 5.1 Principi
+
+- Jedna aplikacija, više klinika.
+- Svaki red poslovnih podataka ima `clinic_id`.
+- RLS na Postgresu: user vidi samo svoju kliniku.
+- 1 auth user ↔ 1 clinic (nema cross-clinic membership u v1).
+- Storage path: `clinic_id / patient_id / ...`
+- Super-admin koristi service role samo na serveru; impersonacija se auditira.
+
+### 5.2 Ključni entiteti (skica)
+
+```text
+clinics
+  id, name, plan_id, trial_ends_at, timezone, phone_country_default,
+  branding_json, settings_json, status (active|readonly|pending_delete)
+
+profiles
+  id → auth.users, clinic_id, role, full_name, is_active, mfa...
+
+clinic_operators   -- PIN quick switch za shared naloge
+  id, profile_id, display_name, pin_hash, is_active
+
+clinic_locations
+  id, clinic_id, name, address, ...
+
+plans / plan_entitlements / clinic_subscriptions
+
+patients, patient_allergies, patient_documents, patient_images
+odontogram_teeth / odontogram_events
+treatment_plans / treatment_plan_items
+services (optionally per location)
+appointments (doctor_id, patient_id, location_id, service_id?, status)
+appointment_waitlist
+invoices / invoice_lines / payments / payment_plans / expenses
+email_templates / outbound_messages
+consent_forms / consent_signatures
+audit_events
+clinic_invites
+```
+
+Detaljna schema, indeksi i RLS → budući `DB-OrdinacijaOS.md`.
+
+### 5.3 Clinic settings (checkbox / toggle primjeri)
+
+- `doctors_see_peer_amounts`
+- `shared_pricelist_across_locations`
+- `ai_enabled` (default **false** kad feature postoji)
+- radno vrijeme, timezone, phone country default
+- branding: logo URL, boje (background, text, accent)
+
+---
+
+## 6. Feature specs — MVP (Professional core)
+
+### 6.1 Signup i onboarding
+
+**Signup (marketing CTA):**
+
+- Email, lozinka, ime ordinacije, ime vlasnika
+- Kreira clinic + owner
+- `trial_ends_at = 2026-12-31` za sve signup-e u 2026
+- Bez payment stepa
+
+**In-app onboarding (3 stepa):**
+
+1. Osnovni podaci ordinacije + radno vrijeme
+2. Dodaj prve usluge (ili CSV import)
+3. Pozovi barem jednog doktora ili recepciju
+
+PDF/video tutorijali: kasnije.
+
+### 6.2 Pacijenti i karton
+
+- Kontakt, medicinska historija, alergije, napomene
+- Dokumenti (PDF), slike/RTG (WebP, max quality-preserving compression)
+- Limit slika po paketu (Pro = 20)
+- Historija tretmana / posjeta
+- GDPR: export JSON/ZIP; delete request → **owner must approve** → hard delete
+
+### 6.3 Odontogram (FDI)
+
+- Standardna FDI mapa (11–48)
+- Statusi zuba i površina; događaji vezani za posjetu/tretman
+- Obavezno u kartonu da se zna na kojem zubu je šta rađeno
+
+### 6.4 Plan terapije
+
+- Entitet odvojen od pojedinačne posjete
+- Stavke: usluga, zub (opciono), status `planned|in_progress|done|cancelled`, procjena cijene
+- Posjeta može “zatvoriti” stavku plana
+- Omogućava pregled budućeg rada bez miješanja s današnjom fakturom
+
+### 6.5 Kalendar
+
+- Veza: **doktor** (+ lokacija ako ih ima više)
+- View: dan / sedmica / mjesec
+- Default trajanje iz usluge; korekcija dozvoljena
+- Statusi: npr. `pending_confirmation`, `confirmed`, `completed`, `cancelled`, `no_show`
+- **Hard block** preklapanja istog doktora
+- Drag & drop (uz re-validaciju overlap-a)
+- Boje termina (po statusu ili usluzi)
+- Online booking **nije** u MVP (Enterprise)
+
+### 6.6 Waitlist
+
+- Pacijent na listu čekanja za doktora/uslugu/lokaciju
+- Na cancel: sistem automatski predloži / ponudi sljedećeg (notifikacija recepciji; opciono email pacijentu kad kanal postoji)
+
+### 6.7 Finansije
+
+- Fakture: serijski broj po klinici (`YYYY-####`), linije, PDV, logo/pečat na PDF
+- Statusi: `unpaid | partial | paid | void`
+- Uplate: način (gotovina/kartica/virman/ostalo) — **samo evidencija** do Stripe 2027
+- Dugovanja lista
+- **Plan rata / kalkulator** (iznos, broj rata, datumi, stanje)
+- Rashodi + profit pregled + Excel export (Pro)
+- Bez fiskalne kase / e-fiskalizacije u app
+
+### 6.8 Dashboard
+
+- Današnji termini, današnji prihod, broj pacijenata
+- Prihod po doktoru
+- Novi pacijenti / izgubljeni pacijenti
+- Mjesečni trendovi
+
+### 6.9 Email sistem
+
+- Default šabloni BS/EN (termin reminder, itd.) s `{{ime}}`, `{{datum}}`, …
+- Klinika edituje tekst (jedan set, ne per-user)
+- Slanje preko Resend (platform domen → kasnije clinic custom from po mogućnosti)
+- SMS/WhatsApp: kasnije, metered, klinika plaća
+
+### 6.10 CRM light
+
+- Sistem generiše in-app obavijesti: birthday, recall, kontrolni pregled
+- Recepcija eksplicitno šalje poruku
+- Ne šalje se potpuno autonomno bez ljudske akcije u MVP
+
+### 6.11 Dokumenti i saglasnosti
+
+- Predlošci dokumenata (Pro)
+- Potpis: **draw signature**
+- Čuvanje u private storage
+
+### 6.12 Inventar (basic Pro)
+
+- Stanje materijala
+- Low-stock upozorenje
+- Automatsko skidanje / barkod / rok: Premium+ (kasnije)
+
+### 6.13 Branding (Pro)
+
+- Logo u app headeru
+- Custom boje (pozadina, tekst, accent)
+- Bez custom domena za app
+
+### 6.14 Import
+
+- CSV pacijenti
+- CSV / lista usluga
+- Validacija + error report; dry-run pregled prije commit-a
+
+### 6.15 Audit log
+
+- Ko, šta, kada, stara/nova vrijednost
+- Obuhvat: pacijenti, termini, fakture, settings, user invite/deaktivacija, GDPR delete
+- Owner UI za pregled
+- Nema patient-facing “ko je gledao karton” access log u v1
+
+### 6.16 Notifikacije (in-app bell)
+
+- CRM eventi, waitlist, nova rezervacija na odobrenje (kad Enterprise booking postoji), security (failed logins), trial expiry upozorenja
+
+---
+
+## 7. Marketing website (kritično)
+
+Javni prodajni site OrdinacijaOS (isti Next.js projekat, public route group).
+
+### 7.1 Jezici i SEO
+
+- BS + EN
+- Full SEO: meta, sitemap, OG, blog
+- Cookie consent + analytics (PostHog i/ili Plausible)
+
+### 7.2 Stranice (v1)
+
+- Home (hero brand-first, jedan CTA)
+- Funkcije
+- Paketi / Pricing (sve 4 cijene vidljive + badge “Free do 31.12.2026”)
+- Zašto OrdinacijaOS / case studies
+- Demo (screenshots + live demo seed klinika)
+- Blog
+- Recenzije (sekcija; puni se nakon feedbacka ~10 dana od signup-a)
+- FAQ
+- Kontakt + **Pozovi me** forma
+- Signup (direktno iz CTA)
+- Privacy Policy, Terms of Service, DPA (obraditelj)
+
+### 7.3 CTA
+
+Primarni: **Registruj ordinaciju** → odmah signup (ne “zakazivanje dema” kao jedini put).  
+Sekundarni: Pozovi me / kontakt.
+
+### 7.4 Social proof
+
+- Početi bez imenovanih klijenata ako nema dozvole
+- Kako stižu klijenti: tražiti feedback nakon ~10 dana → ubaciti u recenzije uz dozvolu
+
+### 7.5 Email
+
+- Resend na kupljenom domenu
+- `support@`, transactional (invite, reminder, security), marketing po potrebi
+
+---
+
+## 8. Security, GDPR, backup, monitoring
+
+### 8.1 Security
+
+- Supabase Auth + RLS na svim clinic tabelama
+- Private storage; **signed URLs** (kratki TTL); nikad public medical files
+- Owner 2FA (TOTP)
+- Lockout + owner alert nakon 5 failova
+- Force logout
+- Secrets samo server-side; odvojen staging/prod
+- AI (kad postoji): draft-only; disclaimer “alat za evidenciju, odluku donosi doktor”
+- Tenant isolation automated tests = **release blocker**
+- Platform admin impersonation uvijek u `audit_events`
+
+### 8.2 GDPR / privacy
+
+- EU data residency
+- Patient data export
+- Erasure: request → owner approval → hard delete DB + storage objekte te klinike/pacijenta
+- Privacy controls u settings
+- PostHog: **bez imena pacijenata**; koristiti `clinic_id`, `role`, feature event names
+- Cookie banner na marketing siteu
+
+### 8.3 Backup
+
+- Platform: Supabase automated backups
+- Clinic: on-demand **export ZIP** (pacijenti, računi, dokumenti meta) za owner-a
+- Pri zatvaranju naloga: export → 7 dana grace → hard delete
+
+### 8.4 Monitoring & analytics
+
+- Sentry: greške (tag `clinic_id` gdje je safe)
+- PostHog: product analytics (anonimizirano)
+- Support: email `support@`
+
+### 8.5 Incident response (v1 ručni)
+
+1. Detekcija (Sentry / report)
+2. Platform owner procjenjuje scope
+3. Obavijest **clinic owner**-u u cilju **≤72h** ako je personal data breach
+4. Owner odlučuje o komunikaciji prema pacijentima (uz smjernice)
+5. Post-incident zapis u internom logu
+
+Formalni playbook kasnije; proces postoji od dana 1.
+
+---
+
+## 9. Billing timeline
+
+| Period | Ponašanje |
+|---|---|
+| Do 31.12.2026 | Self-signup free; Professional entitlements (bez AI/SMS/portal); nema Stripe charge |
+| 1.1.2027 | Stripe pretplate aktivne; trial/grace pravila za postojeće |
+| Neplaćeno nakon free/trial | 7 dana **read-only** → export dostupan → brisanje |
+| Metered add-ons | Uključeno uz transparentan +15% ili own keys |
+
+Svi nalozi kreirani prije 1.1.2027 tretiraju se kao free do kraja 2026.
+
+Online naplata usluga pacijentima (avans preko portala): **nadogradnja poslije** core Stripe pretplata.
+
+---
+
+## 10. Out of scope (eksplicitno)
+
+| Stavka | Napomena |
+|---|---|
+| Fiskalna kasa / državna fiskalizacija | Van app |
+| Patient portal u MVP | Enterprise |
+| Mini website / online booking u MVP | Enterprise |
+| AI Copilot / AI doktor / AI recepcija | Premium+ |
+| SMS/WhatsApp u 2026 free MVP | Kasnije metered |
+| Stolice kao kalendar resurs | Nije MVP (termin = doktor) |
+| Cross-clinic user membership | Nije v1; **poslije razmotriti** (D51) — doktori u više ordinacija |
+| Custom domen za clinic app | Ne; Enterprise site = subdomain platforme |
+| Lab/technician modul | Enterprise |
+| Google/Outlook sync | Kasnije |
+| Računovodstveni ERP konektori | Nije planirano dok market ne traži |
+| Avicena DB / shared tenant | Zabranjeno |
+
+---
+
+## 11. Phased roadmap
+
+### Faza 1 — Foundation
+
+> Progress (2026-07-12): **1–3** done (repo, RLS schema, auth+MFA+invites+PIN). **4** partial (plans seeded + invite limit hard-block). **5–7** not started.
+
+1. ~~Greenfield repo (Next.js, Supabase, i18n BS/EN, shadcn)~~
+2. ~~Multi-tenant schema + RLS~~
+3. ~~Auth, owner 2FA, invites, PIN operators~~
+4. Plans / entitlements *(seed + invite limits; full feature gates TBD)*
+5. Super-admin skeleton
+6. Marketing site skeleton + signup
+7. Sentry + PostHog (bez PII)
+
+### Faza 2 — Core clinical & finance
+
+8. Pacijenti, dokumenti, slike (WebP), odontogram FDI
+9. Plan terapije
+10. Kalendar (hard block, views, waitlist)
+11. Fakture, uplate, rate, PDF
+12. Rashodi, dashboard KPI, Excel
+13. Lokacije + shared pricelist toggle
+14. Branding
+15. CSV import
+16. In-app onboarding
+
+### Faza 3 — SaaS ops & trust
+
+17. Email šabloni + reminderi
+18. CRM light notifikacije
+19. Audit log UI
+20. GDPR export/delete (owner approve)
+21. Clinic export ZIP / backup UX
+22. Trial expiry → readonly → delete job
+23. E2E + tenant isolation CI
+24. Consent draw-sign + doc templates
+25. Inventar basic
+
+### Faza 4 — Premium / Enterprise / 2027 billing
+
+26. Stripe subscriptions + metered
+27. AI copilot (opt-in, draft, 90d transcripts)
+28. SMS/WhatsApp metered
+29. Patient portal + OTP/magic link
+30. Mini website subdomain + online booking (confirm by staff)
+31. Lab/technician
+32. Marketing campaigns / loyalty
+33. Advanced analytics (LTV, no-show, predikcije)
+
+**Release politika 2026:** završen modul → produkcija → partner UAT; free period služi testiranju.
+
+---
+
+## 12. Acceptance criteria i test plan
+
+### 12.1 MVP acceptance (Professional core)
+
+- [x] Owner može uraditi signup bez kartice i dobiti clinic s `trial_ends_at=2026-12-31`
+- [x] Owner pozove doktora i recepciju emailom; oni postave lozinku i uđu s ispravnom rolom
+- [x] Shared reception: PIN switch radi; audit bilježi operatora
+- [ ] Plan limiti hard-blockaju 6. doktora / 11. usera / 3. lokaciju na Pro *(user/doctor hard-block na invite; location limit još nije)*
+- [ ] Pacijent karton: alergije, dokumenti, RTG WebP, FDI odontogram, plan terapije
+- [ ] Termin se kreira s default trajanjem usluge; overlap istog doktora je blokiran
+- [ ] Faktura PDF s brojem, PDV, logom; uplata partial/paid; plan rata
+- [ ] Dashboard prikazuje današnje KPI i prihod po doktoru
+- [ ] Email reminder šablon edit + slanje (test)
+- [ ] Branding: logo + boje vidljivi u app shellu
+- [ ] CSV import pacijenata i usluga
+- [ ] GDPR export; delete zahtjev čeka owner approve pa hard delete
+- [ ] Klinika A ne može pročitati podatke klinike B (automatski test)
+- [ ] Storage objekti nisu javno listable; samo signed URL
+- [ ] Full responsive: login, kalendar, karton, faktura na mobilnom
+- [ ] Marketing: pricing vidljiv, CTA signup, Privacy/Terms/DPA linkovi, cookie banner
+
+### 12.2 E2E prioritet (CI release blockers)
+
+1. **Signup → create clinic → onboarding step 1**
+2. **Zakazivanje termina** (doctor + patient + no overlap)
+3. **Kreiranje fakture + PDF download**
+
+Dodatni blocker: **tenant isolation** suite (clinic A vs B na patients, appointments, storage paths).
+
+### 12.3 UAT
+
+- Testeri: platform owner + 1 doktor + 1 recepcija iz partner ordinacije
+- Demo seed klinika (“Demo Dental”) za sales/test, odvojena od pravih tenanata
+- Shadow mode: partneri mogu paralelno 7–14 dana po svom tempu (nije hard gate)
+- Bug report: email na `support@`
+
+### 12.4 Performance targets
+
+- Kalendar (5 doktora, 1 dan): &lt; 2s
+- Pretraga pacijenata: &lt; 1s
+
+### 12.5 Regression
+
+- CI: lint, typecheck, unit, Playwright E2E (tri flow-a + isolation)
+- Ručni smoke checklist za module bez E2E pokrivenosti
+
+---
+
+## 13. Legal appendix (draft — za pravni review)
+
+> **Upozorenje:** Tekstovi ispod su radni draftovi prilagođeni OrdinacijaOS modelu (SaaS, EU, medicinska evidencija kao alat). Nisu zamjena za advokata. Prije produkcijskog naplatnog perioda (2027) obavezna pravna revizija u nadležnoj jurisdikciji (BiH / ciljna država firme).
+
+### 13.1 Privacy Policy — outline + draft clauses
+
+**Svrha:** Obavijestiti korisnike (ordinacije) i posjetioce marketing sitea kako OrdinacijaOS obrađuje podatke.
+
+**Sekcije:**
+
+1. Ko smo (controller vs processor)
+2. Koje podatke prikupljamo (account, clinic, patient data uneseni od klinike, usage analytics, cookies)
+3. Pravni osnovi (ugovor, legitimni interes, pristanak za cookies/marketing)
+4. Uloga klinike: klinika je **voditelj obrade** za podatke pacijenata; OrdinacijaOS je **obradaitelj**
+5. Čuvanje i lokacija (EU)
+6. Djelioci (Supabase, Vercel, Resend, Sentry, PostHog, Stripe od 2027)
+7. Periodi čuvanja (trial, pretplata, nakon brisanja, AI transcript 90 dana)
+8. Prava ispitanika (pristup, ispravka, brisanje, prenosivost, prigovor)
+9. Sigurnost (šifrovanje u tranzitu, RLS, access control)
+10. Djeca / maloljetnici (podaci samo preko klinike)
+11. Kontakt za privacy zahtjeve
+12. Izmjene politike
+
+**Draft — uloge:**
+
+> Kada stomatološka ordinacija (“Klinika”) unosi podatke o pacijentima u OrdinacijaOS, Klinika određuje svrhu i sredstva obrade tih podataka i djeluje kao voditelj obrade. OrdinacijaOS pruža softver i infrastrukturu i djeluje kao obradaitelj u skladu s Ugovorom o obradi podataka (DPA). Za podatke o korisničkim nalozima Klinike i podatke prikupljene na marketing stranici, OrdinacijaOS može djelovati kao voditelj obrade.
+
+**Draft — analytics:**
+
+> Koristimo alate za analitiku proizvoda kako bismo razumjeli korištenje funkcija. Ne šaljemo imena i prezimena pacijenata u analytics alate. Identifikatori događaja vezani su za kliniku i ulogu korisnika, ne za identitet pacijenta.
+
+### 13.2 Terms of Service — outline + draft clauses
+
+**Sekcije:**
+
+1. Prihvatanje uslova
+2. Opis usluge (SaaS za upravljanje ordinacijom)
+3. Nalozi i odgovornost Klinike za staff pristup (uključujući shared PIN)
+4. Free trial do 31.12.2026; kasnije plaćene pretplate
+5. Prihvatljiva upotreba (zabrana zloupotrebe, pokušaja bypass RLS, skeniranja)
+6. Medicinski disclaimer
+7. Intelektualno vlasništvo
+8. Korisnički sadržaj i licenca za hosting
+9. Naknade, PDV, metered troškovi, neplaćanje → readonly → brisanje
+10. Suspendovanje i raskid
+11. Ograničenje odgovornosti
+12. Odšteta
+13. Mjerodavno pravo / sporovi (TBD po registraciji firme)
+14. Kontakt
+
+**Draft — medicinski disclaimer:**
+
+> OrdinacijaOS je softverski alat za evidenciju i administraciju. Ne pruža medicinski savjet, dijagnozu ni terapiju. Sve kliničke odluke donosi ovlašteni zdravstveni radnik. AI funkcije (ako su uključene) generišu nacrte koje korisnik mora pregledati i potvrditi prije spremanja u karton.
+
+**Draft — trial i brisanje:**
+
+> Tokom besplatnog perioda do 31.12.2026. usluga se pruža “as is” radi evaluacije. Nakon isteka plaćenog ili besplatnog perioda, OrdinacijaOS može prevesti nalog u režim samo-za-čitanje na do 7 dana, omogućiti izvoz podataka, a zatim trajno obrisati podatke Klinike u skladu s politikom čuvanja.
+
+### 13.3 DPA (Data Processing Agreement) — outline + draft clauses
+
+**Strane:** Klinika (Controller) ↔ OrdinacijaOS (Processor)
+
+**Sekcije:**
+
+1. Predmet i trajanje
+2. Priroda obrade (hosting, storage, email delivery, backup)
+3. Vrste podataka (identifikacioni, kontakt, zdravstveni podaci koje unese Klinika)
+4. Kategorije ispitanika (pacijenti, zaposleni Klinike)
+5. Obaveze Processor-a (upute Controller-a, povjerljivost, sigurnost, subprocessors)
+6. Lista podobradaitelja (Supabase, Vercel, Resend, …) + pravo na obavijest o izmjeni
+7. Međunarodni transferi (EU default; SCC ako ikad zatreba)
+8. Prava ispitanika — pomoć Controller-u
+9. Breach notification (cilj: bez nepotrebnog odgađanja, orijentir 72h prema Controller-u)
+10. Brisanje / povrat podataka nakon raskida
+11. Audit prava (razumni interval, NDA)
+12. Potpisi / prihvatanje pri signup-u (clickwrap)
+
+**Draft — upute:**
+
+> Processor obrađuje podatke pacijenata isključivo radi pružanja OrdinacijaOS usluge Klinici i po dokumentovanim uputama Controller-a (uključujući konfiguraciju u aplikaciji). Processor ne koristi podatke pacijenata za treniranje javnih AI modela trećih strana bez eksplicitnog ugovornog osnova i Controllera.
+
+### 13.4 Marketing site legal UX
+
+- Checkbox pri signup-u: prihvatam Terms + Privacy; DPA se smatra prihvaćenim kao dio Terms za processiranje patient data
+- Linkovi u footeru na svim public stranicama
+- Cookie banner: essential vs analytics consent
+
+---
+
+## 14. Open items
+
+| Stavka | Status |
+|---|---|
+| Finalni domen / pravno ime firme | TBD — kupovina domena kad se skonta brand |
+| Tačan PDV / poreski ID na fakturama platforme | Nakon registracije firme |
+| Mjerodavno pravo u Terms | Nakon registracije firme |
+| Vanjski pen-test prije masovne naplate 2027 | Preporučeno; timing TBD |
+| Exact metered unit cijene (SMS/AI) | Objaviti prije uključivanja kanala |
+
+---
+
+## 15. Reference
+
+- Discovery odluke: ovaj dokument §0.1 Decision Log
+- Konkurrentni kontekst: alpinDent i slični dental practice management alati
+- Avicena (`PRD.md`, `PRD2.md`): samo inspiracija za UX; **ne** dijeliti schema/tenant
+
+---
+
+*Kraj PRD OrdinacijaOS v1.0 — 10. juli 2026.*

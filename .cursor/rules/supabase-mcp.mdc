@@ -1,0 +1,12 @@
+---
+description: Use Supabase MCP for schema, SQL, RLS, and migrations — do not leave DB work to the user
+alwaysApply: true
+---
+
+# Supabase MCP
+
+- For anything Supabase-related (SQL, schema, RLS, migrations, advisors, logs, types), use the project Supabase MCP yourself.
+- Do not ask the user to run SQL or apply migrations manually unless MCP cannot do it.
+- If MCP cannot complete a step, say exactly what failed and what is blocked.
+- Prefer `list_tables` / existing schema before inventing tables.
+- After schema changes, check advisors when relevant (RLS, security).

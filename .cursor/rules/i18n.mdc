@@ -1,0 +1,13 @@
+---
+description: BS/EN i18n — no hardcoded user-facing copy outside message files
+globs: app/**/*.{ts,tsx}, components/**/*.{ts,tsx}, messages/**/*, i18n/**/*
+alwaysApply: false
+---
+
+# i18n
+
+- Locales: `bs` (default), `en`.
+- Route under `[locale]`; do not hardcode locale-less user-facing strings in UI.
+- Put copy in message catalogs; both BS and EN when adding UI text.
+- Dates/times: respect clinic timezone (default `Europe/Sarajevo`).
+- Phone inputs: default country `+387` unless clinic setting overrides.

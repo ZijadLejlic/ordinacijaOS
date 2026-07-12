@@ -1,0 +1,16 @@
+---
+description: shadcn/ui patterns — prefer existing primitives and MCP registry
+globs: **/*.{tsx,jsx}
+alwaysApply: false
+---
+
+# UI — shadcn/ui
+
+- Before adding UI, use the shadcn MCP to check availability and pull the latest (if MCP is configured; otherwise use `npx shadcn` + ui.shadcn.com).
+- Use the preset from `components.json` (do not invent a new preset).
+- Prefer `@/components/ui/*` before custom UI.
+- Follow ui.shadcn.com structure, composition, and naming.
+- Do not invent custom button, input, dialog, select, table, or form primitives if shadcn already provides them.
+- Reuse shadcn variants / CVA instead of ad-hoc styles.
+- Forms: shadcn form patterns + accessible labels and errors.
+- Full responsive is required (PRD D40).
