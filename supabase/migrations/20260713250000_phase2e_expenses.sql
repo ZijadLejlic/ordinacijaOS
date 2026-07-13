@@ -1,0 +1,20 @@
+-- Faza 2E — expenses (rashodi) + dashboard payment stats RPC (D29).
+--
+-- Applied to the remote Supabase project via MCP `apply_migration`
+-- under the names:
+--   - phase2e_expenses
+--   - phase2e_dashboard_payment_stats
+--   - phase2e_dashboard_payment_stats_tz
+--
+-- Summary:
+--   * Enum: expense_category (supplies/lab/rent/utilities/salaries/
+--     equipment/marketing/other)
+--   * Helpers: can_access_expenses(), can_write_expenses()
+--     (owner + accountant; anon EXECUTE revoked)
+--   * Table + RLS: expenses (void via UPDATE, no DELETE policy)
+--   * Restrictive owner MFA policy
+--   * RPC dashboard_payment_stats(...) — doctor-safe payment aggregates
+--     for KPI (respects doctors_see_peer_amounts / D17)
+--
+-- App gates feature `expenses_reports_excel` (Pro+) for UI + Excel.
+-- Dashboard KPIs are app-layer over appointments + this RPC + expenses.

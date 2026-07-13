@@ -1,0 +1,8 @@
+-- Faza 2D follow-up — revoke anon EXECUTE on invoice SECURITY DEFINER helpers.
+--
+-- Applied via MCP as: phase2d_invoices_revoke_anon (+ revoke_anon_fix)
+--
+-- revoke all on can_access_invoices / can_write_invoices /
+-- allocate_invoice_number / recompute_invoice_payment_status from public, anon;
+-- recompute trigger fn also revoked from authenticated (trigger-only);
+-- grant execute on access/write/allocate to authenticated only.

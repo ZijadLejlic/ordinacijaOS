@@ -19,10 +19,11 @@ const marketingDisplay = Fraunces({
 
 export const metadata: Metadata = {
   title: {
-    default: "OrdinacijaOS",
-    template: "%s · OrdinacijaOS",
+    default: "DentOrd",
+    template: "%s · DentOrd",
   },
   description: "Cloud softver za stomatološke ordinacije",
+  metadataBase: new URL("https://dentord.com"),
 };
 
 export default function RootLayout({

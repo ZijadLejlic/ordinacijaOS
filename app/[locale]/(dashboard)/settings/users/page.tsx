@@ -1,6 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
-import { Link } from "@/i18n/navigation";
 import {
   Card,
   CardContent,
@@ -79,16 +78,9 @@ export default async function SettingsUsersPage({ params }: Props) {
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-4 py-10">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <p className="text-muted-foreground text-sm">
-            <Link href="/dashboard" className="hover:underline">
-              {t("backDashboard")}
-            </Link>
-          </p>
-          <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
-          <p className="text-muted-foreground text-sm">{t("subtitle")}</p>
-        </div>
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
+        <p className="text-muted-foreground text-sm">{t("subtitle")}</p>
       </div>
 
       <Card>

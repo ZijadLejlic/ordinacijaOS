@@ -7,11 +7,12 @@ type Client = SupabaseClient<Database>;
 /**
  * Insert audit event with actor + optional active PIN operator (D10 / D33).
  * Payload must not include patient names for analytics-facing events.
+ * `clinicId` may be null for pure platform events (D41).
  */
 export async function writeAuditEvent(
   supabase: Client,
   opts: {
-    clinicId: string;
+    clinicId: string | null;
     actorUserId: string;
     eventName: string;
     payload?: Json;

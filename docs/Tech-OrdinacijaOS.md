@@ -1,4 +1,4 @@
-# Tech — OrdinacijaOS
+# Tech — DentOrd
 
 > Tehnička arhitektura. Produktni zahtjevi i Decision Log: `docs/PRD-OrdinacijaOS.md`.  
 > Schema: `docs/DB-OrdinacijaOS.md`.  
@@ -6,7 +6,7 @@
 
 | Polje | Vrijednost |
 |---|---|
-| Status | Skeleton (Faza 1) |
+| Status | Faza 3A email šabloni + reminderi done |
 | Izvor | PRD §0.1, §5, §8, §11 |
 | Ažurirati | Pri scaffoldu i svakoj arhitekturnoj odluci |
 
@@ -14,7 +14,7 @@
 
 ## 1. Cilj dokumenta
 
-Zaključati **kako** gradimo OrdinacijaOS (stack, patterni, granice), da agent/developer ne nagađa. Detalji featurea ostaju u PRD-u.
+Zaključati **kako** gradimo DentOrd (stack, patterni, granice), da agent/developer ne nagađa. Detalji featurea ostaju u PRD-u.
 
 ---
 
@@ -27,7 +27,7 @@ Zaključati **kako** gradimo OrdinacijaOS (stack, patterni, granice), da agent/d
 | UI | shadcn/ui + preset iz `components.json` | Ne inventisati nove primitive |
 | Validacija | Zod na server granicama | Server Actions / Route Handlers |
 | i18n | BS (default) + EN | Routing pod `[locale]` (D37) |
-| Email | Resend | Invite magic link, support@ (D9, D44) |
+| Email | Resend (`dentord.com`) | From `DentOrd <noreply@dentord.com>`; aliases `support@`, `hello@` (D9, D23, D44). Brand constants: `lib/brand/constants.ts` |
 | Errors | Sentry | Tag `clinic_id` gdje je safe |
 | Analytics | PostHog | Bez imena pacijenata (D33) |
 | Billing | Stripe od 1.1.2027 | Do tada bez charge (D4–D5) |
@@ -46,6 +46,19 @@ Zaključati **kako** gradimo OrdinacijaOS (stack, patterni, granice), da agent/d
 | Deploy target | TBD |
 | Auth (Faza 1) | Email/password signup+login; `create_clinic_for_owner` RPC; owner TOTP MFA (D11); staff invites D9 (`/settings/users`, `/invite/[token]`); PIN operators D10 (`/pin`, bcrypt via pgcrypto RPCs); Resend; plan limit hard-block via `lib/entitlements/` |
 | Entitlements (Faza 1) | `lib/entitlements/` — `getClinicEntitlements` / `assertFeature` from `plan_entitlements`; free-2026 override (SMS/AI/portal off); `assertCanInviteStaff`, `assertCanCreateLocation`, `assertCanAddPatientImage` |
+| Platform admin (Faza 1) | `(platform)/platform` — gate via `app_metadata.is_platform_admin` (never `user_metadata`); service-role clinic list/detail; plan + clinic/subscription status updates; owner impersonation with `audit_events` (D41) |
+| Clinic app shell (Faza 2A) | `(dashboard)/layout.tsx` + `components/dashboard/app-shell.tsx` — sidebar/mobile nav (RBAC: patients/services/settings), logout + PIN operator switch, impersonation banner |
+| Patients UI (Faza 2A) | `/patients` lista+search, `/patients/new`, `/patients/[id]` karton (alergije, PDF docs, WebP images + plan limit, FDI odontogram); storage bucket `patient-files`, signed URLs (D21) |
+| Services UI (Faza 2A) | `/services` — lista + search/status; owner CRUD (create/edit/activate); D16 `shared_pricelist_across_locations` → optional `location_id`; staff read-only |
+| Treatment plans (Faza 2B) | Na `/patients/[id]` — plan + stavke (usluga, opcionalni FDI, status planned/in_progress/done/cancelled, procjena EUR); RBAC kao odontogram; feature `treatment_plan` |
+| Calendar (Faza 2C) | `/calendar` — day/week/month; CRUD termina; hard overlap (DB EXCLUDE); DnD uz `calendar_advanced`; waitlist + auto-predlog na cancel uz `waitlist_auto`; `date-fns` + `date-fns-tz` (Europe/Sarajevo); custom grid (bez FullCalendar) |
+| Invoices (Faza 2D) | `/invoices` + `/invoices/[id]` — create/void, payments (cash/card/transfer/other), debts filter, installment plans (`installments_calculator`); PDF via `@react-pdf/renderer` stored on issue; download `GET /api/invoices/[id]/pdf`; RBAC owner/accountant; feature `invoices` |
+| Expenses + KPI + Excel (Faza 2E) | `/expenses` CRUD/void + profit; Excel `GET /api/reports/excel` (`exceljs`); dashboard KPI (today appts/revenue/patients, revenue by doctor, monthly trend); RBAC §3.2; feature `expenses_reports_excel` (Pro+); doctor payment aggregates via `dashboard_payment_stats` RPC (D17) |
+| Locations (Faza 2F) | `/settings/locations` — owner CRUD (soft deactivate); D8 hard-block via `assertCanCreateLocation` + DB trigger (active-only count); D16 `settings_json.shared_pricelist_across_locations` toggle (enabling clears `services.location_id`) |
+| Branding (Faza 2G) | `/settings/branding` — owner logo + colors (`branding_json`); feature `branding_custom` (Pro+); private bucket `clinic-branding`; applied in AppShell + invoice PDF |
+| CSV import (Faza 2H) | `/settings/import` — dry-run preview + commit; patients (owner); services (owner/accountant); CSV parse+Zod; max 500 rows / 1 MB; audit `*_csv_imported` (count only) |
+| Onboarding (Faza 2I) | `/onboarding` — owner 3-step wizard (clinic+hours → services/CSV → invite doctor|reception); `settings_json.onboarding` + `working_hours`; middleware force redirect; skip invite allowed |
+| Email (Faza 3A) | `/settings/email` — BS/EN `appointment_reminder` templates (`{{ime}}`…); owner edit; reception read/send; calendar manual send + test to self; `outbound_messages` log; feature `email_reminders` |
 | Marketing (Faza 1) | `(marketing)/` landing + `/pricing` + signup CTA; display prices mirror PRD §4.1 |
 | Observability (Faza 1) | Sentry (`instrumentation*.ts`, optional DSN); PostHog (`lib/analytics/posthog.ts`, EU host, no patient PII) |
 
@@ -89,6 +102,7 @@ app/
   [locale]/
     (marketing)/          # landing, pricing, signup CTA
     (auth)/               # login, invite accept, MFA
+    (onboarding)/         # owner 3-step wizard (Faza 2I)
     (dashboard)/          # clinic app
     (platform)/           # super-admin (odvojeno)
   api/                    # samo edge case Route Handlers
@@ -114,6 +128,7 @@ docs/
 ## 5. Auth i sesija (iz PRD)
 
 - Signup → `clinic` + `owner` profil; free do `trial_ends_at` (2026-12-31 za naloge u free periodu) (D4).
+- Nove klinike: `settings_json.onboarding.completed=false`; poslije MFA owner ide na `/onboarding` (D43).
 - Staff: invite-by-email (magic link) → set password → role (D9).
 - Owner: MFA (TOTP) obavezno; ostali ne (D11).
   - Enroll: `/mfa/enroll` (QR + 6-cifreni kod) odmah poslije signup/login ako owner nema verified factor.
@@ -127,6 +142,12 @@ docs/
   - Gate: `shared_desk_needs_pin()` + cookie + `/pin`.
   - Switch: `verify_operator_pin` → cookie + audit.
 - v1: 1 user ↔ 1 clinic; nema cross-clinic membership (D7).
+- **Platform admin (D41):** odvojen od clinic UI.
+  - Flag: `auth.users.raw_app_meta_data.is_platform_admin = true` (Auth Admin / service role only).
+  - Routes: `/platform`, `/platform/clinics/[id]` under `(platform)/`.
+  - Ops (list clinics, plan/status flags, entitlements view) preko `createServiceClient()` na serveru.
+  - Impersonacija: session switch na clinic ownera + cookie + banner; `platform.impersonation_start/stop` u `audit_events`.
+  - Grant primjer: `service.auth.admin.updateUserById(id, { app_metadata: { is_platform_admin: true } })`.
 
 ---
 
@@ -135,6 +156,10 @@ docs/
 - Private buckets; signed URLs (kratki TTL) (D21).
 - Path: `clinic_id / patient_id / ...`
 - Image limiti po planu (D22); WebP kompresija.
+- Bucket `patient-files` (Faza 2A): `{clinic_id}/{patient_id}/documents/{id}.pdf` i `{clinic_id}/{patient_id}/images/{id}.webp`; signed URL TTL 120s (`lib/patients/storage.ts`), generisan on-demand po zahtjevu (nema eager fetch).
+- Invoice PDF (Faza 2D): `{clinic_id}/{patient_id}/invoices/{invoice_id}.pdf` — immutable copy snimljen pri issue; Route Handler streamuje stored file (ne regeneriše template).
+- Clinic branding (Faza 2G): bucket `clinic-branding`, path `{clinic_id}/logo.webp`; `branding_json.logo_path` + `colors.{background,text,accent}`; signed URL TTL 3600s za shell; invoice PDF downloada logo kao data URI.
+- Upload: PDF max 20MB za dokumente; slike (bilo koji format) konvertovane u WebP (`sharp`, quality ~82, max width 2400) prije upload-a; broj slika po pacijentu limitiran planom (`assertCanAddPatientImage`).
 
 ---
 
@@ -165,7 +190,7 @@ Iz PRD §10 / Decision Log — posebno u 2026 free MVP:
 
 - Sentry: greške; tag `clinic_id` / `role` via `setClinicErrorContext` (bez patient PII)
 - PostHog: `clinic_id`, `role`, event names — **bez** patient PII (D33); EU host default; disabled bez `NEXT_PUBLIC_POSTHOG_KEY`
-- Support: email `support@` (D44)
+- Support: email `support@dentord.com` (D44)
 
 ---
 
@@ -191,3 +216,18 @@ Prati PRD §11. Tech doc se širi po fazama; ne specifikovati Enterprise module 
 | 2026-07-12 | D9 staff invites: Resend + entitlements hard-block + `/settings/users` + `/invite/[token]` |
 | 2026-07-12 | D10 PIN operators: bcrypt RPCs, `/pin` gate, audit operator_id, Vitest smoke |
 | 2026-07-13 | Entitlements feature gates + location/image helpers; marketing skeleton; Sentry+PostHog wiring |
+| 2026-07-13 | D41 super-admin skeleton: `(platform)/`, app_metadata gate, audited impersonation, billing flags |
+| 2026-07-13 | Faza 2A: clinic `(dashboard)` AppShell — RBAC nav (patients/services/settings), mobile menu, operator switch + logout |
+| 2026-07-13 | Faza 2A: patients UI — lista/new/karton (alergije, PDF docs, WebP images, FDI odontogram); signed URLs; no raw DB errors in UI |
+| 2026-07-13 | Faza 2A: Patients UI — lista/new/karton, allergies, docs/images (WebP + D22 limit), odontogram on chart |
+| 2026-07-13 | Faza 2A: Services UI — `/services` CRUD (owner write), search/status, D16 location field, translated errors |
+| 2026-07-13 | Faza 2B: treatment plans UI on patient chart (D19) + `phase2b_treatment_plans` schema/RLS |
+| 2026-07-13 | Faza 2C: `/calendar` appointments + waitlist (D14/D15/D25); EXCLUDE overlap; feature gates |
+| 2026-07-13 | Faza 2D: `/invoices` + PDF Route Handler; payments append-only; installment plans; `@react-pdf/renderer` |
+| 2026-07-13 | Faza 2E: `/expenses` + dashboard KPI + Excel export (`exceljs`); `dashboard_payment_stats` RPC |
+| 2026-07-13 | Faza 2F: `/settings/locations` + shared pricelist toggle (D16); active-only location plan limit |
+| 2026-07-13 | Faza 2G: `/settings/branding` logo+boje; `clinic-branding` bucket; AppShell + invoice PDF |
+| 2026-07-13 | Faza 2H: `/settings/import` CSV patients+services; dry-run; `can_import_services` for accountant INSERT |
+| 2026-07-13 | Faza 2I: `/onboarding` 3-step wizard; `settings_json.onboarding`+`working_hours`; create_clinic seeds incomplete |
+| 2026-07-13 | Faza 3A: email templates + reminders (D23); `/settings/email`; calendar send; `outbound_messages` |
+| 2026-07-14 | Brand **DentOrd** / `dentord.com`; Resend From `noreply@`; `lib/brand/constants.ts`; assets u `brand/` |

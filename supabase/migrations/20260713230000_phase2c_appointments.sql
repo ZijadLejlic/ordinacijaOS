@@ -1,0 +1,16 @@
+-- Faza 2C — appointments + waitlist (D14 / D15 / D25).
+--
+-- Applied to the remote Supabase project via MCP `apply_migration`
+-- under the name: phase2c_appointments
+--
+-- Summary:
+--   * Extension: btree_gist (extensions schema) for EXCLUDE
+--   * Enums: appointment_status, waitlist_status
+--   * Helpers: can_access/write_appointments, can_manage_all_appointment_doctors,
+--     can_access/write_waitlist
+--   * Tables + RLS: appointments, appointment_waitlist
+--   * Hard block: appointments_no_doctor_overlap EXCLUDE on
+--     (clinic_id, doctor_id, tstzrange) WHERE status not cancelled/no_show
+--
+-- RBAC: calendar owner/doctor/assistant/reception; doctor scoped to self;
+-- waitlist owner/reception only (PRD §3.2).

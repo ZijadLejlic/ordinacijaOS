@@ -136,8 +136,8 @@ export async function assertCanInviteStaff(
 }
 
 /**
- * Hard-block location count before create (D8).
- * Call from location create Server Action when that module ships.
+ * Hard-block location count before create / re-activate (D8).
+ * Counts active locations only — soft-deactivate frees a plan slot.
  */
 export async function assertCanCreateLocation(
   supabase: Client,
@@ -148,7 +148,8 @@ export async function assertCanCreateLocation(
   const { count, error } = await supabase
     .from("clinic_locations")
     .select("id", { count: "exact", head: true })
-    .eq("clinic_id", clinicId);
+    .eq("clinic_id", clinicId)
+    .eq("is_active", true);
 
   if (error) {
     throw new Error(error.message);

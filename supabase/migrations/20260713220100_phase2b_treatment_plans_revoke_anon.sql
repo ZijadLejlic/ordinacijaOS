@@ -1,0 +1,6 @@
+-- Faza 2B follow-up — revoke anon EXECUTE on treatment-plan SECURITY DEFINER helpers.
+-- Applied via MCP as: phase2b_treatment_plans_revoke_anon
+--
+-- revoke all on can_access_treatment_plan / can_write_treatment_plan from public, anon
+-- grant execute to authenticated only
+-- revoke all on treatment_plan_items_enforce_clinic from public, anon, authenticated

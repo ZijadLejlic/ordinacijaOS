@@ -1,5 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { BrandLogo } from "@/components/brand/brand-logo";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -19,19 +20,19 @@ export default async function MarketingHomePage({ params }: Props) {
         className="pointer-events-none absolute inset-0 -z-10"
         style={{
           background:
-            "radial-gradient(ellipse 90% 70% at 70% -10%, color-mix(in_oklab, var(--marketing-accent) 28%, transparent), transparent 55%), radial-gradient(ellipse 60% 50% at 10% 90%, color-mix(in_oklab, var(--marketing-mist) 80%, transparent), transparent 50%), linear-gradient(165deg, var(--marketing-wash) 0%, var(--marketing-surface) 45%, color-mix(in_oklab, var(--marketing-accent) 8%, var(--marketing-surface)) 100%)",
+            "radial-gradient(ellipse 85% 65% at 78% -5%, color-mix(in_oklab, var(--marketing-cyan) 34%, transparent), transparent 55%), radial-gradient(ellipse 70% 55% at 8% 95%, color-mix(in_oklab, var(--marketing-accent) 18%, transparent), transparent 50%), linear-gradient(165deg, var(--marketing-wash) 0%, var(--marketing-surface) 48%, color-mix(in_oklab, var(--marketing-mist) 70%, var(--marketing-surface)) 100%)",
         }}
       />
       <div
         aria-hidden
-        className="marketing-grain pointer-events-none absolute inset-0 -z-10 opacity-[0.35]"
+        className="marketing-grain pointer-events-none absolute inset-0 -z-10 opacity-[0.28]"
       />
 
-      <section className="mx-auto flex w-full max-w-5xl flex-1 flex-col justify-center px-6 pb-20 pt-10 md:px-10 md:pb-28 md:pt-16">
-        <p className="font-[family-name:var(--font-marketing-display)] text-[clamp(3.25rem,12vw,7.5rem)] leading-[0.92] tracking-[-0.04em] text-[var(--marketing-ink)]">
-          OrdinacijaOS
-        </p>
-        <h1 className="mt-8 max-w-xl text-2xl font-medium tracking-tight text-[var(--marketing-ink)] md:text-3xl">
+      <section className="mx-auto flex w-full max-w-5xl flex-1 flex-col justify-center px-6 pb-20 pt-8 md:px-10 md:pb-28 md:pt-12">
+        <div className="w-[min(100%,22rem)] md:w-[min(100%,28rem)]">
+          <BrandLogo priority className="drop-shadow-sm" />
+        </div>
+        <h1 className="mt-10 max-w-xl text-2xl font-medium tracking-tight text-[var(--marketing-ink)] md:text-3xl">
           {t("hero.headline")}
         </h1>
         <p className="mt-4 max-w-md text-base text-[color-mix(in_oklab,var(--marketing-ink)_72%,transparent)] md:text-lg">

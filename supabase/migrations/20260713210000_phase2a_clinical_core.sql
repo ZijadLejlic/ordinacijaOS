@@ -1,0 +1,26 @@
+-- Faza 2A — clinical core (services, patients, allergies, documents, images, odontogram).
+--
+-- This migration was already applied to the remote Supabase project via the
+-- Supabase MCP `apply_migration` tool under the names:
+--   - phase2a_clinical_core
+--   - phase2a_fix_is_valid_fdi_search_path
+--
+-- This file is a local stub kept in sync with the applied schema for
+-- history/reproducibility. See docs/DB-OrdinacijaOS.md §5 for the table
+-- summary and docs/Tech-OrdinacijaOS.md §6 for storage/bucket details.
+--
+-- Applied changes (summary, not re-executed here):
+--   * Enums: allergy_severity (mild/moderate/severe/unknown),
+--     tooth_status (healthy/caries/filled/crown/missing/implant/
+--     root_canal/bridge/other)
+--   * Tables (all with clinic_id + RLS): services, patients,
+--     patient_allergies, patient_documents, patient_images,
+--     odontogram_teeth, odontogram_events
+--   * Function: is_valid_fdi(int) — validates standard FDI tooth numbers
+--     11-18/21-28/31-38/41-48; search_path hardened to `''` in the follow-up
+--     fix migration.
+--   * Storage: private bucket `patient-files` with clinic/patient-scoped
+--     RLS policies; app reads via short-lived signed URLs only.
+--
+-- To regenerate the full SQL for a fresh environment, use
+-- `supabase db diff` against the remote project or re-run via MCP.

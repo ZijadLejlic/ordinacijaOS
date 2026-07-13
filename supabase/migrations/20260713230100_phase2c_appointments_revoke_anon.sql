@@ -1,0 +1,8 @@
+-- Faza 2C follow-up — revoke anon EXECUTE on appointment/waitlist helpers.
+--
+-- Applied via MCP `apply_migration` as: phase2c_appointments_revoke_anon
+--
+-- revoke all on can_access_appointments / can_write_appointments /
+--   can_manage_all_appointment_doctors / can_access_waitlist /
+--   can_write_waitlist from public, anon
+-- grant execute to authenticated only

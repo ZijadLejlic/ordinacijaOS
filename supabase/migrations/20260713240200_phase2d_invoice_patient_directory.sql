@@ -1,0 +1,7 @@
+-- Faza 2D follow-up — patient name helpers for finance without chart RLS.
+--
+-- Applied via MCP as: phase2d_invoice_patient_directory +
+-- phase2d_invoice_patient_names
+--
+-- list_patients_for_invoices / get_patient_for_invoice /
+-- get_invoice_patient_names — id+name only; can_access/write_invoices gated.

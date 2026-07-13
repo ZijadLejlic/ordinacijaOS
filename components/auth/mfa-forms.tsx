@@ -12,6 +12,7 @@ import {
   FieldError,
   FieldDescription,
 } from "@/components/ui/field";
+import { PRODUCT_NAME } from "@/lib/brand/constants";
 import { createClient } from "@/lib/supabase/client";
 import { totpCodeSchema } from "@/lib/validations/auth";
 import { logoutAction } from "@/lib/auth/actions";
@@ -42,7 +43,7 @@ export function MfaEnrollForm() {
 
       const { data, error: enrollError } = await supabase.auth.mfa.enroll({
         factorType: "totp",
-        friendlyName: "OrdinacijaOS",
+        friendlyName: PRODUCT_NAME,
       });
 
       if (cancelled) return;

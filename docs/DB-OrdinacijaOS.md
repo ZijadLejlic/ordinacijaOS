@@ -1,4 +1,4 @@
-# DB — OrdinacijaOS
+# DB — DentOrd
 
 > Database schema, RLS i multi-tenant modeli.  
 > Produkt: `docs/PRD-OrdinacijaOS.md`. Arhitektura: `docs/Tech-OrdinacijaOS.md`.  
@@ -34,7 +34,7 @@ Helpers (SECURITY DEFINER, `search_path = public`, execute samo `authenticated`)
 - `current_app_role()` — JWT `app_metadata.app_role` pa fallback na `profiles`
 - `is_clinic_owner()`
 - `owner_mfa_ok()` — D11: owner s verified MFA mora `aal2` (RLS restrictive)
-- `create_clinic_for_owner(name, full_name, trial_ends_at?)` — signup: clinic + owner + default location + trial subscription (Professional)
+- `create_clinic_for_owner(name, full_name, trial_ends_at?)` — signup: clinic + owner + default location + trial subscription (Professional); seeds `settings_json.onboarding` incomplete (Faza 2I)
 
 **JWT hook (B5):** `custom_access_token_hook` upisuje `clinic_id` + `app_role` u `app_metadata` pri izdavanju tokena. Funkcija je u bazi; **mora se ručno uključiti** u dashboardu: Authentication → Hooks → Custom Access Token → `public.custom_access_token_hook`. Bez toga helperi i dalje rade preko `profiles` fallbacka.
 
@@ -84,7 +84,7 @@ Kolone su **namjera**; tipovi/constrainti se finalizuju u migraciji. `…` = TBD
 | `trial_ends_at` | npr. 2026-12-31 za early signup (D4) |
 | `timezone` | default `Europe/Sarajevo` (D47) |
 | `phone_country_default` | default `+387` (D46) |
-| `branding_json` | logo, boje |
+| `branding_json` | `{ logo_path?, logo_url?, colors?: { background?, text?, accent? } }` (hex `#RRGGBB`) |
 | `settings_json` | vidi §5 |
 | `status` | `active` \| `readonly` \| `pending_delete` |
 
@@ -124,8 +124,11 @@ Writes samo preko RPC (table INSERT/UPDATE revoked za authenticated).
 | `id` | PK |
 | `clinic_id` | |
 | `name` | |
-| `address` | … |
-| limite po planu | enforce u app + DB gdje ima smisla (D8) |
+| `address` | nullable |
+| `is_active` | soft deactivate (UI); no hard delete from app |
+| limite po planu | `enforce_location_limits` BEFORE INSERT + `assertCanCreateLocation` — broje **aktivne** (D8) |
+
+Signup (`create_clinic_for_owner`) kreira default „Glavna lokacija“. Owner UI: `/settings/locations`.
 
 #### `clinic_invites`
 
@@ -173,6 +176,13 @@ Evidencija paketa / budući Stripe (D5). Do 2027 bez charge — i dalje red za p
 
 Platform impersonacija mora ostaviti trag ovdje (D41).
 
+Eventi (Faza 1 platform): `platform.impersonation_start` / `platform.impersonation_stop`,
+`platform.clinic_status_update`, `platform.clinic_plan_update`, `platform.subscription_status_update`
+(payload `phase`: requested / succeeded / failed).
+
+**Platform admin identity:** nije `profiles.role` (nema clinic membership). Flag u
+`auth.users.raw_app_meta_data.is_platform_admin` → JWT `app_metadata` (nikad `user_metadata`).
+
 ---
 
 ## 4. Clinic settings (u `settings_json` ili normalizovano)
@@ -182,32 +192,146 @@ Iz PRD §5.3 — minimalni ključevi:
 | Key | Default / napomena |
 |---|---|
 | `doctors_see_peer_amounts` | D17 |
-| `shared_pricelist_across_locations` | D16 |
+| `shared_pricelist_across_locations` | D16 — default **true**; owner toggle na `/settings/locations`; uključivanje null-uje `services.location_id` |
 | `ai_enabled` | default **false** kad feature postoji (D31) |
-| radno vrijeme | TBD struktura |
-| timezone / phone | mogu biti i kolone na `clinics` |
+| `working_hours` | `{ monday…sunday: { closed, open:"HH:MM", close:"HH:MM" } }` — Faza 2I onboarding |
+| `onboarding` | `{ completed, step, steps:{clinic,services,invite}, completed_at?, skipped_invite? }` — Faza 2I; **missing key = grandfathered completed** |
+| timezone / phone | kolone na `clinics` (`timezone`, `phone_country_default`) |
 
 ---
 
-## 5. Faza 2+ — skica entiteta (još bez finalnih kolona)
+## 5. Faza 2A — clinical core (implementirano)
 
-Proširiti ovaj dokument **kad** se implementira modul. Imena iz PRD §5.2:
+Migracija `phase2a_clinical_core` (+ `is_valid_fdi` search_path fix). RLS + `clinic_id` na svim redovima.
+
+| Tabela | Napomena |
+|---|---|
+| `services` | Cjenovnik; opcionalni `location_id` (D16); `price_eur` + `vat_rate` |
+| `patients` | Karton: kontakt, anamneza, napomene, soft `is_active` |
+| `patient_allergies` | `allergy_severity`: mild/moderate/severe/unknown |
+| `patient_documents` | PDF meta; `storage_path` unique; path `{clinic}/{patient}/documents/{id}.pdf` |
+| `patient_images` | WebP meta; plan limit enforce u app (D22) |
+| `odontogram_teeth` | FDI via `is_valid_fdi()`; `tooth_status` enum |
+| `odontogram_events` | Historija izmjena statusa |
+
+### Faza 2B — treatment plans (implementirano)
+
+Migracija `phase2b_treatment_plans` (+ revoke anon EXECUTE follow-up).
+
+| Tabela | Napomena |
+|---|---|
+| `treatment_plans` | Po pacijentu; soft `is_active`; `created_by` |
+| `treatment_plan_items` | Usluga (+ `service_name` snapshot), opcionalni FDI, status enum, `estimated_price_eur` |
+
+**RLS helpers:** `can_access_treatment_plan` (owner/doctor/assistant), `can_write_treatment_plan` (owner/doctor).
+
+### Faza 2C — appointments + waitlist (implementirano)
+
+Migracija `phase2c_appointments` (+ revoke anon EXECUTE follow-up). Extension `btree_gist`.
+
+| Tabela | Napomena |
+|---|---|
+| `appointments` | `doctor_id` → profiles; `starts_at`/`ends_at`; status enum; **EXCLUDE** `appointments_no_doctor_overlap` (D14) — no overlap same clinic+doctor when status not cancelled/no_show |
+| `appointment_waitlist` | preferred doctor/service/location + date window; status waiting/offered/booked/cancelled (D25) |
+
+**RLS helpers:** `can_access/write_appointments` (owner/doctor/assistant/reception); `can_manage_all_appointment_doctors` (owner/assistant/reception — doctors scoped to self); `can_access/write_waitlist` (owner/reception).
+
+### Faza 2D — invoices + payments + plans (implementirano)
+
+Migracija `phase2d_invoices` (+ revoke anon EXECUTE follow-up).
+
+| Tabela | Napomena |
+|---|---|
+| `invoice_number_counters` | `(clinic_id, year)` → `last_number`; samo preko `allocate_invoice_number` RPC (row lock) |
+| `invoices` | `YYYY-####` unique per clinic; status `unpaid\|partial\|paid\|void`; void umjesto DELETE; `pdf_storage_path` |
+| `invoice_lines` | Denormalized `clinic_id`; snapshot description/price/`vat_rate` (0–1); INSERT-only |
+| `payments` | Append-only; method `cash\|card\|bank_transfer\|other`; trigger recompute invoice status |
+| `payment_plans` + `payment_plan_installments` | Rate kalkulator; app gate `installments_calculator` |
+
+**RLS helpers:** `can_access/write_invoices` (owner/accountant only — PRD §3.2).
+
+**Storage:** `{clinic_id}/{patient_id}/invoices/{invoice_id}.pdf` u `patient-files` (+ finance storage policies).
+
+### Faza 2E — expenses + dashboard KPI (implementirano)
+
+Migracija `phase2e_expenses` (+ `dashboard_payment_stats` RPC).
+
+| Tabela / RPC | Napomena |
+|---|---|
+| `expenses` | Kategorije enum; void umjesto DELETE; EUR; RLS owner+accountant |
+| `dashboard_payment_stats` | Agregati uplata za KPI; doktor vidi svoj (ili peer ako `doctors_see_peer_amounts`) |
+
+**App:** `/expenses` + Excel `GET /api/reports/excel` gated `expenses_reports_excel` (Pro+); dashboard KPI RBAC po §3.2.
+
+### Faza 2F — locations + shared pricelist (implementirano)
+
+Tabela `clinic_locations` već postoji (Faza 1). Migracija `phase2f_locations_active_limit` usklađuje D8 limit da broji samo `is_active`.
+
+**App:** `/settings/locations` — owner CRUD (soft deactivate); D16 `settings_json.shared_pricelist_across_locations`.
+
+### Faza 2G — branding (implementirano)
+
+Nema nove tabele — `clinics.branding_json` (Faza 1). Migracija `phase2g_branding`: private bucket `clinic-branding`.
+
+| Ključ | Napomena |
+|---|---|
+| `logo_path` | `{clinic_id}/logo.webp` u `clinic-branding` |
+| `logo_url` | legacy fallback (invoice) |
+| `colors.background` / `text` / `accent` | hex `#RRGGBB`; AppShell sidebar |
+
+**RLS storage:** member SELECT (isti `clinic_id`); owner INSERT/UPDATE/DELETE. Feature gate `branding_custom` (Pro+).
+
+### Faza 2H — CSV import (implementirano)
+
+Nema nove tabele. Migracija `phase2h_csv_import`:
+
+| Helper / policy | Napomena |
+|---|---|
+| `can_import_services()` | owner + accountant (PRD §3.2 Import CSV) |
+| `services_insert_import` | INSERT na `services` preko `can_import_services` (update/delete ostaju `can_write_services` = owner) |
+
+**App:** `/settings/import` — dry-run + commit; patients INSERT via postojeći RLS (`can_write_patients`, app gate owner-only); max 500 redova.
+
+### Faza 2I — in-app onboarding (implementirano)
+
+Nema nove tabele. Migracija `phase2i_onboarding`:
+
+| Promjena | Napomena |
+|---|---|
+| `create_clinic_for_owner` | Seed `settings_json.onboarding` (`completed:false`, `step:1`) za nove klinike |
+| `settings_json.working_hours` | App write u koraku 1 (nema RLS change — owner `clinics_update`) |
+| Grandfather | Klinike bez `onboarding` key → app tretira kao `completed` |
+
+**App:** `/onboarding` — owner-only; middleware force redirect dok nije completed; `/settings/import` dozvoljen mid-wizard (CSV usluge). Audit: `onboarding.step1_completed` / `step2_completed` / `completed` (bez PII).
+
+### Faza 3A — email šabloni + reminderi (implementirano)
+
+Migracija `phase3a_email_templates` (+ seed membership guard):
+
+| Tabela / helper | Napomena |
+|---|---|
+| `email_templates` | `(clinic_id, template_key, locale)` unique; MVP key `appointment_reminder`; BS+EN |
+| `outbound_messages` | append-ish log (insert+status update); channel `email`; test vs appointment send |
+| `can_read_email_templates` | owner + reception |
+| `can_write_email_templates` | owner |
+| `can_send_outbound_messages` | owner + reception |
+| `seed_default_email_templates(clinic_id)` | SECURITY DEFINER; member-only; called on clinic create + lazy ensure |
+
+**Varijable:** `{{ime}}`, `{{datum}}`, `{{vrijeme}}`, `{{ordinacija}}`, `{{doktor}}`, `{{usluga}}`.
+
+**App:** `/settings/email` (edit owner; read/send reception); kalendar „Pošalji email podsjetnik“; feature `email_reminders`. Audit: `email_template.updated` / `email.test_sent` / `email.reminder_sent` (bez PII — ids + template_key).
+
+**Još nije u DB (skica):**
 
 ```text
-patients, patient_allergies, patient_documents, patient_images
-odontogram_teeth / odontogram_events          -- FDI (D18)
-treatment_plans / treatment_plan_items        -- D19
-services                                      -- optional per location (D16)
-appointments                                  -- doctor_id; hard block overlap (D14)
-appointment_waitlist                          -- D25
-invoices / invoice_lines / payments / payment_plans / expenses
-email_templates / outbound_messages
 consent_forms / consent_signatures            -- draw sign (D20)
 ```
 
 **Kalendar:** termin vezan za doktora; stolice nisu u MVP (D14).
 
-**Image limits:** po planu (D22) — enforce pri uploadu.
+**Image limits:** po planu (D22) — `assertCanAddPatientImage` pri uploadu.
+
+**Storage buckets:** `patient-files` (private, signed URLs, TTL ~120s); `clinic-branding` (private, logo TTL ~3600s u shellu).
 
 ---
 
@@ -215,10 +339,10 @@ consent_forms / consent_signatures            -- draw sign (D20)
 
 | Pravilo | Detalj |
 |---|---|
-| Bucket | private |
-| Path | `{clinic_id}/{patient_id}/...` |
-| Access | signed URL, kratki TTL |
-| Transform | WebP kompresija |
+| Bucket | `patient-files`, `clinic-branding` (oba private) |
+| Path | patients: `{clinic_id}/{patient_id}/documents\|images\|invoices/...`; branding: `{clinic_id}/logo.webp` |
+| Access | signed URL, kratki TTL (patients 120s; branding shell 3600s) |
+| Transform | WebP kompresija (`sharp`) |
 
 ---
 
@@ -278,6 +402,24 @@ Location create must call `assertCanCreateLocation`; image upload must call `ass
 | `code_review_b2_login_lockout` | B2/D13: `check_login_lockout`, `record_failed_login`, `clear_login_lockout` |
 | `code_review_b4_rls_performance` | B4: select-wrapped RLS, FK indexes, dedupe invite index, split owner write policies |
 | `code_review_b5_jwt_custom_claims` | B5: `custom_access_token_hook` + JWT-first helper reads with profiles fallback |
+| `phase2a_clinical_core` | services, patients, allergies, documents, images, odontogram + RLS + `patient-files` bucket |
+| `phase2a_fix_is_valid_fdi_search_path` | `is_valid_fdi` search_path hardening |
+| `phase2b_treatment_plans` | treatment_plans + items + RLS + RBAC helpers |
+| `phase2b_treatment_plans_revoke_anon` | revoke anon EXECUTE on new SECURITY DEFINER fns |
+| `phase2c_appointments` | appointments + waitlist + EXCLUDE overlap + RLS |
+| `phase2c_appointments_revoke_anon` | revoke anon EXECUTE on appointment/waitlist helpers |
+| `phase2d_invoices` | invoices/lines/payments/plans + counters + allocate RPC + finance RLS + invoice storage policies |
+| `phase2d_invoices_revoke_anon` | revoke anon EXECUTE on invoice helpers; trigger fn not callable via API |
+| `phase2d_invoice_patient_directory` | limited patient id/name RPCs for accountant invoice UX |
+| `phase2d_invoice_patient_names` | batch patient name resolver for invoice list/detail |
+| `phase2e_expenses` | expenses table + category enum + finance RLS |
+| `phase2e_dashboard_payment_stats` (+ `_tz`) | doctor-safe payment KPI aggregates RPC |
+| `phase2f_locations_active_limit` | D8: `enforce_location_limits` counts `is_active` only |
+| `phase2g_branding` | private bucket `clinic-branding` + owner write / member select policies |
+| `phase2h_csv_import` | `can_import_services()` (owner+accountant); services INSERT policy for CSV import |
+| `phase2i_onboarding` | `create_clinic_for_owner` seeds `settings_json.onboarding` incomplete |
+| `phase3a_email_templates` | `email_templates` + `outbound_messages` + RLS/RBAC + seed defaults; create_clinic seeds templates |
+| `phase3a_email_seed_guard` | `seed_default_email_templates` requires active clinic membership |
 
 ---
 
@@ -293,3 +435,15 @@ Location create must call `assertCanCreateLocation`; image upload must call `ass
 | 2026-07-13 | Documented app-layer entitlement helpers (no new migration) |
 | 2026-07-13 | CODE-REVIEW A1/A2: profiles self-update lock, DB plan limit triggers, tenant-isolation test suite |
 | 2026-07-13 | CODE-REVIEW B2/B4/B5: login lockout, RLS performance pass, JWT custom claims hook (dashboard enable pending) |
+| 2026-07-13 | D41 platform admin skeleton (app-layer; no new table — flag in `app_metadata`) |
+| 2026-07-13 | Faza 2A clinical core: patients/services/odontogram tables + Patients UI docs |
+| 2026-07-13 | Faza 2A: Services UI documented — owner write via `can_write_services`; D16 location optional |
+| 2026-07-13 | Faza 2B: treatment_plans / treatment_plan_items + RLS (D19) |
+| 2026-07-13 | Faza 2C: appointments + appointment_waitlist + EXCLUDE overlap (D14/D25) |
+| 2026-07-13 | Faza 2D: invoices/lines/payments/plans + allocate serial + PDF storage (D29) |
+| 2026-07-13 | Faza 2E: expenses + dashboard_payment_stats RPC (D29) |
+| 2026-07-13 | Faza 2F: locations UI + shared pricelist; active-only location limit |
+| 2026-07-13 | Faza 2G: clinic-branding bucket + branding_json logo/colors (AppShell) |
+| 2026-07-13 | Faza 2H: `can_import_services` + services insert for accountant CSV import (D30) |
+| 2026-07-13 | Faza 2I: onboarding seed in `create_clinic_for_owner`; working_hours + onboarding in settings_json (D43) |
+| 2026-07-13 | Faza 3A: email_templates + outbound_messages; appointment_reminder BS/EN; Resend send (D23) |

@@ -1,11 +1,11 @@
 ---
-description: OrdinacijaOS product source of truth — do not invent requirements
+description: DentOrd product source of truth — do not invent requirements
 alwaysApply: true
 ---
 
-# OrdinacijaOS — source of truth
+# DentOrd — source of truth
 
-- Product: **OrdinacijaOS** (multi-tenant dental SaaS). Avicena is UX/pattern reference only (D1).
+- Product: **DentOrd** (`dentord.com`, multi-tenant dental SaaS). Avicena is UX/pattern reference only (D1).
 - Before implementing features, read:
   - `docs/PRD-OrdinacijaOS.md` (requirements + Decision Log D1–D51)
   - `docs/Tech-OrdinacijaOS.md` when it exists
@@ -15,3 +15,4 @@ alwaysApply: true
 - Entitlements come from `plans` / features — never hardcode plan gates only in UI (D42).
 - Default locale BS, secondary EN (D37). Currency display EUR with VAT (PRD).
 - Defaults: timezone `Europe/Sarajevo`, phone `+387` (D46–D47).
+- Brand constants / emails: `lib/brand/constants.ts`; logo drop folder: `brand/`.

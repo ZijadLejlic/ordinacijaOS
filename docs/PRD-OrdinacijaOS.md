@@ -1,8 +1,8 @@
-# PRD — OrdinacijaOS
+# PRD — DentOrd
 
 ## Multi-tenant Dental SaaS za stomatološke ordinacije
 
-> **Napomena:** Ovo je izvorni poslovni dokument (PRD + SoW-lite) za greenfield proizvod **OrdinacijaOS**. Nije dio Avicena single-clinic projekta. Tehnička arhitektura ide u budući `Tech-OrdinacijaOS.md`; database schema u budući `DB-OrdinacijaOS.md` (novi repo). Ovaj fajl se kasnije kopira u greenfield repozitorij.
+> **Napomena:** Ovo je izvorni poslovni dokument (PRD + SoW-lite) za greenfield proizvod **DentOrd**. Nije dio Avicena single-clinic projekta. Tehnička arhitektura ide u budući `Tech-OrdinacijaOS.md`; database schema u budući `DB-OrdinacijaOS.md` (novi repo). Ovaj fajl se kasnije kopira u greenfield repozitorij.
 
 ---
 
@@ -10,7 +10,7 @@
 
 | Polje | Vrijednost |
 |---|---|
-| Naziv projekta | OrdinacijaOS |
+| Naziv projekta | DentOrd |
 | Verzija dokumenta | 1.0 |
 | Datum | 10. juli 2026. |
 | Status | Odobreno za implementaciju (discovery zaključen) |
@@ -18,7 +18,7 @@
 | Proizvod | Cloud SaaS za stomatološke ordinacije |
 | Izvođač | Platform owner / developer |
 | Repozitorij | Greenfield (novi repo; nije Avicena) |
-| Domen | TBD (kupovina nakon finalnog imena brenda) |
+| Domen | dentord.com |
 | Primarni market | Balkan → zatim globalno |
 | UI jezici (start) | BS (default), EN |
 | Valuta prikaza | EUR (cijene prikazane sa PDV-om) |
@@ -31,7 +31,7 @@ Odluke su finalne za v1 planiranje. Agent/developer **ne nagađa** mimo ovog log
 
 | # | Tema | Odluka |
 |---|---|---|
-| D1 | Proizvod | Greenfield SaaS **OrdinacijaOS**; Avicena samo UX/pattern referenca |
+| D1 | Proizvod | Greenfield SaaS **DentOrd**; Avicena samo UX/pattern referenca |
 | D2 | MVP paket | **Professional** (25€/mj prikaz); branding uključen |
 | D3 | Van MVP u free periodu | Bez AI, bez SMS/WhatsApp, bez patient portala |
 | D4 | Free trial | Self-signup, bez plaćanja; svi nalozi kreirani do 31.12.2026 = free do kraja 2026 |
@@ -87,7 +87,7 @@ Odluke su finalne za v1 planiranje. Agent/developer **ne nagađa** mimo ovog log
 
 ## 1. Executive summary
 
-**OrdinacijaOS** je moderni cloud SaaS za stomatološke ordinacije. Cilj nije samo digitalni karton, nego pomoći ordinaciji da radi efikasnije i zaradi više: kalendar, kartoni, odontogram, fakture, dashboard, email podsjetnici, CRM light, branding.
+**DentOrd** je moderni cloud SaaS za stomatološke ordinacije. Cilj nije samo digitalni karton, nego pomoći ordinaciji da radi efikasnije i zaradi više: kalendar, kartoni, odontogram, fakture, dashboard, email podsjetnici, CRM light, branding.
 
 Razlikovanje od postojećih rješenja (alpinDent i slični):
 
@@ -450,7 +450,7 @@ PDF/video tutorijali: kasnije.
 
 ## 7. Marketing website (kritično)
 
-Javni prodajni site OrdinacijaOS (isti Next.js projekat, public route group).
+Javni prodajni site DentOrd (isti Next.js projekat, public route group).
 
 ### 7.1 Jezici i SEO
 
@@ -463,7 +463,7 @@ Javni prodajni site OrdinacijaOS (isti Next.js projekat, public route group).
 - Home (hero brand-first, jedan CTA)
 - Funkcije
 - Paketi / Pricing (sve 4 cijene vidljive + badge “Free do 31.12.2026”)
-- Zašto OrdinacijaOS / case studies
+- Zašto DentOrd / case studies
 - Demo (screenshots + live demo seed klinika)
 - Blog
 - Recenzije (sekcija; puni se nakon feedbacka ~10 dana od signup-a)
@@ -574,31 +574,31 @@ Online naplata usluga pacijentima (avans preko portala): **nadogradnja poslije**
 
 ### Faza 1 — Foundation
 
-> Progress (2026-07-13): **1–4** done (repo, RLS, auth+MFA+invites+PIN, entitlements feature gates + location/image helpers). **5** not started (super-admin). **6–7** done (marketing skeleton, Sentry+PostHog wiring).
+> Progress (2026-07-13): **1–7** done (repo, RLS, auth+MFA+invites+PIN, entitlements, **super-admin skeleton**, marketing, Sentry+PostHog). Faza 1 foundation complete.
 
 1. ~~Greenfield repo (Next.js, Supabase, i18n BS/EN, shadcn)~~
 2. ~~Multi-tenant schema + RLS~~
 3. ~~Auth, owner 2FA, invites, PIN operators~~
 4. ~~Plans / entitlements~~ *(feature gates + free-2026 overrides; location/image hard-block helpers; invite limits)*
-5. Super-admin skeleton
+5. ~~Super-admin skeleton~~ *(D41: `/platform`, app_metadata gate, audited impersonation, plan/status flags)*
 6. ~~Marketing site skeleton + signup~~
 7. ~~Sentry + PostHog (bez PII)~~ *(SDK wired; aktivno kad su DSN/key u env)*
 
 ### Faza 2 — Core clinical & finance
 
-8. Pacijenti, dokumenti, slike (WebP), odontogram FDI
-9. Plan terapije
-10. Kalendar (hard block, views, waitlist)
-11. Fakture, uplate, rate, PDF
-12. Rashodi, dashboard KPI, Excel
-13. Lokacije + shared pricelist toggle
-14. Branding
-15. CSV import
-16. In-app onboarding
+8. ~~Pacijenti, dokumenti, slike (WebP), odontogram FDI~~ *(slice 2A implementirano: karton, alergije, PDF/WebP storage, FDI odontogram; plan terapije još nije)*
+9. ~~Plan terapije~~ *(slice 2B: `treatment_plans` / items na kartonu; statusi planned/in_progress/done/cancelled)*
+10. ~~Kalendar~~ *(slice 2C: hard overlap EXCLUDE, day/week/month, waitlist auto-predlog; DnD = `calendar_advanced`)*
+11. ~~Fakture, uplate, rate, PDF~~ *(slice 2D: `/invoices`, serial YYYY-####, PDV linije, payments, payment_plans + installments_calculator gate, immutable PDF)*
+12. ~~Rashodi, dashboard KPI, Excel~~ *(slice 2E: `/expenses`, void, Excel export, dashboard KPI + `dashboard_payment_stats`)*
+13. ~~Lokacije + shared pricelist toggle~~ *(slice 2F: `/settings/locations`, D8 active-only limit, D16 `shared_pricelist_across_locations`)*
+14. ~~Branding~~ *(slice 2G: `/settings/branding`, `branding_json` logo+boje, AppShell + invoice PDF; feature `branding_custom`)*
+15. ~~CSV import~~ *(slice 2H: `/settings/import` dry-run+commit; pacijenti owner; usluge owner/accountant; `can_import_services` RLS)*
+16. ~~In-app onboarding~~ *(slice 2I: `/onboarding` 3 stepa; `settings_json.onboarding` + `working_hours`; force redirect owner)*
 
 ### Faza 3 — SaaS ops & trust
 
-17. Email šabloni + reminderi
+17. ~~Email šabloni + reminderi~~ *(slice 3A: `/settings/email` BS/EN edit; kalendar send; `email_templates` + `outbound_messages`; feature `email_reminders`)*
 18. CRM light notifikacije
 19. Audit log UI
 20. GDPR export/delete (owner approve)
@@ -627,17 +627,19 @@ Online naplata usluga pacijentima (avans preko portala): **nadogradnja poslije**
 
 ### 12.1 MVP acceptance (Professional core)
 
+- [x] Signup → create clinic → onboarding step 1 *(Faza 2I: `/onboarding`; MFA → wizard)*
 - [x] Owner može uraditi signup bez kartice i dobiti clinic s `trial_ends_at=2026-12-31`
 - [x] Owner pozove doktora i recepciju emailom; oni postave lozinku i uđu s ispravnom rolom
 - [x] Shared reception: PIN switch radi; audit bilježi operatora
-- [x] Plan limiti hard-blockaju 6. doktora / 11. usera / 3. lokaciju na Pro *(helpers: invite users/doctors + `assertCanCreateLocation`; location UI create još nije; image helper spreman za storage modul)*
-- [ ] Pacijent karton: alergije, dokumenti, RTG WebP, FDI odontogram, plan terapije
-- [ ] Termin se kreira s default trajanjem usluge; overlap istog doktora je blokiran
-- [ ] Faktura PDF s brojem, PDV, logom; uplata partial/paid; plan rata
-- [ ] Dashboard prikazuje današnje KPI i prihod po doktoru
-- [ ] Email reminder šablon edit + slanje (test)
-- [ ] Branding: logo + boje vidljivi u app shellu
-- [ ] CSV import pacijenata i usluga
+- [x] Plan limiti hard-blockaju 6. doktora / 11. usera / 3. lokaciju na Pro *(helpers + DB triggers; location UI: `/settings/locations` + `assertCanCreateLocation`; image helper na storage)*
+- [x] Pacijent karton: alergije, dokumenti, RTG WebP, FDI odontogram, plan terapije *(zatvaranje stavke iz posjete još nije — follow-up)*
+- [x] Termin se kreira s default trajanjem usluge; overlap istog doktora je blokiran *(Faza 2C: `/calendar` + DB EXCLUDE; waitlist auto-predlog na cancel)*
+- [x] Faktura PDF s brojem, PDV, logom; uplata partial/paid; plan rata *(Faza 2D: issue + storage PDF; logo iz branding_json ako postoji; plan rata = Pro+)*
+- [x] Dashboard prikazuje današnje KPI i prihod po doktoru *(Faza 2E; RBAC §3.2; doctor peer amounts D17)*
+- [x] Owner može dodati lokaciju (do plana) i uključiti/isključiti shared pricelist *(Faza 2F; D8/D16)*
+- [x] Email reminder šablon edit + slanje (test) *(Faza 3A: `/settings/email` + kalendar send; Resend; outbound log)*
+- [x] Branding: logo + boje vidljivi u app shellu *(Faza 2G; feature `branding_custom`)*
+- [x] CSV import pacijenata i usluga *(Faza 2H: dry-run + commit; RBAC §3.2)*
 - [ ] GDPR export; delete zahtjev čeka owner approve pa hard delete
 - [ ] Klinika A ne može pročitati podatke klinike B (automatski test)
 - [ ] Storage objekti nisu javno listable; samo signed URL
@@ -673,18 +675,18 @@ Dodatni blocker: **tenant isolation** suite (clinic A vs B na patients, appointm
 
 ## 13. Legal appendix (draft — za pravni review)
 
-> **Upozorenje:** Tekstovi ispod su radni draftovi prilagođeni OrdinacijaOS modelu (SaaS, EU, medicinska evidencija kao alat). Nisu zamjena za advokata. Prije produkcijskog naplatnog perioda (2027) obavezna pravna revizija u nadležnoj jurisdikciji (BiH / ciljna država firme).
+> **Upozorenje:** Tekstovi ispod su radni draftovi prilagođeni DentOrd modelu (SaaS, EU, medicinska evidencija kao alat). Nisu zamjena za advokata. Prije produkcijskog naplatnog perioda (2027) obavezna pravna revizija u nadležnoj jurisdikciji (BiH / ciljna država firme).
 
 ### 13.1 Privacy Policy — outline + draft clauses
 
-**Svrha:** Obavijestiti korisnike (ordinacije) i posjetioce marketing sitea kako OrdinacijaOS obrađuje podatke.
+**Svrha:** Obavijestiti korisnike (ordinacije) i posjetioce marketing sitea kako DentOrd obrađuje podatke.
 
 **Sekcije:**
 
 1. Ko smo (controller vs processor)
 2. Koje podatke prikupljamo (account, clinic, patient data uneseni od klinike, usage analytics, cookies)
 3. Pravni osnovi (ugovor, legitimni interes, pristanak za cookies/marketing)
-4. Uloga klinike: klinika je **voditelj obrade** za podatke pacijenata; OrdinacijaOS je **obradaitelj**
+4. Uloga klinike: klinika je **voditelj obrade** za podatke pacijenata; DentOrd je **obradaitelj**
 5. Čuvanje i lokacija (EU)
 6. Djelioci (Supabase, Vercel, Resend, Sentry, PostHog, Stripe od 2027)
 7. Periodi čuvanja (trial, pretplata, nakon brisanja, AI transcript 90 dana)
@@ -696,7 +698,7 @@ Dodatni blocker: **tenant isolation** suite (clinic A vs B na patients, appointm
 
 **Draft — uloge:**
 
-> Kada stomatološka ordinacija (“Klinika”) unosi podatke o pacijentima u OrdinacijaOS, Klinika određuje svrhu i sredstva obrade tih podataka i djeluje kao voditelj obrade. OrdinacijaOS pruža softver i infrastrukturu i djeluje kao obradaitelj u skladu s Ugovorom o obradi podataka (DPA). Za podatke o korisničkim nalozima Klinike i podatke prikupljene na marketing stranici, OrdinacijaOS može djelovati kao voditelj obrade.
+> Kada stomatološka ordinacija (“Klinika”) unosi podatke o pacijentima u DentOrd, Klinika određuje svrhu i sredstva obrade tih podataka i djeluje kao voditelj obrade. DentOrd pruža softver i infrastrukturu i djeluje kao obradaitelj u skladu s Ugovorom o obradi podataka (DPA). Za podatke o korisničkim nalozima Klinike i podatke prikupljene na marketing stranici, DentOrd može djelovati kao voditelj obrade.
 
 **Draft — analytics:**
 
@@ -723,15 +725,15 @@ Dodatni blocker: **tenant isolation** suite (clinic A vs B na patients, appointm
 
 **Draft — medicinski disclaimer:**
 
-> OrdinacijaOS je softverski alat za evidenciju i administraciju. Ne pruža medicinski savjet, dijagnozu ni terapiju. Sve kliničke odluke donosi ovlašteni zdravstveni radnik. AI funkcije (ako su uključene) generišu nacrte koje korisnik mora pregledati i potvrditi prije spremanja u karton.
+> DentOrd je softverski alat za evidenciju i administraciju. Ne pruža medicinski savjet, dijagnozu ni terapiju. Sve kliničke odluke donosi ovlašteni zdravstveni radnik. AI funkcije (ako su uključene) generišu nacrte koje korisnik mora pregledati i potvrditi prije spremanja u karton.
 
 **Draft — trial i brisanje:**
 
-> Tokom besplatnog perioda do 31.12.2026. usluga se pruža “as is” radi evaluacije. Nakon isteka plaćenog ili besplatnog perioda, OrdinacijaOS može prevesti nalog u režim samo-za-čitanje na do 7 dana, omogućiti izvoz podataka, a zatim trajno obrisati podatke Klinike u skladu s politikom čuvanja.
+> Tokom besplatnog perioda do 31.12.2026. usluga se pruža “as is” radi evaluacije. Nakon isteka plaćenog ili besplatnog perioda, DentOrd može prevesti nalog u režim samo-za-čitanje na do 7 dana, omogućiti izvoz podataka, a zatim trajno obrisati podatke Klinike u skladu s politikom čuvanja.
 
 ### 13.3 DPA (Data Processing Agreement) — outline + draft clauses
 
-**Strane:** Klinika (Controller) ↔ OrdinacijaOS (Processor)
+**Strane:** Klinika (Controller) ↔ DentOrd (Processor)
 
 **Sekcije:**
 
@@ -750,7 +752,7 @@ Dodatni blocker: **tenant isolation** suite (clinic A vs B na patients, appointm
 
 **Draft — upute:**
 
-> Processor obrađuje podatke pacijenata isključivo radi pružanja OrdinacijaOS usluge Klinici i po dokumentovanim uputama Controller-a (uključujući konfiguraciju u aplikaciji). Processor ne koristi podatke pacijenata za treniranje javnih AI modela trećih strana bez eksplicitnog ugovornog osnova i Controllera.
+> Processor obrađuje podatke pacijenata isključivo radi pružanja DentOrd usluge Klinici i po dokumentovanim uputama Controller-a (uključujući konfiguraciju u aplikaciji). Processor ne koristi podatke pacijenata za treniranje javnih AI modela trećih strana bez eksplicitnog ugovornog osnova i Controllera.
 
 ### 13.4 Marketing site legal UX
 
@@ -764,7 +766,7 @@ Dodatni blocker: **tenant isolation** suite (clinic A vs B na patients, appointm
 
 | Stavka | Status |
 |---|---|
-| Finalni domen / pravno ime firme | TBD — kupovina domena kad se skonta brand |
+| Finalni domen / pravno ime firme | domen **dentord.com** (brand **DentOrd**); pravno ime firme još TBD |
 | Tačan PDV / poreski ID na fakturama platforme | Nakon registracije firme |
 | Mjerodavno pravo u Terms | Nakon registracije firme |
 | Vanjski pen-test prije masovne naplate 2027 | Preporučeno; timing TBD |
@@ -780,4 +782,4 @@ Dodatni blocker: **tenant isolation** suite (clinic A vs B na patients, appointm
 
 ---
 
-*Kraj PRD OrdinacijaOS v1.0 — 10. juli 2026.*
+*Kraj PRD DentOrd v1.0 — 10. juli 2026.*

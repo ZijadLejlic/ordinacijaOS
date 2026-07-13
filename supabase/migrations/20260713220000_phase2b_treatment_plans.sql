@@ -1,0 +1,14 @@
+-- Faza 2B — treatment plans (D19).
+--
+-- Applied to the remote Supabase project via MCP `apply_migration`
+-- under the name: phase2b_treatment_plans
+--
+-- Summary:
+--   * Enum: treatment_plan_item_status (planned|in_progress|done|cancelled)
+--   * Helpers: can_access_treatment_plan(), can_write_treatment_plan()
+--   * Tables + RLS: treatment_plans, treatment_plan_items
+--   * FDI check on optional fdi_number via is_valid_fdi()
+--   * Trigger: item clinic_id must match parent plan clinic_id
+--
+-- RBAC: owner/doctor write; assistant read; reception/accountant/technician no
+-- (same matrix row as odontogram / plan terapije — PRD §3.2).

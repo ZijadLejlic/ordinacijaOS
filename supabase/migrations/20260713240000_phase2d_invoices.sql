@@ -1,0 +1,17 @@
+-- Faza 2D — invoices, payments, payment plans, PDF paths (D29).
+--
+-- Applied to the remote Supabase project via MCP `apply_migration`
+-- under the name: phase2d_invoices
+--
+-- Summary:
+--   * Enums: invoice_status, payment_method, payment_plan_status,
+--     payment_plan_installment_status
+--   * Helpers: can_access_invoices(), can_write_invoices()
+--   * allocate_invoice_number(clinic_id) + invoice_number_counters
+--   * Tables + RLS: invoices, invoice_lines, payments,
+--     payment_plans, payment_plan_installments
+--   * Trigger: payments → recompute invoice unpaid/partial/paid
+--   * Storage policies for patient-files/.../invoices/ (finance RBAC)
+--
+-- RBAC: owner + accountant only (PRD §3.2). Append-only lines/payments;
+-- void instead of delete. Serial YYYY-#### unique per clinic.

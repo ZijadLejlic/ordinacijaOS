@@ -5,17 +5,33 @@ import { redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ensureOwnerClinic } from "@/lib/auth/ensure-clinic";
 import { mfaPath, resolveOwnerMfaGate } from "@/lib/auth/mfa";
+import { resolveOnboardingGate } from "@/lib/onboarding/gate";
 import { clearOperatorCookie } from "@/lib/operators/session";
+import { isPlatformAdmin } from "@/lib/platform/admin";
+import { clearImpersonationCookie } from "@/lib/platform/session";
 import { loginSchema, signupSchema } from "@/lib/validations/auth";
 
 async function redirectAfterAuth(locale: string) {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (isPlatformAdmin(user)) {
+    redirect({ href: "/platform", locale });
+  }
+
   const gate = await resolveOwnerMfaGate(supabase);
-  if (gate === "ok") {
-    redirect({ href: "/dashboard", locale });
-  } else {
+  if (gate !== "ok") {
     redirect({ href: mfaPath(gate), locale });
   }
+
+  const onboardingGate = await resolveOnboardingGate(supabase);
+  if (onboardingGate === "needs_onboarding") {
+    redirect({ href: "/onboarding", locale });
+  }
+
+  redirect({ href: "/dashboard", locale });
 }
 
 export type AuthActionState = {
@@ -114,30 +130,33 @@ export async function loginAction(
     data: { user },
   } = await supabase.auth.getUser();
 
-  const meta = user?.user_metadata ?? {};
-  const clinicName =
-    typeof meta.clinic_name === "string" ? meta.clinic_name : null;
-  const fullName =
-    typeof meta.full_name === "string"
-      ? meta.full_name
-      : (user?.email ?? "Owner");
+  // Platform admins have no clinic profile (D41).
+  if (!isPlatformAdmin(user)) {
+    const meta = user?.user_metadata ?? {};
+    const clinicName =
+      typeof meta.clinic_name === "string" ? meta.clinic_name : null;
+    const fullName =
+      typeof meta.full_name === "string"
+        ? meta.full_name
+        : (user?.email ?? "Owner");
 
-  if (clinicName) {
-    const ensured = await ensureOwnerClinic(supabase, {
-      clinicName,
-      fullName,
-    });
-    if (ensured.error) {
-      return { error: ensured.error };
-    }
-  } else {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("id")
-      .maybeSingle();
+    if (clinicName) {
+      const ensured = await ensureOwnerClinic(supabase, {
+        clinicName,
+        fullName,
+      });
+      if (ensured.error) {
+        return { error: ensured.error };
+      }
+    } else {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("id")
+        .maybeSingle();
 
-    if (!profile) {
-      return { error: "missingClinic" };
+      if (!profile) {
+        return { error: "missingClinic" };
+      }
     }
   }
 
@@ -149,6 +168,7 @@ export async function logoutAction() {
   const supabase = await createClient();
   const locale = await getLocale();
   await clearOperatorCookie();
+  await clearImpersonationCookie();
   await supabase.auth.signOut();
   redirect({ href: "/login", locale });
 }

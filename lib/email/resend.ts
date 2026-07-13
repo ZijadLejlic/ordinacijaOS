@@ -1,4 +1,9 @@
 import { Resend } from "resend";
+import {
+  EMAIL_FROM_DEFAULT,
+  EMAIL_SUPPORT,
+  PRODUCT_NAME,
+} from "@/lib/brand/constants";
 
 function appUrl() {
   const url = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "");
@@ -14,9 +19,13 @@ function fromAddress() {
     if (process.env.NODE_ENV === "production") {
       throw new Error("Missing EMAIL_FROM");
     }
-    return "OrdinacijaOS <onboarding@resend.dev>";
+    return EMAIL_FROM_DEFAULT;
   }
   return from;
+}
+
+function replyToAddress() {
+  return process.env.EMAIL_REPLY_TO?.trim() || EMAIL_SUPPORT;
 }
 
 export type StaffInviteEmailInput = {
@@ -30,7 +39,7 @@ export type StaffInviteEmailInput = {
 
 export async function sendStaffInviteEmail(input: StaffInviteEmailInput) {
   const inviteUrl = `${appUrl()}/${input.locale}/invite/${input.token}`;
-  const subject = `Pozivnica za ${input.clinicName} — OrdinacijaOS`;
+  const subject = `Pozivnica za ${input.clinicName} — ${PRODUCT_NAME}`;
   const html = `
     <p>Pozdrav ${escapeHtml(input.fullName)},</p>
     <p>Pozvani ste u ordinaciju <strong>${escapeHtml(input.clinicName)}</strong>
@@ -52,6 +61,7 @@ export async function sendStaffInviteEmail(input: StaffInviteEmailInput) {
   const { data, error } = await resend.emails.send({
     from: fromAddress(),
     to: input.to,
+    replyTo: replyToAddress(),
     subject,
     html,
   });
@@ -95,8 +105,45 @@ export async function sendPasswordResetEmail(input: PasswordResetEmailInput) {
   const { data, error } = await resend.emails.send({
     from: fromAddress(),
     to: input.to,
+    replyTo: replyToAddress(),
     subject,
     html,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return { id: data?.id ?? null };
+}
+
+export type TemplatedEmailInput = {
+  to: string;
+  subject: string;
+  html: string;
+};
+
+/** Generic Resend send for clinic templates (reminders, test). */
+export async function sendTemplatedEmail(input: TemplatedEmailInput) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("Missing RESEND_API_KEY");
+    }
+    console.info("[email:dev] templated", {
+      to: input.to,
+      subject: input.subject,
+    });
+    return { id: "dev-skip" };
+  }
+
+  const resend = new Resend(apiKey);
+  const { data, error } = await resend.emails.send({
+    from: fromAddress(),
+    to: input.to,
+    replyTo: replyToAddress(),
+    subject: input.subject,
+    html: input.html,
   });
 
   if (error) {

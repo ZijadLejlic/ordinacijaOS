@@ -15,7 +15,7 @@ export async function GET() {
     );
   }
 
-  const eventId = Sentry.captureMessage("OrdinacijaOS Sentry test", {
+  const eventId = Sentry.captureMessage("DentOrd Sentry test", {
     level: "info",
     tags: { source: "sentry-test-api" },
   });
