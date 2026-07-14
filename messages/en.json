@@ -747,7 +747,8 @@
       "reception": "Reception",
       "accountant": "Accountant",
       "technician": "Technician"
-    }
+    },
+    "consent": "Consent templates"
   },
   "Patients": {
     "title": "Patients",
@@ -1245,6 +1246,13 @@
       },
       "auth": {
         "login_lockout": "Login lockout"
+      },
+      "consent_template": {
+        "updated": "Consent template updated"
+      },
+      "consent": {
+        "signed": "Consent signed",
+        "deleted": "Consent deleted"
       }
     }
   },
@@ -1323,6 +1331,79 @@
       "closureFailed": "Could not start closure.",
       "clinicReadonly": "Clinic is read-only. Edits are not allowed.",
       "clinicPendingDelete": "Account is scheduled for deletion. Edits are not allowed."
+    }
+  },
+  "ConsentTemplates": {
+    "title": "Consent templates",
+    "subtitle": "Document templates for draw-sign consents (BS/EN). One set per clinic.",
+    "upsellTitle": "Consent templates not included",
+    "upsellDescription": "Draw-sign consents and document templates are available on Professional and higher.",
+    "generalCardTitle": "General treatment",
+    "generalCardDescription": "Standard dental treatment consent.",
+    "dataCardTitle": "Data processing",
+    "dataCardDescription": "Consent to process personal and health data.",
+    "radiographyCardTitle": "Radiography",
+    "radiographyCardDescription": "Consent for dental X-rays.",
+    "titleField": "Document title",
+    "body": "Body",
+    "varsHint": "Available variables: {vars}",
+    "save": "Save",
+    "saved": "Template saved.",
+    "submitting": "Please wait…",
+    "readOnlyHint": "Only the owner can edit templates. Clinical staff can sign on the patient chart.",
+    "locales": {
+      "bs": "Bosnian",
+      "en": "English"
+    },
+    "keys": {
+      "general_treatment": "General treatment",
+      "data_processing": "Data processing",
+      "radiography": "Radiography"
+    },
+    "errors": {
+      "invalid": "Check the form fields.",
+      "unauthorized": "You must be signed in.",
+      "forbidden": "You do not have permission for consent templates.",
+      "clinicReadonly": "Clinic is read-only.",
+      "clinicPendingDelete": "Clinic is pending deletion.",
+      "featureDisabled": "Consent draw-sign is not included in your plan.",
+      "saveFailed": "Could not save the change.",
+      "templateNotFound": "Template not found."
+    }
+  },
+  "Consent": {
+    "title": "Consents",
+    "description": "Draw-sign consent documents. Stored privately with signed URLs.",
+    "upsellTitle": "Consents not included",
+    "upsellDescription": "Draw-sign consents are available on Professional and higher.",
+    "emptySignatures": "No signed consents yet.",
+    "newSignatureTitle": "New consent signature",
+    "chooseTemplate": "Template",
+    "signaturePadLabel": "Signature pad",
+    "signatureHint": "Patient draws signature here.",
+    "signatureReady": "Signature captured.",
+    "clearSignature": "Clear",
+    "signAndSave": "Sign and save PDF",
+    "signed": "Consent signed and saved.",
+    "submitting": "Please wait…",
+    "openPdf": "Open PDF",
+    "delete": "Delete",
+    "noTemplates": "No templates for this language. Add them in Consent templates settings.",
+    "errors": {
+      "invalid": "Check the form fields.",
+      "unauthorized": "You must be signed in.",
+      "forbidden": "You do not have permission to sign consents.",
+      "clinicReadonly": "Clinic is read-only.",
+      "clinicPendingDelete": "Clinic is pending deletion.",
+      "featureDisabled": "Consent draw-sign is not included in your plan.",
+      "signatureEmpty": "Draw a signature before saving.",
+      "patientNotFound": "Patient not found.",
+      "templateNotFound": "Template not found.",
+      "pdfFailed": "Could not generate the PDF.",
+      "signFailed": "Could not save the signed consent.",
+      "deleteFailed": "Could not delete the consent.",
+      "notFound": "Consent not found.",
+      "signedUrlFailed": "Could not open the PDF."
     }
   }
 }

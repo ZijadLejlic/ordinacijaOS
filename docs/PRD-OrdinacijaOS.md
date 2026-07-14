@@ -605,7 +605,7 @@ Online naplata usluga pacijentima (avans preko portala): **nadogradnja poslije**
 21. ~~Clinic export ZIP / backup UX~~ *(slice 3C: `/settings/privacy` ZIP; `GET /api/privacy/clinic/export`; pacijenti+računi+docs meta; D45)*
 22. ~~Trial expiry → readonly → delete job~~ *(slice 3C: `clinic_is_writable` RLS; owner close; cron `/api/cron/clinic-lifecycle`; hard delete RPC)*
 23. ~~E2E + tenant isolation CI~~ *(Playwright: signup→onboarding, termin, faktura+PDF, isolation UI; Vitest RLS patients/appointments/storage; `.github/workflows/e2e.yml` + `security.yml`)*
-24. Consent draw-sign + doc templates
+24. ~~Consent draw-sign + doc templates~~ *(slice 3D: `/settings/consent` BS/EN predlošci; karton draw-sign → PDF; `consent_forms` / `consent_signatures`; feature `consent_draw_sign`)*
 25. Inventar basic
 
 ### Faza 4 — Premium / Enterprise / 2027 billing

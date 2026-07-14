@@ -387,8 +387,25 @@ Migracija `phase3b_crm_light`:
 **Još nije u DB (skica):**
 
 ```text
-consent_forms / consent_signatures            -- draw sign (D20)
+(inventar tables — item 25)
 ```
+
+### Faza 3D — Consent draw-sign + doc templates (implementirano)
+
+Migracije `phase3d_consent_draw_sign` + `phase3d_consent_hooks`:
+
+| Tabela / helper | Napomena |
+|---|---|
+| `consent_forms` | clinic predlošci; keys `general_treatment\|data_processing\|radiography`; BS/EN; `{{ime}}` `{{datum}}` `{{ordinacija}}` |
+| `consent_signatures` | snapshot title/body_rendered; PNG + PDF paths u `patient-files`; signed_by |
+| `can_read_consent_forms` | owner + doctor + assistant + reception |
+| `can_write_consent_forms` | owner only |
+| `can_sign_consents` | mirrors `can_write_patients` |
+| `seed_default_consent_forms` | lazy + clinic create |
+
+**App:** `/settings/consent` (owner edit); patient chart draw-sign → PDF; feature `consent_draw_sign`. Audit: `consent_template.updated`, `consent.signed`, `consent.deleted`. GDPR hard delete briše `consent_signatures` (+ storage paths u app cleanup).
+
+**Migracije:** `supabase/migrations/20260714050000_phase3d_consent_draw_sign.sql` — primijenjene na remote.
 
 **Kalendar:** termin vezan za doktora; stolice nisu u MVP (D14).
 
@@ -487,6 +504,8 @@ Location create must call `assertCanCreateLocation`; image upload must call `ass
 | `phase3c_audit_log_ui` | `audit_events` SELECT owner-only; `(clinic_id, created_at desc)` index |
 | `phase3c_gdpr_erasure` | `gdpr_erasure_requests` + RLS; `approve_gdpr_patient_erasure` hard delete RPC (D35) |
 | `phase3c_clinic_lifecycle` | grace columns; `clinic_is_writable` RLS; closure + lifecycle + hard_delete RPCs (D6/D45) |
+| `phase3d_consent_draw_sign` | `consent_forms` / `consent_signatures` + RLS + seed (D20) |
+| `phase3d_consent_hooks` | clinic create seed + GDPR erase consents |
 
 ---
 
@@ -518,3 +537,4 @@ Location create must call `assertCanCreateLocation`; image upload must call `ass
 | 2026-07-14 | Faza 3C: audit owner SELECT + GDPR erasure table/RPC (D35); local migrations `phase3c_*` |
 | 2026-07-14 | Faza 3C: clinic ZIP backup app-layer (§8.3 / D45) — no new table |
 | 2026-07-14 | Faza 3C: clinic lifecycle (D6/D45) — grace columns, writable RLS, closure + cron hard delete |
+| 2026-07-14 | Faza 3D: consent_forms / consent_signatures + draw-sign (D20); GDPR + clinic create hooks |

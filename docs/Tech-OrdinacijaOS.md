@@ -66,6 +66,7 @@ Zaključati **kako** gradimo DentOrd (stack, patterni, granice), da agent/develo
 | Clinic ZIP backup (Faza 3C / §8.3) | Owner on-demand ZIP: `GET /api/privacy/clinic/export` — patients, invoices(+lines/payments), documents/images meta; audit `clinic.backup_exported` |
 | Clinic lifecycle (Faza 3C / D6 / D45) | Trial/unpaid → `readonly` (7d grace) → `pending_delete` → hard delete; owner close via `/settings/privacy`; cron `GET /api/cron/clinic-lifecycle`; RLS `clinic_is_writable()` |
 | E2E + tenant isolation CI (item 23) | Playwright `e2e/` — signup→MFA→onboarding step 1, termin+overlap, faktura+PDF, UI isolation; Vitest `lib/security/tenant-isolation.test.ts` — patients/appointments/storage; workflows `e2e.yml` + `security.yml` |
+| Consent draw-sign (Faza 3D / D20) | `/settings/consent` — BS/EN predlošci (`general_treatment`, `data_processing`, `radiography`); karton draw-sign → PDF + PNG u `patient-files`; `consent_forms` / `consent_signatures`; feature `consent_draw_sign` (Pro+) |
 | Marketing (Faza 1) | `(marketing)/` landing + `/pricing` + signup CTA; display prices mirror PRD §4.1 |
 | Observability (Faza 1) | Sentry (`instrumentation*.ts`, optional DSN); PostHog (`lib/analytics/posthog.ts`, EU host, no patient PII) |
 
@@ -164,6 +165,7 @@ docs/
 - Path: `clinic_id / patient_id / ...`
 - Image limiti po planu (D22); WebP kompresija.
 - Bucket `patient-files` (Faza 2A): `{clinic_id}/{patient_id}/documents/{id}.pdf` i `{clinic_id}/{patient_id}/images/{id}.webp`; signed URL TTL 120s (`lib/patients/storage.ts`), generisan on-demand po zahtjevu (nema eager fetch).
+- Consents (Faza 3D / D20): `{clinic_id}/{patient_id}/consents/{id}.pdf` + `{id}.sig.png`; PDF via `@react-pdf/renderer` + canvas draw-sign.
 - Invoice PDF (Faza 2D): `{clinic_id}/{patient_id}/invoices/{invoice_id}.pdf` — immutable copy snimljen pri issue; Route Handler streamuje stored file (ne regeneriše template).
 - Clinic branding (Faza 2G): bucket `clinic-branding`, path `{clinic_id}/logo.webp`; `branding_json.logo_path` + `colors.{background,text,accent}`; signed URL TTL 3600s za shell; invoice PDF downloada logo kao data URI.
 - Upload: PDF max 20MB za dokumente; slike (bilo koji format) konvertovane u WebP (`sharp`, quality ~82, max width 2400) prije upload-a; broj slika po pacijentu limitiran planom (`assertCanAddPatientImage`).
@@ -244,3 +246,4 @@ Prati PRD §11. Tech doc se širi po fazama; ne specifikovati Enterprise module 
 | 2026-07-14 | Faza 3C: clinic lifecycle trial→readonly→hard delete (D6/D45); cron `/api/cron/clinic-lifecycle` |
 | 2026-07-14 | Item 23: Playwright E2E (signup/termin/faktura/isolation) + Vitest tenant isolation patients/appts/storage CI |
 | 2026-07-14 | Fix allocate_invoice_number ambiguity (migration + app fallback); nest AuditLog.events keys for next-intl |
+| 2026-07-14 | Faza 3D / D20: consent templates + draw-sign PDF (`consent_forms` / `consent_signatures`) |

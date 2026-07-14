@@ -10,6 +10,7 @@ import { clearOperatorSessionAction } from "@/lib/operators/actions";
 import { canAccessCalendar } from "@/lib/calendar/rbac";
 import { canAccessCrm } from "@/lib/crm/rbac";
 import { canReadEmailTemplates } from "@/lib/email/rbac";
+import { canReadConsentForms } from "@/lib/consent/rbac";
 import { canAccessExpenses } from "@/lib/expenses/rbac";
 import { canAccessImport } from "@/lib/import/rbac";
 import { canAccessInvoices } from "@/lib/invoices/rbac";
@@ -34,6 +35,7 @@ type NavItem = {
     | "/settings/locations"
     | "/settings/branding"
     | "/settings/email"
+    | "/settings/consent"
     | "/settings/import"
     | "/settings/audit"
     | "/settings/privacy";
@@ -50,6 +52,7 @@ type NavItem = {
     | "locations"
     | "branding"
     | "email"
+    | "consent"
     | "import"
     | "audit"
     | "privacy";
@@ -70,6 +73,7 @@ type AppShellProps = {
   showExpenses?: boolean;
   showCrm?: boolean;
   crmOpenCount?: number;
+  showConsent?: boolean;
   branding?: AppShellBranding | null;
   children: React.ReactNode;
 };
@@ -83,11 +87,13 @@ export function AppShell({
   showExpenses = false,
   showCrm = false,
   crmOpenCount = 0,
+  showConsent = false,
   branding = null,
   children,
 }: AppShellProps) {
   const showImport = canAccessImport(role);
   const showEmail = canReadEmailTemplates(role);
+  const showConsentNav = showConsent && canReadConsentForms(role);
   const crmNav = showCrm && canAccessCrm(role);
   const t = useTranslations("Nav");
   const pathname = usePathname();
@@ -130,6 +136,9 @@ export function AppShell({
       : []),
     ...(showEmail
       ? ([{ href: "/settings/email", labelKey: "email" }] as const)
+      : []),
+    ...(showConsentNav
+      ? ([{ href: "/settings/consent", labelKey: "consent" }] as const)
       : []),
     ...(showImport
       ? ([{ href: "/settings/import", labelKey: "import" }] as const)

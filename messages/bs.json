@@ -747,7 +747,8 @@
       "reception": "Recepcija",
       "accountant": "Računovodstvo",
       "technician": "Tehničar"
-    }
+    },
+    "consent": "Predlošci saglasnosti"
   },
   "Patients": {
     "title": "Pacijenti",
@@ -1245,6 +1246,13 @@
       },
       "auth": {
         "login_lockout": "Login lockout"
+      },
+      "consent_template": {
+        "updated": "Predložak saglasnosti ažuriran"
+      },
+      "consent": {
+        "signed": "Saglasnost potpisana",
+        "deleted": "Saglasnost obrisana"
       }
     }
   },
@@ -1323,6 +1331,79 @@
       "closureFailed": "Zatvaranje nije uspjelo.",
       "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmjene nisu dozvoljene.",
       "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmjene nisu dozvoljene."
+    }
+  },
+  "ConsentTemplates": {
+    "title": "Predlošci saglasnosti",
+    "subtitle": "Predlošci dokumenata za potpis saglasnosti (BS/EN). Jedan set po ordinaciji.",
+    "upsellTitle": "Predlošci saglasnosti nisu uključeni",
+    "upsellDescription": "Draw-sign saglasnosti i predlošci dokumenata dostupni su na Professional i višim planovima.",
+    "generalCardTitle": "Opći tretman",
+    "generalCardDescription": "Standardna saglasnost za stomatološki tretman.",
+    "dataCardTitle": "Obrada podataka",
+    "dataCardDescription": "Saglasnost za obradu ličnih i zdravstvenih podataka.",
+    "radiographyCardTitle": "RTG",
+    "radiographyCardDescription": "Saglasnost za rendgensko snimanje.",
+    "titleField": "Naslov dokumenta",
+    "body": "Tekst",
+    "varsHint": "Dostupne varijable: {vars}",
+    "save": "Sačuvaj",
+    "saved": "Predložak sačuvan.",
+    "submitting": "Sačekajte…",
+    "readOnlyHint": "Samo vlasnik uređuje predloške. Kliničko osoblje potpisuje na kartonu pacijenta.",
+    "locales": {
+      "bs": "Bosanski",
+      "en": "Engleski"
+    },
+    "keys": {
+      "general_treatment": "Opći tretman",
+      "data_processing": "Obrada podataka",
+      "radiography": "RTG"
+    },
+    "errors": {
+      "invalid": "Provjerite polja forme.",
+      "unauthorized": "Morate biti prijavljeni.",
+      "forbidden": "Nemate dozvolu za predloške saglasnosti.",
+      "clinicReadonly": "Ordinacija je samo za čitanje.",
+      "clinicPendingDelete": "Ordinacija je označena za brisanje.",
+      "featureDisabled": "Draw-sign saglasnosti nisu uključene u vaš plan.",
+      "saveFailed": "Izmjena nije sačuvana.",
+      "templateNotFound": "Predložak nije pronađen."
+    }
+  },
+  "Consent": {
+    "title": "Saglasnosti",
+    "description": "Dokumenti saglasnosti s draw potpisom. Privatni storage i signed URL-ovi.",
+    "upsellTitle": "Saglasnosti nisu uključene",
+    "upsellDescription": "Draw-sign saglasnosti dostupne su na Professional i višim planovima.",
+    "emptySignatures": "Još nema potpisanih saglasnosti.",
+    "newSignatureTitle": "Nova saglasnost",
+    "chooseTemplate": "Predložak",
+    "signaturePadLabel": "Polje za potpis",
+    "signatureHint": "Pacijent ovdje crta potpis.",
+    "signatureReady": "Potpis snimljen.",
+    "clearSignature": "Obriši",
+    "signAndSave": "Potpiši i sačuvaj PDF",
+    "signed": "Saglasnost potpisana i sačuvana.",
+    "submitting": "Sačekajte…",
+    "openPdf": "Otvori PDF",
+    "delete": "Obriši",
+    "noTemplates": "Nema predložaka za ovaj jezik. Dodajte ih u postavkama Predlošci saglasnosti.",
+    "errors": {
+      "invalid": "Provjerite polja forme.",
+      "unauthorized": "Morate biti prijavljeni.",
+      "forbidden": "Nemate dozvolu za potpis saglasnosti.",
+      "clinicReadonly": "Ordinacija je samo za čitanje.",
+      "clinicPendingDelete": "Ordinacija je označena za brisanje.",
+      "featureDisabled": "Draw-sign saglasnosti nisu uključene u vaš plan.",
+      "signatureEmpty": "Nacrtajte potpis prije čuvanja.",
+      "patientNotFound": "Pacijent nije pronađen.",
+      "templateNotFound": "Predložak nije pronađen.",
+      "pdfFailed": "PDF nije generisan.",
+      "signFailed": "Potpisana saglasnost nije sačuvana.",
+      "deleteFailed": "Saglasnost nije obrisana.",
+      "notFound": "Saglasnost nije pronađena.",
+      "signedUrlFailed": "PDF nije moguće otvoriti."
     }
   }
 }

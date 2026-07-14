@@ -11,6 +11,7 @@ export type PatientExportPayload = {
   allergies: Json[];
   documents: Json[];
   images: Json[];
+  consent_signatures: Json[];
   odontogram_teeth: Json[];
   odontogram_events: Json[];
   treatment_plans: Json[];
@@ -42,6 +43,7 @@ export async function buildPatientExport(
     allergies,
     documents,
     images,
+    consents,
     teeth,
     odontogramEvents,
     plans,
@@ -63,6 +65,13 @@ export async function buildPatientExport(
     supabase
       .from("patient_images")
       .select("id, title, storage_path, size_bytes, created_at")
+      .eq("clinic_id", clinicId)
+      .eq("patient_id", patientId),
+    supabase
+      .from("consent_signatures")
+      .select(
+        "id, template_key, locale, title, pdf_storage_path, signature_storage_path, signed_at, created_at",
+      )
       .eq("clinic_id", clinicId)
       .eq("patient_id", patientId),
     supabase
@@ -131,6 +140,7 @@ export async function buildPatientExport(
     allergies: (allergies.data ?? []) as Json[],
     documents: (documents.data ?? []) as Json[],
     images: (images.data ?? []) as Json[],
+    consent_signatures: (consents.data ?? []) as Json[],
     odontogram_teeth: (teeth.data ?? []) as Json[],
     odontogram_events: (odontogramEvents.data ?? []) as Json[],
     treatment_plans: (plans.data ?? []) as Json[],
@@ -151,7 +161,7 @@ export async function listPatientStoragePaths(
   clinicId: string,
   patientId: string,
 ): Promise<string[]> {
-  const [{ data: docs }, { data: images }, { data: invoices }] =
+  const [{ data: docs }, { data: images }, { data: invoices }, { data: consents }] =
     await Promise.all([
       supabase
         .from("patient_documents")
@@ -168,6 +178,11 @@ export async function listPatientStoragePaths(
         .select("pdf_storage_path")
         .eq("clinic_id", clinicId)
         .eq("patient_id", patientId),
+      supabase
+        .from("consent_signatures")
+        .select("pdf_storage_path, signature_storage_path")
+        .eq("clinic_id", clinicId)
+        .eq("patient_id", patientId),
     ]);
 
   const paths = [
@@ -176,6 +191,10 @@ export async function listPatientStoragePaths(
     ...(invoices ?? [])
       .map((i) => i.pdf_storage_path)
       .filter((p): p is string => Boolean(p)),
+    ...(consents ?? []).flatMap((c) => [
+      c.pdf_storage_path,
+      c.signature_storage_path,
+    ]),
   ];
 
   return [...new Set(paths)];

@@ -20,6 +20,24 @@ export function imagePath(clinicId: string, patientId: string, fileId: string) {
   return `${clinicId}/${patientId}/images/${fileId}.webp`;
 }
 
+/** Signed consent PDF (D20). */
+export function consentPdfPath(
+  clinicId: string,
+  patientId: string,
+  fileId: string,
+) {
+  return `${clinicId}/${patientId}/consents/${fileId}.pdf`;
+}
+
+/** Draw-signature PNG paired with consent PDF (D20). */
+export function consentSignaturePath(
+  clinicId: string,
+  patientId: string,
+  fileId: string,
+) {
+  return `${clinicId}/${patientId}/consents/${fileId}.sig.png`;
+}
+
 /** Compress and re-encode any raster image to WebP (D21 — quality-preserving). */
 export async function convertImageToWebp(buffer: Buffer): Promise<Buffer> {
   return sharp(buffer)

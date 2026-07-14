@@ -13,6 +13,7 @@ import {
 } from "@/lib/branding/storage";
 import { clinicHasFeature } from "@/lib/entitlements";
 import { canAccessCrm } from "@/lib/crm/rbac";
+import { canReadConsentForms } from "@/lib/consent/rbac";
 import { countOpenCrmNotifications } from "@/lib/crm/load";
 import { canAccessExpenses } from "@/lib/expenses/rbac";
 import { getOperatorIdFromCookie } from "@/lib/operators/session";
@@ -70,7 +71,7 @@ export default async function DashboardLayout({ children, params }: Props) {
     operatorName = op?.display_name ?? null;
   }
 
-  const [showExpenses, brandingEnabled, showCrm] = await Promise.all([
+  const [showExpenses, brandingEnabled, showCrm, showConsent] = await Promise.all([
     canAccessExpenses(profile!.role)
       ? clinicHasFeature(
           supabase,
@@ -81,6 +82,9 @@ export default async function DashboardLayout({ children, params }: Props) {
     clinicHasFeature(supabase, profile!.clinic_id, "branding_custom"),
     canAccessCrm(profile!.role)
       ? clinicHasFeature(supabase, profile!.clinic_id, "crm_light")
+      : Promise.resolve(false),
+    canReadConsentForms(profile!.role)
+      ? clinicHasFeature(supabase, profile!.clinic_id, "consent_draw_sign")
       : Promise.resolve(false),
   ]);
 
@@ -135,6 +139,7 @@ export default async function DashboardLayout({ children, params }: Props) {
         showExpenses={showExpenses}
         showCrm={showCrm}
         crmOpenCount={crmOpenCount}
+        showConsent={showConsent}
         branding={shellBranding}
       >
         {children}

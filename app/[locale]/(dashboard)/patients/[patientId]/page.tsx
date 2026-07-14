@@ -25,8 +25,15 @@ import {
   ImageUploadForm,
   ImagesList,
 } from "@/components/patients/patient-files";
+import { PatientConsentPanel } from "@/components/consent/patient-consent-panel";
 import { Odontogram } from "@/components/odontogram/odontogram";
 import { TreatmentPlansPanel } from "@/components/treatment-plans/treatment-plans-panel";
+import {
+  loadConsentFormsForClinic,
+  loadPatientConsentSignatures,
+} from "@/lib/consent/load";
+import { canSignConsents } from "@/lib/consent/rbac";
+import { clinicHasFeature } from "@/lib/entitlements";
 import {
   canAccessOdontogram,
   canAccessPatients,
@@ -40,6 +47,8 @@ import {
   canRequestPatientErasure,
 } from "@/lib/privacy/rbac";
 import { createClient } from "@/lib/supabase/server";
+import { formatInTimeZone } from "date-fns-tz";
+import { CLINIC_TIMEZONE } from "@/lib/calendar/time";
 
 type Props = {
   params: Promise<{ locale: string; patientId: string }>;
@@ -49,6 +58,7 @@ export default async function PatientDetailPage({ params }: Props) {
   const { locale, patientId } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("Patients");
+  const tConsent = await getTranslations("Consent");
   const supabase = await createClient();
 
   const {
@@ -61,13 +71,16 @@ export default async function PatientDetailPage({ params }: Props) {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role, clinic_id")
+    .select("role, clinic_id, clinics(name)")
     .eq("id", user!.id)
     .maybeSingle();
 
   if (!profile || !canAccessPatients(profile.role)) {
     redirect({ href: "/dashboard", locale });
   }
+
+  const clinicName =
+    (profile!.clinics as { name: string } | null)?.name ?? "";
 
   const { data: patient } = await supabase
     .from("patients")
@@ -89,6 +102,13 @@ export default async function PatientDetailPage({ params }: Props) {
   const canViewTreatmentPlan = canAccessTreatmentPlan(profile!.role);
   const canEditTreatmentPlan =
     canWriteTreatmentPlan(profile!.role) && patient.is_active;
+  const canSign = canSignConsents(profile!.role) && patient.is_active;
+
+  const consentFeatureOk = await clinicHasFeature(
+    supabase,
+    profile!.clinic_id,
+    "consent_draw_sign",
+  );
 
   const [
     { data: allergies },
@@ -96,6 +116,8 @@ export default async function PatientDetailPage({ params }: Props) {
     { data: images },
     odontogramData,
     treatmentPlanData,
+    consentForms,
+    consentSignatures,
   ] = await Promise.all([
     supabase
       .from("patient_allergies")
@@ -160,7 +182,23 @@ export default async function PatientDetailPage({ params }: Props) {
           return { plans: plans ?? [], items: items ?? [], services: services ?? [] };
         })()
       : null,
+    consentFeatureOk
+      ? loadConsentFormsForClinic(profile!.clinic_id)
+      : Promise.resolve([]),
+    consentFeatureOk
+      ? loadPatientConsentSignatures(profile!.clinic_id, patientId)
+      : Promise.resolve([]),
   ]);
+
+  const consentVars = {
+    ime: `${patient.first_name} ${patient.last_name}`.trim(),
+    datum: formatInTimeZone(
+      new Date(),
+      CLINIC_TIMEZONE,
+      locale === "en" ? "dd MMM yyyy" : "dd.MM.yyyy.",
+    ),
+    ordinacija: clinicName,
+  };
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-4 py-10">
@@ -246,6 +284,23 @@ export default async function PatientDetailPage({ params }: Props) {
             }))}
           />
           {canWrite ? <DocumentUploadForm patientId={patient.id} /> : null}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{tConsent("title")}</CardTitle>
+          <CardDescription>{tConsent("description")}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <PatientConsentPanel
+            patientId={patient.id}
+            forms={consentForms}
+            signatures={consentSignatures}
+            vars={consentVars}
+            canWrite={canSign}
+            featureOk={consentFeatureOk}
+          />
         </CardContent>
       </Card>
 

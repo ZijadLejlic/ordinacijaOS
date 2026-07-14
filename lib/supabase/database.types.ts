@@ -510,6 +510,124 @@ export type Database = {
           },
         ]
       }
+      consent_forms: {
+        Row: {
+          body_text: string
+          clinic_id: string
+          created_at: string
+          id: string
+          locale: string
+          template_key: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body_text: string
+          clinic_id: string
+          created_at?: string
+          id?: string
+          locale: string
+          template_key: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body_text?: string
+          clinic_id?: string
+          created_at?: string
+          id?: string
+          locale?: string
+          template_key?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consent_forms_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      consent_signatures: {
+        Row: {
+          body_rendered: string
+          clinic_id: string
+          consent_form_id: string
+          created_at: string
+          id: string
+          locale: string
+          patient_id: string
+          pdf_storage_path: string
+          signature_storage_path: string
+          signed_at: string
+          signed_by: string | null
+          template_key: string
+          title: string
+        }
+        Insert: {
+          body_rendered: string
+          clinic_id: string
+          consent_form_id: string
+          created_at?: string
+          id?: string
+          locale: string
+          patient_id: string
+          pdf_storage_path: string
+          signature_storage_path: string
+          signed_at?: string
+          signed_by?: string | null
+          template_key: string
+          title: string
+        }
+        Update: {
+          body_rendered?: string
+          clinic_id?: string
+          consent_form_id?: string
+          created_at?: string
+          id?: string
+          locale?: string
+          patient_id?: string
+          pdf_storage_path?: string
+          signature_storage_path?: string
+          signed_at?: string
+          signed_by?: string | null
+          template_key?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consent_signatures_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consent_signatures_consent_form_id_fkey"
+            columns: ["consent_form_id"]
+            isOneToOne: false
+            referencedRelation: "consent_forms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consent_signatures_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consent_signatures_signed_by_fkey"
+            columns: ["signed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       crm_notifications: {
         Row: {
           clinic_id: string
@@ -1897,18 +2015,11 @@ export type Database = {
           series_year: number
         }[]
       }
-      auth_email_exists: { Args: { p_email: string }; Returns: boolean }
       approve_gdpr_patient_erasure: {
         Args: { p_request_id: string }
         Returns: Json
       }
-      clinic_is_writable: { Args: never; Returns: boolean }
-      hard_delete_clinic: {
-        Args: { p_clinic_id: string }
-        Returns: Json
-      }
-      request_clinic_closure: { Args: never; Returns: Json }
-      run_clinic_lifecycle_transitions: { Args: never; Returns: Json }
+      auth_email_exists: { Args: { p_email: string }; Returns: boolean }
       can_access_appointments: { Args: never; Returns: boolean }
       can_access_crm: { Args: never; Returns: boolean }
       can_access_expenses: { Args: never; Returns: boolean }
@@ -1918,9 +2029,12 @@ export type Database = {
       can_access_waitlist: { Args: never; Returns: boolean }
       can_import_services: { Args: never; Returns: boolean }
       can_manage_all_appointment_doctors: { Args: never; Returns: boolean }
+      can_read_consent_forms: { Args: never; Returns: boolean }
       can_read_email_templates: { Args: never; Returns: boolean }
       can_send_outbound_messages: { Args: never; Returns: boolean }
+      can_sign_consents: { Args: never; Returns: boolean }
       can_write_appointments: { Args: never; Returns: boolean }
+      can_write_consent_forms: { Args: never; Returns: boolean }
       can_write_email_templates: { Args: never; Returns: boolean }
       can_write_expenses: { Args: never; Returns: boolean }
       can_write_invoices: { Args: never; Returns: boolean }
@@ -1931,6 +2045,7 @@ export type Database = {
       can_write_waitlist: { Args: never; Returns: boolean }
       check_login_lockout: { Args: { p_email: string }; Returns: undefined }
       clear_login_lockout: { Args: never; Returns: undefined }
+      clinic_is_writable: { Args: never; Returns: boolean }
       create_clinic_for_owner: {
         Args: {
           p_clinic_name: string
@@ -1980,6 +2095,7 @@ export type Database = {
           last_name: string
         }[]
       }
+      hard_delete_clinic: { Args: { p_clinic_id: string }; Returns: Json }
       hash_operator_pin: { Args: { p_pin: string }; Returns: string }
       is_clinic_owner: { Args: never; Returns: boolean }
       is_valid_fdi: { Args: { p_fdi: number }; Returns: boolean }
@@ -2014,6 +2130,12 @@ export type Database = {
         }[]
       }
       record_failed_login: { Args: { p_email: string }; Returns: undefined }
+      request_clinic_closure: { Args: never; Returns: Json }
+      run_clinic_lifecycle_transitions: { Args: never; Returns: Json }
+      seed_default_consent_forms: {
+        Args: { p_clinic_id: string }
+        Returns: undefined
+      }
       seed_default_email_templates: {
         Args: { p_clinic_id: string }
         Returns: undefined
