@@ -349,12 +349,17 @@ describeSecurity(
         expect(createError).toBeNull();
         expect(operatorId).toBeTruthy();
 
-        const { error: wrongPinError } = await receptionClient.rpc("verify_operator_pin", {
-          p_operator_id: operatorId as string,
-          p_pin: "0000",
-        });
-        expect(wrongPinError).not.toBeNull();
-        expect(wrongPinError?.message.toLowerCase()).toContain("invalid_pin");
+        const { data: wrongPinData, error: wrongPinError } = await receptionClient.rpc(
+          "verify_operator_pin",
+          {
+            p_operator_id: operatorId as string,
+            p_pin: "0000",
+          },
+        );
+        // Wrong PIN returns empty rows (no RAISE) so the failed-count UPDATE can commit.
+        expect(wrongPinError).toBeNull();
+        const wrongRow = Array.isArray(wrongPinData) ? wrongPinData[0] : wrongPinData;
+        expect(wrongRow?.operator_id).toBeFalsy();
 
         const { data: verified, error: verifyError } = await receptionClient.rpc(
           "verify_operator_pin",
@@ -365,13 +370,7 @@ describeSecurity(
         expect(row?.operator_id).toBe(operatorId);
       }, 30_000);
 
-      // KNOWN GAP (found while writing this test, 2026-07-14): profiles.pin_failed_count /
-      // pin_locked_until columns exist but verify_operator_pin() never updates them — repeated
-      // wrong PINs just keep returning "invalid_pin" with no lockout. D10 / earlier code review
-      // claimed this was implemented; it is not. Tracked for a follow-up migration (mirror
-      // code_review_b2_login_lockout.sql) — this test intentionally documents current behavior,
-      // not the intended one, so CI stays green until that fix lands.
-      it("KNOWN GAP: repeated wrong PIN attempts do NOT currently lock the profile (no brute-force protection yet)", async () => {
+      it("locks shared desk profile after 5 wrong PIN attempts (D10)", async () => {
         const ownerClient = await signInAs(url, anonKey, owner.email, owner.password);
         const receptionClient = await signInAs(url, anonKey, reception.email, reception.password);
 
@@ -379,18 +378,25 @@ describeSecurity(
           "create_clinic_operator",
           {
             p_profile_id: reception.userId,
-            p_display_name: `Gap probe ${randomTag()}`,
+            p_display_name: `Lock probe ${randomTag()}`,
             p_pin: "1357",
           },
         );
         expect(createError).toBeNull();
 
-        for (let attempt = 0; attempt < 8; attempt += 1) {
-          const { error } = await receptionClient.rpc("verify_operator_pin", {
+        await service
+          .from("profiles")
+          .update({ pin_failed_count: 0, pin_locked_until: null })
+          .eq("id", reception.userId);
+
+        for (let attempt = 0; attempt < 5; attempt += 1) {
+          const { data, error } = await receptionClient.rpc("verify_operator_pin", {
             p_operator_id: operatorId as string,
             p_pin: "0000",
           });
-          expect(error?.message.toLowerCase()).toContain("invalid_pin");
+          expect(error).toBeNull();
+          const row = Array.isArray(data) ? data[0] : data;
+          expect(row?.operator_id).toBeFalsy();
         }
 
         const { data: profileState } = await service
@@ -398,8 +404,25 @@ describeSecurity(
           .select("pin_failed_count, pin_locked_until")
           .eq("id", reception.userId)
           .single();
-        expect(profileState?.pin_failed_count).toBe(0);
-        expect(profileState?.pin_locked_until).toBeNull();
+        expect(profileState?.pin_failed_count).toBe(5);
+        expect(profileState?.pin_locked_until).not.toBeNull();
+
+        const { error: lockedWrong } = await receptionClient.rpc("verify_operator_pin", {
+          p_operator_id: operatorId as string,
+          p_pin: "0000",
+        });
+        expect(lockedWrong?.message.toLowerCase()).toContain("locked");
+
+        const { error: lockedCorrect } = await receptionClient.rpc("verify_operator_pin", {
+          p_operator_id: operatorId as string,
+          p_pin: "1357",
+        });
+        expect(lockedCorrect?.message.toLowerCase()).toContain("locked");
+
+        await service
+          .from("profiles")
+          .update({ pin_failed_count: 0, pin_locked_until: null })
+          .eq("id", reception.userId);
       }, 30_000);
 
       it("operator from another clinic cannot be verified by a different clinic's user", async () => {
