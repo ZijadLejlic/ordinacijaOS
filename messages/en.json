@@ -67,7 +67,8 @@
     "invalidCredentials": "Incorrect email or password.",
     "locked": "Too many failed attempts. Try again in 15 minutes.",
     "confirmEmail": "Check your email to confirm, then log in.",
-    "missingClinic": "This account has no clinic. Sign up as an owner."
+    "missingClinic": "This account has no clinic. Sign up as an owner.",
+    "emailTaken": "This email already has an account. Log in instead."
   },
   "Mfa": {
     "enrollTitle": "Enable 2FA",
@@ -180,7 +181,9 @@
       "createFailed": "Expense was not created.",
       "saveFailed": "Changes were not saved.",
       "expenseNotFound": "Expense not found.",
-      "alreadyVoid": "Expense is already voided."
+      "alreadyVoid": "Expense is already voided.",
+      "clinicReadonly": "Clinic is read-only. Edits are not allowed.",
+      "clinicPendingDelete": "Account is scheduled for deletion. Edits are not allowed."
     }
   },
   "Invoices": {
@@ -290,7 +293,9 @@
       "planNotAllowed": "Installment plan is not allowed for this invoice.",
       "planExists": "An active installment plan already exists.",
       "planNotFound": "Plan not found.",
-      "planNotActive": "Plan is not active."
+      "planNotActive": "Plan is not active.",
+      "clinicReadonly": "Clinic is read-only. Edits are not allowed.",
+      "clinicPendingDelete": "Account is scheduled for deletion. Edits are not allowed."
     }
   },
   "Platform": {
@@ -355,7 +360,9 @@
       "alreadyImpersonating": "Impersonation is already active.",
       "sessionSwitchFailed": "Could not switch session.",
       "notImpersonating": "No active impersonation.",
-      "impersonationMismatch": "Session does not match impersonation."
+      "impersonationMismatch": "Session does not match impersonation.",
+      "clinicReadonly": "Clinic is read-only. Edits are not allowed.",
+      "clinicPendingDelete": "Account is scheduled for deletion. Edits are not allowed."
     }
   },
   "Users": {
@@ -423,7 +430,9 @@
       "cannotDeactivateSelf": "You cannot deactivate your own account.",
       "userNotFound": "User not found.",
       "missingAppUrl": "NEXT_PUBLIC_APP_URL is missing.",
-      "resetFailed": "Could not create a reset link."
+      "resetFailed": "Could not create a reset link.",
+      "clinicReadonly": "Clinic is read-only. Edits are not allowed.",
+      "clinicPendingDelete": "Account is scheduled for deletion. Edits are not allowed."
     }
   },
   "Operators": {
@@ -456,7 +465,9 @@
       "pinTaken": "Another operator on this account already uses this PIN.",
       "notFound": "Operator not found.",
       "locked": "Too many attempts. Wait 15 minutes.",
-      "failed": "Action failed."
+      "failed": "Action failed.",
+      "clinicReadonly": "Clinic is read-only. Edits are not allowed.",
+      "clinicPendingDelete": "Account is scheduled for deletion. Edits are not allowed."
     }
   },
   "Locations": {
@@ -505,7 +516,9 @@
       "createFailed": "Could not create the location.",
       "saveFailed": "Could not save the change. Try again.",
       "locationNotFound": "Location not found.",
-      "lastLocation": "Keep at least one active location."
+      "lastLocation": "Keep at least one active location.",
+      "clinicReadonly": "Clinic is read-only. Edits are not allowed.",
+      "clinicPendingDelete": "Account is scheduled for deletion. Edits are not allowed."
     }
   },
   "Branding": {
@@ -540,7 +553,9 @@
       "saveFailed": "Could not save the change. Try again.",
       "uploadFailed": "Could not upload the logo.",
       "logoTooLarge": "Logo must be 2 MB or smaller.",
-      "logoInvalidType": "Use JPEG, PNG, WebP, HEIC, or HEIF."
+      "logoInvalidType": "Use JPEG, PNG, WebP, HEIC, or HEIF.",
+      "clinicReadonly": "Clinic is read-only. Edits are not allowed.",
+      "clinicPendingDelete": "Account is scheduled for deletion. Edits are not allowed."
     }
   },
   "Onboarding": {
@@ -616,7 +631,9 @@
       "emailTaken": "This email is already registered.",
       "inviteExists": "An invite for this email already exists.",
       "inviteFailed": "Could not send the invite.",
-      "emailFailed": "Email was not sent. Check EMAIL_FROM / Resend."
+      "emailFailed": "Email was not sent. Check EMAIL_FROM / Resend.",
+      "clinicReadonly": "Clinic is read-only. Edits are not allowed.",
+      "clinicPendingDelete": "Account is scheduled for deletion. Edits are not allowed."
     }
   },
   "Import": {
@@ -661,7 +678,9 @@
       "noRows": "No rows to import.",
       "tooManyRows": "Maximum 500 rows per file.",
       "hasRowErrors": "Fix CSV errors before importing.",
-      "importFailed": "Import failed. Try again."
+      "importFailed": "Import failed. Try again.",
+      "clinicReadonly": "Clinic is read-only. Edits are not allowed.",
+      "clinicPendingDelete": "Account is scheduled for deletion. Edits are not allowed."
     }
   },
   "Pin": {
@@ -679,7 +698,9 @@
       "locked": "Account temporarily locked (15 min) after failed PIN attempts.",
       "forbidden": "PIN switch is not available for this role.",
       "unauthorized": "You must be signed in.",
-      "notFound": "Operator not found."
+      "notFound": "Operator not found.",
+      "clinicReadonly": "Clinic is read-only. Edits are not allowed.",
+      "clinicPendingDelete": "Account is scheduled for deletion. Edits are not allowed."
     }
   },
   "Invite": {
@@ -710,7 +731,10 @@
     "locations": "Locations",
     "branding": "Branding",
     "email": "Email templates",
+    "crm": "CRM",
     "import": "Import",
+    "audit": "Audit log",
+    "privacy": "Privacy",
     "logout": "Log out",
     "menu": "Menu",
     "closeMenu": "Close menu",
@@ -749,6 +773,7 @@
     "phone": "Phone",
     "email": "Email",
     "dateOfBirth": "Date of birth",
+    "nextControlAt": "Next control",
     "address": "Address",
     "medicalHistory": "Medical history",
     "notes": "Notes",
@@ -817,7 +842,9 @@
       "imageConvertFailed": "Could not convert the image to WebP.",
       "imageNotFound": "Image not found.",
       "signedUrlFailed": "Could not create a signed URL.",
-      "saveFailed": "Could not save the change. Try again."
+      "saveFailed": "Could not save the change. Try again.",
+      "clinicReadonly": "Clinic is read-only. Edits are not allowed.",
+      "clinicPendingDelete": "Account is scheduled for deletion. Edits are not allowed."
     }
   },
   "Services": {
@@ -869,7 +896,9 @@
       "forbidden": "Only the owner can manage services.",
       "createFailed": "Could not create the service.",
       "serviceNotFound": "Service not found.",
-      "saveFailed": "Could not save the change. Try again."
+      "saveFailed": "Could not save the change. Try again.",
+      "clinicReadonly": "Clinic is read-only. Edits are not allowed.",
+      "clinicPendingDelete": "Account is scheduled for deletion. Edits are not allowed."
     }
   },
   "Odontogram": {
@@ -904,7 +933,9 @@
       "forbidden": "You do not have permission for the odontogram.",
       "featureDisabled": "Odontogram is not included in your plan.",
       "patientNotFound": "Patient not found.",
-      "saveFailed": "Could not save the change. Try again."
+      "saveFailed": "Could not save the change. Try again.",
+      "clinicReadonly": "Clinic is read-only. Edits are not allowed.",
+      "clinicPendingDelete": "Account is scheduled for deletion. Edits are not allowed."
     }
   },
   "TreatmentPlan": {
@@ -952,7 +983,9 @@
       "planInactive": "Plan is archived.",
       "serviceNotFound": "Service not found.",
       "createFailed": "Could not create. Try again.",
-      "saveFailed": "Could not save the change. Try again."
+      "saveFailed": "Could not save the change. Try again.",
+      "clinicReadonly": "Clinic is read-only. Edits are not allowed.",
+      "clinicPendingDelete": "Account is scheduled for deletion. Edits are not allowed."
     }
   },
   "Calendar": {
@@ -1021,7 +1054,9 @@
       "appointmentNotSendable": "Reminders are not sent for cancelled/no-show appointments.",
       "templateNotFound": "Email template not found.",
       "sendFailed": "Email could not be sent. Try again.",
-      "missingActorEmail": "Your account has no email."
+      "missingActorEmail": "Your account has no email.",
+      "clinicReadonly": "Clinic is read-only. Edits are not allowed.",
+      "clinicPendingDelete": "Account is scheduled for deletion. Edits are not allowed."
     }
   },
   "EmailTemplates": {
@@ -1031,6 +1066,12 @@
     "upsellDescription": "This feature is not included in your plan.",
     "reminderCardTitle": "Appointment reminder",
     "reminderCardDescription": "Send manually from the calendar, or test to your own email.",
+    "birthdayCardTitle": "Birthday",
+    "birthdayCardDescription": "CRM birthday message. Sent manually from the CRM inbox.",
+    "recallCardTitle": "Recall",
+    "recallCardDescription": "CRM message when a patient has not visited in 180+ days. Sent manually from the CRM inbox.",
+    "controlCardTitle": "Follow-up control",
+    "controlCardDescription": "CRM message for next control date (set on the patient chart). Sent manually from the CRM inbox.",
     "subject": "Subject",
     "body": "Message body",
     "varsHint": "Available variables: {vars}",
@@ -1045,7 +1086,10 @@
       "en": "English"
     },
     "keys": {
-      "appointment_reminder": "Appointment reminder"
+      "appointment_reminder": "Appointment reminder",
+      "birthday": "Birthday",
+      "recall": "Recall",
+      "control": "Follow-up"
     },
     "errors": {
       "invalid": "Check the form fields.",
@@ -1058,7 +1102,46 @@
       "missingActorEmail": "Your account has no email.",
       "patientNoEmail": "Patient has no email address.",
       "appointmentNotFound": "Appointment not found.",
-      "appointmentNotSendable": "Reminders are not sent for cancelled/no-show appointments."
+      "appointmentNotSendable": "Reminders are not sent for cancelled/no-show appointments.",
+      "clinicReadonly": "Clinic is read-only. Edits are not allowed.",
+      "clinicPendingDelete": "Account is scheduled for deletion. Edits are not allowed."
+    }
+  },
+  "Crm": {
+    "title": "CRM",
+    "subtitle": "In-app alerts: birthday, recall, and follow-up. Reception explicitly sends email.",
+    "upsellTitle": "CRM light not included",
+    "upsellDescription": "This feature is available on Professional and higher plans.",
+    "inboxTitle": "Open notifications",
+    "inboxDescription": "The system builds the list; you decide who receives a message.",
+    "empty": "No open CRM notifications.",
+    "send": "Send email",
+    "dismiss": "Dismiss",
+    "noEmail": "No email",
+    "kinds": {
+      "birthday": "Birthday",
+      "recall": "Recall",
+      "control": "Follow-up"
+    },
+    "columns": {
+      "kind": "Type",
+      "patient": "Patient",
+      "dueOn": "Date",
+      "email": "Email",
+      "actions": "Actions"
+    },
+    "errors": {
+      "invalid": "Check the input.",
+      "unauthorized": "You must be signed in.",
+      "forbidden": "You do not have permission for CRM.",
+      "featureDisabled": "CRM light is not included in your plan.",
+      "notFound": "Notification not found.",
+      "notOpen": "Notification is no longer open.",
+      "patientNoEmail": "Patient has no email address.",
+      "templateNotFound": "Email template not found.",
+      "sendFailed": "Send failed. Try again.",
+      "clinicReadonly": "Clinic is read-only. Edits are not allowed.",
+      "clinicPendingDelete": "Account is scheduled for deletion. Edits are not allowed."
     }
   },
   "Waitlist": {
@@ -1100,7 +1183,146 @@
       "appointmentOverlap": "This doctor already has an overlapping appointment.",
       "waitlistNotFound": "Waitlist entry not found.",
       "createFailed": "Could not create. Try again.",
-      "saveFailed": "Could not save the change. Try again."
+      "saveFailed": "Could not save the change. Try again.",
+      "clinicReadonly": "Clinic is read-only. Edits are not allowed.",
+      "clinicPendingDelete": "Account is scheduled for deletion. Edits are not allowed."
+    }
+  },
+  "AuditLog": {
+    "title": "Audit log",
+    "subtitle": "Clinic events: who, what, when, and change details.",
+    "backDashboard": "← Dashboard",
+    "filterTitle": "Filter",
+    "filterDescription": "Filter by event type.",
+    "eventLabel": "Event",
+    "allEvents": "All events",
+    "applyFilter": "Apply",
+    "listTitle": "Events",
+    "listDescription": "Newest first. Owner-only access.",
+    "empty": "No audit events for this filter.",
+    "prev": "Previous",
+    "next": "Next",
+    "pageInfo": "Page {page} / {totalPages} · total {total}",
+    "columns": {
+      "when": "When",
+      "actor": "Who",
+      "event": "What",
+      "details": "Details (old/new)"
+    },
+    "events": {
+      "patient": {
+        "created": "Patient created",
+        "updated": "Patient updated",
+        "deactivated": "Patient deactivated"
+      },
+      "appointment": {
+        "created": "Appointment created",
+        "updated": "Appointment updated",
+        "cancelled": "Appointment cancelled"
+      },
+      "invoice": {
+        "created": "Invoice created",
+        "voided": "Invoice voided"
+      },
+      "payment": {
+        "recorded": "Payment recorded"
+      },
+      "invite": {
+        "created": "Invite sent",
+        "revoked": "Invite revoked"
+      },
+      "user": {
+        "deactivated": "User deactivated"
+      },
+      "gdpr": {
+        "erasure_requested": "GDPR erasure requested",
+        "erasure_rejected": "GDPR erasure rejected",
+        "patient_erased": "GDPR hard delete completed",
+        "patient_exported": "GDPR patient export"
+      },
+      "operator": {
+        "switched": "PIN operator switch"
+      },
+      "auth": {
+        "login_lockout": "Login lockout"
+      }
+    }
+  },
+  "Privacy": {
+    "title": "Privacy / GDPR",
+    "subtitle": "Clinic backup, patient export, and hard-delete requests (owner approval).",
+    "backDashboard": "← Dashboard",
+    "clinicZipTitle": "Clinic backup (ZIP)",
+    "clinicZipDescription": "On-demand owner export: patients, invoices, and document metadata (§8.3).",
+    "clinicZipHint": "ZIP includes patients, invoices (+ lines and payments), and documents/images metadata. It does not include binary files or the full chart (odontogram, treatment plans) — that is the separate per-patient GDPR JSON.",
+    "clinicZipClosureNote": "On account closure (D45): same export → 7-day grace → hard delete (nightly automated job).",
+    "clinicZipDownload": "Download ZIP",
+    "exportCardTitle": "Patient export",
+    "exportCardDescription": "JSON export is available on the patient chart (Export JSON).",
+    "exportHint": "Open a patient → Export JSON. Includes chart, allergies, document meta, appointments, invoices.",
+    "erasureCardTitle": "Erasure requests",
+    "erasureCardDescription": "After approval, patient data and storage objects are permanently deleted (D35).",
+    "emptyRequests": "No GDPR requests.",
+    "exportJson": "Export JSON",
+    "requestErasure": "Request erasure",
+    "confirmRequest": "Request hard delete for this patient? Owner must approve.",
+    "confirmApprove": "Approve PERMANENT deletion? This cannot be undone.",
+    "approve": "Approve & delete",
+    "reject": "Reject",
+    "rejectReasonPlaceholder": "Reason (optional)",
+    "submitting": "Please wait…",
+    "patientRemoved": "Patient deleted",
+    "columns": {
+      "patient": "Patient",
+      "status": "Status",
+      "requestedAt": "Requested",
+      "actions": "Actions"
+    },
+    "status": {
+      "pending": "Pending",
+      "rejected": "Rejected",
+      "completed": "Completed",
+      "failed": "Failed"
+    },
+    "errors": {
+      "unauthorized": "You must be signed in.",
+      "forbidden": "You do not have permission.",
+      "patientNotFound": "Patient not found.",
+      "alreadyPending": "A pending request already exists.",
+      "requestFailed": "Could not create the request.",
+      "notFound": "Request not found.",
+      "storageDeleteFailed": "Could not delete storage files.",
+      "eraseFailed": "Hard delete failed.",
+      "mfaRequired": "Owner MFA (AAL2) is required.",
+      "clinicReadonly": "Clinic is read-only. Edits are not allowed.",
+      "clinicPendingDelete": "Account is scheduled for deletion. Edits are not allowed."
+    }
+  },
+  "ClinicLifecycle": {
+    "readonlyTitle": "Clinic is read-only",
+    "readonlyBody": "Edits are temporarily blocked. Download a ZIP backup before deletion.",
+    "readonlyBodyWithGrace": "Edits are blocked until {date}. Download a ZIP backup; after the grace period the account is permanently deleted.",
+    "pendingDeleteTitle": "Account is scheduled for deletion",
+    "pendingDeleteBody": "Data will be permanently deleted. Export is not guaranteed after hard delete.",
+    "exportCta": "Privacy / backup",
+    "closeCardTitle": "Close account",
+    "closeCardDescription": "Export → 7-day grace (read-only) → hard delete (D45).",
+    "closeHint": "Download the ZIP backup first. Then you can close the account: 7 days read-only, then permanent deletion.",
+    "closeConfirmPrompt": "Type the exact clinic name to confirm:",
+    "closeConfirm": "Close the account? After 7 days data is permanently deleted.",
+    "closeAccount": "Close account",
+    "closing": "Closing…",
+    "closureInProgressTitle": "Closure in progress",
+    "closureInProgressBody": "The account is read-only. Grace ends {date}. Hard delete follows automatically.",
+    "errors": {
+      "unauthorized": "You must be signed in.",
+      "forbidden": "You do not have permission.",
+      "mfaRequired": "Owner MFA (AAL2) is required.",
+      "alreadyClosing": "Closure is already in progress.",
+      "notActive": "Clinic is not active.",
+      "closureFailed": "Could not start closure.",
+      "clinicReadonly": "Clinic is read-only. Edits are not allowed.",
+      "clinicPendingDelete": "Account is scheduled for deletion. Edits are not allowed."
     }
   }
 }

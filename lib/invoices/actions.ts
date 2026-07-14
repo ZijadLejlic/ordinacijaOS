@@ -9,8 +9,10 @@ import {
   type ClinicBranding,
 } from "@/lib/branding/parse";
 import { CLINIC_BRANDING_BUCKET } from "@/lib/branding/storage";
+import { getClinicWriteBlock } from "@/lib/clinic/writable";
 import { assertFeature, clinicHasFeature } from "@/lib/entitlements";
 import { canWriteInvoices } from "@/lib/invoices/rbac";
+import { allocateInvoiceNumber } from "@/lib/invoices/allocate-number";
 import {
   formatInvoiceNumber,
   invoiceStoragePath,
@@ -86,6 +88,11 @@ async function requireInvoiceWriter() {
 
   if (!profile?.is_active || !canWriteInvoices(profile.role)) {
     return { error: "forbidden" as const, supabase, user, profile: null };
+  }
+
+  const writeBlock = await getClinicWriteBlock(supabase, profile.clinic_id);
+  if (writeBlock) {
+    return { error: writeBlock, supabase, user, profile: profile as ProfileRow };
   }
 
   return { error: null, supabase, user, profile: profile as ProfileRow };
@@ -198,15 +205,11 @@ export async function createInvoiceAction(
     };
   });
 
-  const { data: numberRows, error: numberError } = await supabase.rpc(
-    "allocate_invoice_number",
-    { p_clinic_id: profile.clinic_id },
-  );
-  if (numberError || !numberRows?.[0]) {
-    return { error: "createFailed" };
+  const allocated = await allocateInvoiceNumber(supabase, profile.clinic_id);
+  if ("error" in allocated) {
+    return { error: allocated.error };
   }
-  const { series_year: seriesYear, series_number: seriesNumber } =
-    numberRows[0];
+  const { series_year: seriesYear, series_number: seriesNumber } = allocated;
 
   const { data: invoice, error: invoiceError } = await supabase
     .from("invoices")

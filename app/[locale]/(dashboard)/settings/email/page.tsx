@@ -13,12 +13,50 @@ import {
   canReadEmailTemplates,
   canWriteEmailTemplates,
 } from "@/lib/email/rbac";
+import {
+  type EmailTemplateKey,
+} from "@/lib/email/templates";
 import { clinicHasFeature } from "@/lib/entitlements";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
   params: Promise<{ locale: string }>;
 };
+
+const CARD_KEYS: {
+  key: EmailTemplateKey;
+  titleKey:
+    | "reminderCardTitle"
+    | "birthdayCardTitle"
+    | "recallCardTitle"
+    | "controlCardTitle";
+  descriptionKey:
+    | "reminderCardDescription"
+    | "birthdayCardDescription"
+    | "recallCardDescription"
+    | "controlCardDescription";
+}[] = [
+  {
+    key: "appointment_reminder",
+    titleKey: "reminderCardTitle",
+    descriptionKey: "reminderCardDescription",
+  },
+  {
+    key: "birthday",
+    titleKey: "birthdayCardTitle",
+    descriptionKey: "birthdayCardDescription",
+  },
+  {
+    key: "recall",
+    titleKey: "recallCardTitle",
+    descriptionKey: "recallCardDescription",
+  },
+  {
+    key: "control",
+    titleKey: "controlCardTitle",
+    descriptionKey: "controlCardDescription",
+  },
+];
 
 export default async function SettingsEmailPage({ params }: Props) {
   const { locale } = await params;
@@ -71,15 +109,21 @@ export default async function SettingsEmailPage({ params }: Props) {
           </CardHeader>
         </Card>
       ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("reminderCardTitle")}</CardTitle>
-            <CardDescription>{t("reminderCardDescription")}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <EmailTemplateForms templates={templates} canEdit={canEdit} />
-          </CardContent>
-        </Card>
+        CARD_KEYS.map((card) => {
+          const group = templates.filter((row) => row.templateKey === card.key);
+          if (group.length === 0) return null;
+          return (
+            <Card key={card.key}>
+              <CardHeader>
+                <CardTitle>{t(card.titleKey)}</CardTitle>
+                <CardDescription>{t(card.descriptionKey)}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <EmailTemplateForms templates={group} canEdit={canEdit} />
+              </CardContent>
+            </Card>
+          );
+        })
       )}
     </main>
   );

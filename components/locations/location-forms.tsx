@@ -25,6 +25,8 @@ const KNOWN_ERRORS = [
   "invalid",
   "unauthorized",
   "forbidden",
+  "clinicReadonly",
+  "clinicPendingDelete",
   "locationLimit",
   "createFailed",
   "saveFailed",

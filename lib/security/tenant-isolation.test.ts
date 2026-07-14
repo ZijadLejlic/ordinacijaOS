@@ -124,14 +124,28 @@ async function createTestClinic(
 }
 
 async function cleanupTestData(service: DbClient, clinics: TestClinic[]) {
+  const clinicIds = [...new Set(clinics.map((c) => c.clinicId))];
+
+  for (const clinicId of clinicIds) {
+    await service
+      .from("clinics")
+      .update({ status: "pending_delete" })
+      .eq("id", clinicId);
+    const { error } = await service.rpc("hard_delete_clinic", {
+      p_clinic_id: clinicId,
+    });
+    if (error) {
+      await service.from("clinic_invites").delete().eq("clinic_id", clinicId);
+      await service.from("clinic_locations").delete().eq("clinic_id", clinicId);
+      await service.from("audit_events").delete().eq("clinic_id", clinicId);
+      await service.from("clinic_subscriptions").delete().eq("clinic_id", clinicId);
+      await service.from("profiles").delete().eq("clinic_id", clinicId);
+      await service.from("clinics").delete().eq("id", clinicId);
+    }
+  }
+
   for (const clinic of clinics) {
-    await service.from("clinic_invites").delete().eq("clinic_id", clinic.clinicId);
-    await service.from("clinic_locations").delete().eq("clinic_id", clinic.clinicId);
-    await service.from("audit_events").delete().eq("clinic_id", clinic.clinicId);
-    await service.from("clinic_subscriptions").delete().eq("clinic_id", clinic.clinicId);
-    await service.from("profiles").delete().eq("clinic_id", clinic.clinicId);
-    await service.from("clinics").delete().eq("id", clinic.clinicId);
-    await service.auth.admin.deleteUser(clinic.userId);
+    await service.auth.admin.deleteUser(clinic.userId).catch(() => undefined);
   }
 }
 
@@ -333,5 +347,127 @@ describeSecurity("tenant isolation & RBAC (release blocker)", () => {
       .from("profiles")
       .update({ failed_login_count: 0, locked_until: null })
       .eq("id", lockClinic.userId);
+  }, 30_000);
+
+  it("clinic A cannot read clinic B patients", async () => {
+    const { data: patientB, error: insertError } = await service
+      .from("patients")
+      .insert({
+        clinic_id: clinicB.clinicId,
+        first_name: "Isolated",
+        last_name: "PatientB",
+        is_active: true,
+      })
+      .select("id")
+      .single();
+
+    expect(insertError).toBeNull();
+    expect(patientB?.id).toBeTruthy();
+
+    const client = await signInAs(url, anonKey, clinicA.email, clinicA.password);
+    const { data, error } = await client
+      .from("patients")
+      .select("id")
+      .eq("id", patientB!.id);
+
+    expect(error).toBeNull();
+    expect(data ?? []).toHaveLength(0);
+
+    const { data: byClinic } = await client
+      .from("patients")
+      .select("id")
+      .eq("clinic_id", clinicB.clinicId);
+
+    expect(byClinic ?? []).toHaveLength(0);
+  });
+
+  it("clinic A cannot read clinic B appointments", async () => {
+    const { data: patientB } = await service
+      .from("patients")
+      .insert({
+        clinic_id: clinicB.clinicId,
+        first_name: "Appt",
+        last_name: "PatientB",
+        is_active: true,
+      })
+      .select("id")
+      .single();
+
+    const starts = new Date(Date.now() + 86_400_000);
+    const ends = new Date(starts.getTime() + 30 * 60_000);
+
+    const { data: apptB, error: apptError } = await service
+      .from("appointments")
+      .insert({
+        clinic_id: clinicB.clinicId,
+        doctor_id: clinicB.userId,
+        patient_id: patientB!.id,
+        starts_at: starts.toISOString(),
+        ends_at: ends.toISOString(),
+        status: "confirmed",
+      })
+      .select("id")
+      .single();
+
+    expect(apptError).toBeNull();
+    expect(apptB?.id).toBeTruthy();
+
+    const client = await signInAs(url, anonKey, clinicA.email, clinicA.password);
+    const { data, error } = await client
+      .from("appointments")
+      .select("id")
+      .eq("id", apptB!.id);
+
+    expect(error).toBeNull();
+    expect(data ?? []).toHaveLength(0);
+  });
+
+  it("clinic A cannot list or download clinic B storage objects", async () => {
+    const { data: patientB } = await service
+      .from("patients")
+      .insert({
+        clinic_id: clinicB.clinicId,
+        first_name: "File",
+        last_name: "PatientB",
+        is_active: true,
+      })
+      .select("id")
+      .single();
+
+    const path = `${clinicB.clinicId}/${patientB!.id}/documents/isolation-test.pdf`;
+    const pdfBytes = new Uint8Array([
+      0x25, 0x50, 0x44, 0x46, 0x2d, 0x31, 0x2e, 0x34, 0x0a, 0x25, 0xc3, 0xa4,
+      0xc3, 0xbc, 0xc3, 0xb6, 0x0a,
+    ]);
+
+    const { error: uploadError } = await service.storage
+      .from("patient-files")
+      .upload(path, pdfBytes, {
+        contentType: "application/pdf",
+        upsert: true,
+      });
+
+    expect(uploadError).toBeNull();
+
+    const client = await signInAs(url, anonKey, clinicA.email, clinicA.password);
+
+    const { data: downloaded, error: downloadError } = await client.storage
+      .from("patient-files")
+      .download(path);
+
+    expect(downloaded).toBeNull();
+    expect(downloadError).not.toBeNull();
+
+    const { data: listed } = await client.storage
+      .from("patient-files")
+      .list(clinicB.clinicId, { limit: 10 });
+
+    expect(listed ?? []).toHaveLength(0);
+
+    const anon = createSupabaseClient(url, anonKey);
+    const { data: publicList } = await anon.storage
+      .from("patient-files")
+      .list("", { limit: 10 });
+    expect(publicList ?? []).toHaveLength(0);
   }, 30_000);
 });

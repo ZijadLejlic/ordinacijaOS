@@ -77,6 +77,14 @@ export async function signupAction(
   });
 
   if (error) {
+    const raw = error.message.toLowerCase();
+    if (
+      raw.includes("already registered") ||
+      raw.includes("already been registered") ||
+      raw.includes("user already exists")
+    ) {
+      return { error: "emailTaken" };
+    }
     return { error: error.message };
   }
 
@@ -149,12 +157,10 @@ export async function loginAction(
         return { error: ensured.error };
       }
     } else {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("id")
-        .maybeSingle();
-
-      if (!profile) {
+      // Prefer SECURITY DEFINER helper — `profiles` SELECT is blocked for owners
+      // at aal1 after MFA enrollment (restrictive owner_mfa_ok RLS).
+      const { data: clinicId } = await supabase.rpc("current_clinic_id");
+      if (!clinicId) {
         return { error: "missingClinic" };
       }
     }

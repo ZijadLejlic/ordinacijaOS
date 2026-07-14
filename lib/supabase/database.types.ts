@@ -454,11 +454,14 @@ export type Database = {
       clinics: {
         Row: {
           branding_json: Json
+          closure_reason: string | null
           created_at: string
+          grace_ends_at: string | null
           id: string
           name: string
           phone_country_default: string
           plan_id: string
+          readonly_started_at: string | null
           settings_json: Json
           status: Database["public"]["Enums"]["clinic_status"]
           timezone: string
@@ -467,11 +470,14 @@ export type Database = {
         }
         Insert: {
           branding_json?: Json
+          closure_reason?: string | null
           created_at?: string
+          grace_ends_at?: string | null
           id?: string
           name: string
           phone_country_default?: string
           plan_id: string
+          readonly_started_at?: string | null
           settings_json?: Json
           status?: Database["public"]["Enums"]["clinic_status"]
           timezone?: string
@@ -480,11 +486,14 @@ export type Database = {
         }
         Update: {
           branding_json?: Json
+          closure_reason?: string | null
           created_at?: string
+          grace_ends_at?: string | null
           id?: string
           name?: string
           phone_country_default?: string
           plan_id?: string
+          readonly_started_at?: string | null
           settings_json?: Json
           status?: Database["public"]["Enums"]["clinic_status"]
           timezone?: string
@@ -497,6 +506,80 @@ export type Database = {
             columns: ["plan_id"]
             isOneToOne: false
             referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_notifications: {
+        Row: {
+          clinic_id: string
+          created_at: string
+          dismissed_at: string | null
+          due_on: string
+          id: string
+          kind: string
+          outbound_message_id: string | null
+          patient_id: string
+          sent_at: string | null
+          sent_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          clinic_id: string
+          created_at?: string
+          dismissed_at?: string | null
+          due_on: string
+          id?: string
+          kind: string
+          outbound_message_id?: string | null
+          patient_id: string
+          sent_at?: string | null
+          sent_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          clinic_id?: string
+          created_at?: string
+          dismissed_at?: string | null
+          due_on?: string
+          id?: string
+          kind?: string
+          outbound_message_id?: string | null
+          patient_id?: string
+          sent_at?: string | null
+          sent_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_notifications_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_notifications_outbound_message_id_fkey"
+            columns: ["outbound_message_id"]
+            isOneToOne: false
+            referencedRelation: "outbound_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_notifications_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_notifications_sent_by_fkey"
+            columns: ["sent_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -602,6 +685,83 @@ export type Database = {
           {
             foreignKeyName: "expenses_recorded_by_fkey"
             columns: ["recorded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gdpr_erasure_requests: {
+        Row: {
+          approved_at: string | null
+          approved_by: string | null
+          clinic_id: string
+          completed_at: string | null
+          created_at: string
+          error_message: string | null
+          id: string
+          patient_id: string | null
+          patient_snapshot: Json
+          rejection_reason: string | null
+          requested_by: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          approved_at?: string | null
+          approved_by?: string | null
+          clinic_id: string
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          patient_id?: string | null
+          patient_snapshot?: Json
+          rejection_reason?: string | null
+          requested_by: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          approved_at?: string | null
+          approved_by?: string | null
+          clinic_id?: string
+          completed_at?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          patient_id?: string | null
+          patient_snapshot?: Json
+          rejection_reason?: string | null
+          requested_by?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gdpr_erasure_requests_approved_by_fkey"
+            columns: ["approved_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gdpr_erasure_requests_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gdpr_erasure_requests_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gdpr_erasure_requests_requested_by_fkey"
+            columns: ["requested_by"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -1181,6 +1341,7 @@ export type Database = {
           is_active: boolean
           last_name: string
           medical_history: string | null
+          next_control_at: string | null
           notes: string | null
           phone: string | null
           updated_at: string
@@ -1196,6 +1357,7 @@ export type Database = {
           is_active?: boolean
           last_name: string
           medical_history?: string | null
+          next_control_at?: string | null
           notes?: string | null
           phone?: string | null
           updated_at?: string
@@ -1211,6 +1373,7 @@ export type Database = {
           is_active?: boolean
           last_name?: string
           medical_history?: string | null
+          next_control_at?: string | null
           notes?: string | null
           phone?: string | null
           updated_at?: string
@@ -1735,7 +1898,19 @@ export type Database = {
         }[]
       }
       auth_email_exists: { Args: { p_email: string }; Returns: boolean }
+      approve_gdpr_patient_erasure: {
+        Args: { p_request_id: string }
+        Returns: Json
+      }
+      clinic_is_writable: { Args: never; Returns: boolean }
+      hard_delete_clinic: {
+        Args: { p_clinic_id: string }
+        Returns: Json
+      }
+      request_clinic_closure: { Args: never; Returns: Json }
+      run_clinic_lifecycle_transitions: { Args: never; Returns: Json }
       can_access_appointments: { Args: never; Returns: boolean }
+      can_access_crm: { Args: never; Returns: boolean }
       can_access_expenses: { Args: never; Returns: boolean }
       can_access_invoices: { Args: never; Returns: boolean }
       can_access_patients: { Args: never; Returns: boolean }

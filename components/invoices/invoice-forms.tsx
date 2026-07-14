@@ -30,6 +30,8 @@ const KNOWN_ERRORS = [
   "invalid",
   "unauthorized",
   "forbidden",
+  "clinicReadonly",
+  "clinicPendingDelete",
   "featureDisabled",
   "createFailed",
   "saveFailed",
@@ -241,6 +243,7 @@ export function CreateInvoiceForm({
             id="patientId"
             name="patientId"
             required
+            data-testid="invoice-patient"
             className="border-input bg-background h-9 w-full rounded-lg border px-2.5 text-sm"
           >
             <option value="">{t("selectPatient")}</option>
@@ -325,6 +328,7 @@ export function CreateInvoiceForm({
               onChange={(e) => applyService(line.key, e.target.value)}
               className="border-input bg-background h-9 rounded-lg border px-2.5 text-sm lg:col-span-2"
               aria-label={t("service")}
+              data-testid="invoice-line-service"
             >
               <option value="">{t("customLine")}</option>
               {services.map((s) => (

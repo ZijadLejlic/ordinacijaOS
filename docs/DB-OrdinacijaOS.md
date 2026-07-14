@@ -34,7 +34,7 @@ Helpers (SECURITY DEFINER, `search_path = public`, execute samo `authenticated`)
 - `current_app_role()` — JWT `app_metadata.app_role` pa fallback na `profiles`
 - `is_clinic_owner()`
 - `owner_mfa_ok()` — D11: owner s verified MFA mora `aal2` (RLS restrictive)
-- `create_clinic_for_owner(name, full_name, trial_ends_at?)` — signup: clinic + owner + default location + trial subscription (Professional); seeds `settings_json.onboarding` incomplete (Faza 2I)
+- `create_clinic_for_owner(name, full_name, trial_ends_at?)` — signup: clinic + owner + default location + trial subscription (Professional); seeds `settings_json.onboarding` incomplete (Faza 2I). Idempotent: if profile already exists, returns existing `clinic_id` (needed because owners at aal1 cannot SELECT `profiles` under restrictive `owner_mfa_ok` RLS)
 
 **JWT hook (B5):** `custom_access_token_hook` upisuje `clinic_id` + `app_role` u `app_metadata` pri izdavanju tokena. Funkcija je u bazi; **mora se ručno uključiti** u dashboardu: Authentication → Hooks → Custom Access Token → `public.custom_access_token_hook`. Bez toga helperi i dalje rade preko `profiles` fallbacka.
 
@@ -42,7 +42,7 @@ Clinic-scoped policies koriste `clinic_id = (select current_clinic_id())`. Owner
 
 Advisor note: linter WARN-a da su ovi SECURITY DEFINER callable od `authenticated` — **namjerno** (signup RPC + RLS helpers). `anon` execute je revoked.
 
-**Test:** tenant isolation automated tests = release blocker (PRD §8.1) — `lib/security/tenant-isolation.test.ts` + CI workflow `.github/workflows/security.yml`.
+**Test:** tenant isolation automated tests = release blocker (PRD §8.1 / §12.2) — `lib/security/tenant-isolation.test.ts` (patients, appointments, storage, RBAC) + Playwright `e2e/tenant-isolation.spec.ts` + CI (`.github/workflows/security.yml`, `.github/workflows/e2e.yml`).
 
 ---
 
@@ -87,6 +87,9 @@ Kolone su **namjera**; tipovi/constrainti se finalizuju u migraciji. `…` = TBD
 | `branding_json` | `{ logo_path?, logo_url?, colors?: { background?, text?, accent? } }` (hex `#RRGGBB`) |
 | `settings_json` | vidi §5 |
 | `status` | `active` \| `readonly` \| `pending_delete` |
+| `readonly_started_at` | set when entering readonly (trial expiry / owner close / unpaid) |
+| `grace_ends_at` | end of 7-day export window before `pending_delete` |
+| `closure_reason` | `trial_expired` \| `owner_requested` \| `unpaid` |
 
 #### `profiles`
 
@@ -182,6 +185,49 @@ Eventi (Faza 1 platform): `platform.impersonation_start` / `platform.impersonati
 
 **Platform admin identity:** nije `profiles.role` (nema clinic membership). Flag u
 `auth.users.raw_app_meta_data.is_platform_admin` → JWT `app_metadata` (nikad `user_metadata`).
+
+**SELECT RLS (Faza 3C):** samo owner (`is_clinic_owner()`); index `(clinic_id, created_at desc)`.
+
+#### `gdpr_erasure_requests` (Faza 3C / D35)
+
+| Kolona | Napomena |
+|---|---|
+| `id` | PK |
+| `clinic_id` | |
+| `patient_id` | SET NULL nakon hard delete |
+| `patient_snapshot` | jsonb snapshot (ime) za owner UI |
+| `requested_by` | |
+| `status` | pending / rejected / completed / failed |
+| `approved_by` / `approved_at` | owner |
+| `completed_at` | |
+| `rejection_reason` / `error_message` | |
+
+RPC `approve_gdpr_patient_erasure(request_id)` — owner + MFA; hard-delete patient subtree; audit `gdpr.patient_erased`.
+
+#### Clinic ZIP backup (Faza 3C / §8.3 — app-layer, no new table)
+
+On-demand owner export via `GET /api/privacy/clinic/export` (`jszip`):
+
+| ZIP entry | Source |
+|---|---|
+| `patients.json` | `patients` |
+| `invoices.json` / `invoice_lines.json` / `payments.json` | finance tables |
+| `documents_meta.json` / `images_meta.json` | `patient_documents` / `patient_images` (meta only) |
+| `manifest.json` | counts + scope `clinic_backup_v1` |
+
+Distinct from single-patient GDPR JSON. Audit: `clinic.backup_exported` (counts only).
+
+#### Clinic lifecycle (Faza 3C / D6 / D45)
+
+| Piece | Napomena |
+|---|---|
+| `clinic_is_writable()` | Restrictive RLS on business-table writes while `status <> active` |
+| `request_clinic_closure()` | Owner + MFA → `readonly` + `grace_ends_at = now()+7d` |
+| `run_clinic_lifecycle_transitions()` | service_role: trial/unpaid → readonly; grace expired → `pending_delete` |
+| `hard_delete_clinic(id)` | service_role: storage + clinic cascade + auth users |
+| Cron | `GET /api/cron/clinic-lifecycle` (Bearer `CRON_SECRET`); Vercel daily 03:00 |
+
+App: banner in dashboard shell; close account on `/settings/privacy`.
 
 ---
 
@@ -321,6 +367,23 @@ Migracija `phase3a_email_templates` (+ seed membership guard):
 
 **App:** `/settings/email` (edit owner; read/send reception); kalendar „Pošalji email podsjetnik“; feature `email_reminders`. Audit: `email_template.updated` / `email.test_sent` / `email.reminder_sent` (bez PII — ids + template_key).
 
+### Faza 3B — CRM light notifikacije (implementirano)
+
+Migracija `phase3b_crm_light`:
+
+| Tabela / helper | Napomena |
+|---|---|
+| `patients.next_control_at` | date null; kontrola window 7 dana |
+| `crm_notifications` | kind `birthday\|recall\|control`; status `open\|sent\|dismissed`; partial unique open |
+| `can_access_crm` | owner + reception |
+| `email_templates` keys | + `birthday`, `recall`, `control` (BS/EN seed) |
+
+**Pravila generisanja (Europe/Sarajevo):** birthday = DOB u narednih 7 dana; recall = zadnji ne-cancelled termin stariji od 180 dana, bez budućeg termina; control = `next_control_at` ≤ danas+7 (uključujući overdue).
+
+**App:** `/crm` inbox + nav badge; send → Resend + `outbound_messages`; dismiss. Feature `crm_light`. Audit: `crm.notification_sent` / `crm.notification_dismissed` (bez PII).
+
+**Migracija:** `supabase/migrations/20260714000000_phase3b_crm_light.sql` — primijenjena na remote (`next_control_at`, `crm_notifications`, `can_access_crm` verified).
+
 **Još nije u DB (skica):**
 
 ```text
@@ -409,6 +472,7 @@ Location create must call `assertCanCreateLocation`; image upload must call `ass
 | `phase2c_appointments` | appointments + waitlist + EXCLUDE overlap + RLS |
 | `phase2c_appointments_revoke_anon` | revoke anon EXECUTE on appointment/waitlist helpers |
 | `phase2d_invoices` | invoices/lines/payments/plans + counters + allocate RPC + finance RLS + invoice storage policies |
+| `fix_allocate_invoice_number` | fix Postgres 42702 ambiguous `series_year` in `allocate_invoice_number` (ON CONFLICT vs RETURNS TABLE) |
 | `phase2d_invoices_revoke_anon` | revoke anon EXECUTE on invoice helpers; trigger fn not callable via API |
 | `phase2d_invoice_patient_directory` | limited patient id/name RPCs for accountant invoice UX |
 | `phase2d_invoice_patient_names` | batch patient name resolver for invoice list/detail |
@@ -420,6 +484,9 @@ Location create must call `assertCanCreateLocation`; image upload must call `ass
 | `phase2i_onboarding` | `create_clinic_for_owner` seeds `settings_json.onboarding` incomplete |
 | `phase3a_email_templates` | `email_templates` + `outbound_messages` + RLS/RBAC + seed defaults; create_clinic seeds templates |
 | `phase3a_email_seed_guard` | `seed_default_email_templates` requires active clinic membership |
+| `phase3c_audit_log_ui` | `audit_events` SELECT owner-only; `(clinic_id, created_at desc)` index |
+| `phase3c_gdpr_erasure` | `gdpr_erasure_requests` + RLS; `approve_gdpr_patient_erasure` hard delete RPC (D35) |
+| `phase3c_clinic_lifecycle` | grace columns; `clinic_is_writable` RLS; closure + lifecycle + hard_delete RPCs (D6/D45) |
 
 ---
 
@@ -447,3 +514,7 @@ Location create must call `assertCanCreateLocation`; image upload must call `ass
 | 2026-07-13 | Faza 2H: `can_import_services` + services insert for accountant CSV import (D30) |
 | 2026-07-13 | Faza 2I: onboarding seed in `create_clinic_for_owner`; working_hours + onboarding in settings_json (D43) |
 | 2026-07-13 | Faza 3A: email_templates + outbound_messages; appointment_reminder BS/EN; Resend send (D23) |
+| 2026-07-14 | Faza 3B: crm_notifications + next_control_at; CRM email templates birthday/recall/control (D24) |
+| 2026-07-14 | Faza 3C: audit owner SELECT + GDPR erasure table/RPC (D35); local migrations `phase3c_*` |
+| 2026-07-14 | Faza 3C: clinic ZIP backup app-layer (§8.3 / D45) — no new table |
+| 2026-07-14 | Faza 3C: clinic lifecycle (D6/D45) — grace columns, writable RLS, closure + cron hard delete |

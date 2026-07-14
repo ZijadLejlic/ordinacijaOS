@@ -4,6 +4,7 @@ import { formatInTimeZone } from "date-fns-tz";
 import { getLocale } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import { writeAuditEvent } from "@/lib/audit/log";
+import { getClinicWriteBlock } from "@/lib/clinic/writable";
 import { sendTemplatedEmail } from "@/lib/email/resend";
 import {
   canReadEmailTemplates,
@@ -76,6 +77,18 @@ async function requireEmailAccess(
 
   if (!ok) {
     return { error: "forbidden" as const, supabase, user, profile: null };
+  }
+
+  if (mode === "write" || mode === "send") {
+    const writeBlock = await getClinicWriteBlock(supabase, profile.clinic_id);
+    if (writeBlock) {
+      return {
+        error: writeBlock,
+        supabase,
+        user,
+        profile: profile as ProfileRow,
+      };
+    }
   }
 
   return { error: null, supabase, user, profile: profile as ProfileRow };

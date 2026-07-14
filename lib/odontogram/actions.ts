@@ -3,6 +3,7 @@
 import { getLocale } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import { writeAuditEvent } from "@/lib/audit/log";
+import { getClinicWriteBlock } from "@/lib/clinic/writable";
 import { assertFeature } from "@/lib/entitlements";
 import { isValidFdi } from "@/lib/odontogram/fdi";
 import { canWriteOdontogram } from "@/lib/patients/rbac";
@@ -37,6 +38,11 @@ async function requireOdontogramWriter() {
 
   if (!profile?.is_active || !canWriteOdontogram(profile.role)) {
     return { error: "forbidden" as const, supabase, user, profile: null };
+  }
+
+  const writeBlock = await getClinicWriteBlock(supabase, profile.clinic_id);
+  if (writeBlock) {
+    return { error: writeBlock, supabase, user, profile };
   }
 
   return { error: null, supabase, user, profile };

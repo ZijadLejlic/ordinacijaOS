@@ -3,6 +3,7 @@
 import { getLocale } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import { writeAuditEvent } from "@/lib/audit/log";
+import { getClinicWriteBlock } from "@/lib/clinic/writable";
 import { assertFeature } from "@/lib/entitlements";
 import { canWriteExpenses } from "@/lib/expenses/rbac";
 import { createClient } from "@/lib/supabase/server";
@@ -47,6 +48,11 @@ async function requireExpenseWriter() {
 
   if (!profile?.is_active || !canWriteExpenses(profile.role)) {
     return { error: "forbidden" as const, supabase, user, profile: null };
+  }
+
+  const writeBlock = await getClinicWriteBlock(supabase, profile.clinic_id);
+  if (writeBlock) {
+    return { error: writeBlock, supabase, user, profile: profile as ProfileRow };
   }
 
   return { error: null, supabase, user, profile: profile as ProfileRow };

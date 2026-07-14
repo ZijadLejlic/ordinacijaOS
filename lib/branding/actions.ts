@@ -18,6 +18,7 @@ import {
 import { assertFeature } from "@/lib/entitlements";
 import { createClient } from "@/lib/supabase/server";
 import { updateBrandingColorsSchema } from "@/lib/validations/branding";
+import { getClinicWriteBlock } from "@/lib/clinic/writable";
 
 export type BrandingActionState = {
   error?: string;
@@ -54,6 +55,11 @@ async function requireBrandingManager() {
 
   if (!profile?.is_active || !canManageBranding(profile.role)) {
     return { error: "forbidden" as const, supabase, user, profile: null };
+  }
+
+  const writeBlock = await getClinicWriteBlock(supabase, profile.clinic_id);
+  if (writeBlock) {
+    return { error: writeBlock, supabase, user, profile: profile as ProfileRow };
   }
 
   return { error: null, supabase, user, profile: profile as ProfileRow };

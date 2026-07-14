@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/clinic-lifecycle",
+      "schedule": "0 3 * * *"
+    }
+  ]
+}

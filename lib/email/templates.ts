@@ -1,4 +1,9 @@
-export const EMAIL_TEMPLATE_KEYS = ["appointment_reminder"] as const;
+export const EMAIL_TEMPLATE_KEYS = [
+  "appointment_reminder",
+  "birthday",
+  "recall",
+  "control",
+] as const;
 export type EmailTemplateKey = (typeof EMAIL_TEMPLATE_KEYS)[number];
 
 export const EMAIL_TEMPLATE_LOCALES = ["bs", "en"] as const;

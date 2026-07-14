@@ -37,6 +37,20 @@ export async function updateSession(request: NextRequest, response: NextResponse
 }
 
 export function copyCookies(from: NextResponse, to: NextResponse) {
+  // Prefer the cookie jar's serialized Set-Cookie so httpOnly / secure / maxAge
+  // survive redirects (getAll() only exposes name + value).
+  const setCookies =
+    typeof from.headers.getSetCookie === "function"
+      ? from.headers.getSetCookie()
+      : [];
+
+  if (setCookies.length > 0) {
+    for (const cookie of setCookies) {
+      to.headers.append("Set-Cookie", cookie);
+    }
+    return to;
+  }
+
   from.cookies.getAll().forEach((cookie) => {
     to.cookies.set(cookie.name, cookie.value);
   });

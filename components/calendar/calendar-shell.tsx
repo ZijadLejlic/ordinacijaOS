@@ -157,6 +157,7 @@ export function CalendarShell({
         {canWrite ? (
           <Button
             type="button"
+            data-testid="calendar-new-appointment"
             onClick={() => {
               const start = new Date();
               openCreate(start, addMinutes(start, SLOT_MINUTES));

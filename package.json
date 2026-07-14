@@ -9,7 +9,10 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:security": "vitest run lib/security/tenant-isolation.test.ts"
+    "test:security": "vitest run lib/security/tenant-isolation.test.ts",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:dev": "PLAYWRIGHT_WEB_SERVER=dev PLAYWRIGHT_REUSE_SERVER=1 playwright test"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
@@ -22,6 +25,7 @@
     "date-fns": "^4.4.0",
     "date-fns-tz": "^3.2.0",
     "exceljs": "^4.4.0",
+    "jszip": "^3.10.1",
     "lucide-react": "^1.24.0",
     "next": "16.2.10",
     "next-intl": "^4.13.2",
@@ -36,6 +40,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@tailwindcss/postcss": "^4",
     "@types/exceljs": "^0.5.3",
     "@types/node": "^20",
@@ -45,6 +50,7 @@
     "@types/ws": "^8.18.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
+    "otpauth": "^9.5.1",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.10",

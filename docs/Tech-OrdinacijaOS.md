@@ -6,7 +6,8 @@
 
 | Polje | Vrijednost |
 |---|---|
-| Status | Faza 3A email šabloni + reminderi done |
+| Status | Faza 3C done — item 23 E2E + tenant isolation CI |
+
 | Izvor | PRD §0.1, §5, §8, §11 |
 | Ažurirati | Pri scaffoldu i svakoj arhitekturnoj odluci |
 
@@ -52,13 +53,19 @@ Zaključati **kako** gradimo DentOrd (stack, patterni, granice), da agent/develo
 | Services UI (Faza 2A) | `/services` — lista + search/status; owner CRUD (create/edit/activate); D16 `shared_pricelist_across_locations` → optional `location_id`; staff read-only |
 | Treatment plans (Faza 2B) | Na `/patients/[id]` — plan + stavke (usluga, opcionalni FDI, status planned/in_progress/done/cancelled, procjena EUR); RBAC kao odontogram; feature `treatment_plan` |
 | Calendar (Faza 2C) | `/calendar` — day/week/month; CRUD termina; hard overlap (DB EXCLUDE); DnD uz `calendar_advanced`; waitlist + auto-predlog na cancel uz `waitlist_auto`; `date-fns` + `date-fns-tz` (Europe/Sarajevo); custom grid (bez FullCalendar) |
-| Invoices (Faza 2D) | `/invoices` + `/invoices/[id]` — create/void, payments (cash/card/transfer/other), debts filter, installment plans (`installments_calculator`); PDF via `@react-pdf/renderer` stored on issue; download `GET /api/invoices/[id]/pdf`; RBAC owner/accountant; feature `invoices` |
+| Invoices (Faza 2D) | `/invoices` + `/invoices/[id]` — create/void, payments (cash/card/transfer/other), debts filter, installment plans (`installments_calculator`); PDF via `@react-pdf/renderer` stored on issue; download `GET /api/invoices/[id]/pdf`; RBAC owner/accountant; feature `invoices`. Number allocate: RPC + temporary service-role fallback for Postgres 42702 until `20260714040000_fix_allocate_invoice_number` applied |
 | Expenses + KPI + Excel (Faza 2E) | `/expenses` CRUD/void + profit; Excel `GET /api/reports/excel` (`exceljs`); dashboard KPI (today appts/revenue/patients, revenue by doctor, monthly trend); RBAC §3.2; feature `expenses_reports_excel` (Pro+); doctor payment aggregates via `dashboard_payment_stats` RPC (D17) |
 | Locations (Faza 2F) | `/settings/locations` — owner CRUD (soft deactivate); D8 hard-block via `assertCanCreateLocation` + DB trigger (active-only count); D16 `settings_json.shared_pricelist_across_locations` toggle (enabling clears `services.location_id`) |
 | Branding (Faza 2G) | `/settings/branding` — owner logo + colors (`branding_json`); feature `branding_custom` (Pro+); private bucket `clinic-branding`; applied in AppShell + invoice PDF |
 | CSV import (Faza 2H) | `/settings/import` — dry-run preview + commit; patients (owner); services (owner/accountant); CSV parse+Zod; max 500 rows / 1 MB; audit `*_csv_imported` (count only) |
 | Onboarding (Faza 2I) | `/onboarding` — owner 3-step wizard (clinic+hours → services/CSV → invite doctor|reception); `settings_json.onboarding` + `working_hours`; middleware force redirect; skip invite allowed |
-| Email (Faza 3A) | `/settings/email` — BS/EN `appointment_reminder` templates (`{{ime}}`…); owner edit; reception read/send; calendar manual send + test to self; `outbound_messages` log; feature `email_reminders` |
+| Email (Faza 3A) | `/settings/email` — BS/EN templates (`appointment_reminder` + CRM keys); owner edit; reception read/send; calendar manual send + test to self; `outbound_messages` log; feature `email_reminders` |
+| CRM light (Faza 3B) | `/crm` inbox — birthday (7d) / recall (180d) / control (`next_control_at`); reception/owner send email or dismiss; nav badge; feature `crm_light`; audit `crm.notification_*` |
+| Audit log (Faza 3C) | `/settings/audit` — owner-only; `audit_events` SELECT RLS owner; filter + pagination; payload old/new when present |
+| GDPR (Faza 3C) | `/settings/privacy` + patient chart export/request; `gdpr_erasure_requests`; owner approve → `approve_gdpr_patient_erasure` hard delete + storage cleanup; JSON export `GET /api/privacy/patients/[id]/export` |
+| Clinic ZIP backup (Faza 3C / §8.3) | Owner on-demand ZIP: `GET /api/privacy/clinic/export` — patients, invoices(+lines/payments), documents/images meta; audit `clinic.backup_exported` |
+| Clinic lifecycle (Faza 3C / D6 / D45) | Trial/unpaid → `readonly` (7d grace) → `pending_delete` → hard delete; owner close via `/settings/privacy`; cron `GET /api/cron/clinic-lifecycle`; RLS `clinic_is_writable()` |
+| E2E + tenant isolation CI (item 23) | Playwright `e2e/` — signup→MFA→onboarding step 1, termin+overlap, faktura+PDF, UI isolation; Vitest `lib/security/tenant-isolation.test.ts` — patients/appointments/storage; workflows `e2e.yml` + `security.yml` |
 | Marketing (Faza 1) | `(marketing)/` landing + `/pricing` + signup CTA; display prices mirror PRD §4.1 |
 | Observability (Faza 1) | Sentry (`instrumentation*.ts`, optional DSN); PostHog (`lib/analytics/posthog.ts`, EU host, no patient PII) |
 
@@ -231,3 +238,9 @@ Prati PRD §11. Tech doc se širi po fazama; ne specifikovati Enterprise module 
 | 2026-07-13 | Faza 2I: `/onboarding` 3-step wizard; `settings_json.onboarding`+`working_hours`; create_clinic seeds incomplete |
 | 2026-07-13 | Faza 3A: email templates + reminders (D23); `/settings/email`; calendar send; `outbound_messages` |
 | 2026-07-14 | Brand **DentOrd** / `dentord.com`; Resend From `noreply@`; `lib/brand/constants.ts`; assets u `brand/` |
+| 2026-07-14 | Faza 3B: CRM light `/crm` + `crm_notifications`; birthday/recall/control; `patients.next_control_at` |
+| 2026-07-14 | Faza 3C: owner audit UI `/settings/audit`; GDPR export + erasure approve/hard-delete `/settings/privacy` |
+| 2026-07-14 | Faza 3C: clinic ZIP backup `/api/privacy/clinic/export` (patients, invoices, docs meta; §8.3 / D45) |
+| 2026-07-14 | Faza 3C: clinic lifecycle trial→readonly→hard delete (D6/D45); cron `/api/cron/clinic-lifecycle` |
+| 2026-07-14 | Item 23: Playwright E2E (signup/termin/faktura/isolation) + Vitest tenant isolation patients/appts/storage CI |
+| 2026-07-14 | Fix allocate_invoice_number ambiguity (migration + app fallback); nest AuditLog.events keys for next-intl |

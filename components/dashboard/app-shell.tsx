@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { logoutAction } from "@/lib/auth/actions";
 import { clearOperatorSessionAction } from "@/lib/operators/actions";
 import { canAccessCalendar } from "@/lib/calendar/rbac";
+import { canAccessCrm } from "@/lib/crm/rbac";
 import { canReadEmailTemplates } from "@/lib/email/rbac";
 import { canAccessExpenses } from "@/lib/expenses/rbac";
 import { canAccessImport } from "@/lib/import/rbac";
@@ -28,11 +29,14 @@ type NavItem = {
     | "/services"
     | "/invoices"
     | "/expenses"
+    | "/crm"
     | "/settings/users"
     | "/settings/locations"
     | "/settings/branding"
     | "/settings/email"
-    | "/settings/import";
+    | "/settings/import"
+    | "/settings/audit"
+    | "/settings/privacy";
   labelKey:
     | "dashboard"
     | "calendar"
@@ -40,12 +44,16 @@ type NavItem = {
     | "services"
     | "invoices"
     | "expenses"
+    | "crm"
     | "settings"
     | "users"
     | "locations"
     | "branding"
     | "email"
-    | "import";
+    | "import"
+    | "audit"
+    | "privacy";
+  badge?: number;
 };
 
 export type AppShellBranding = {
@@ -60,6 +68,8 @@ type AppShellProps = {
   operatorName?: string | null;
   isOwner: boolean;
   showExpenses?: boolean;
+  showCrm?: boolean;
+  crmOpenCount?: number;
   branding?: AppShellBranding | null;
   children: React.ReactNode;
 };
@@ -71,11 +81,14 @@ export function AppShell({
   operatorName,
   isOwner,
   showExpenses = false,
+  showCrm = false,
+  crmOpenCount = 0,
   branding = null,
   children,
 }: AppShellProps) {
   const showImport = canAccessImport(role);
   const showEmail = canReadEmailTemplates(role);
+  const crmNav = showCrm && canAccessCrm(role);
   const t = useTranslations("Nav");
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -97,11 +110,22 @@ export function AppShell({
     ...(showExpenses && canAccessExpenses(role)
       ? ([{ href: "/expenses", labelKey: "expenses" }] as const)
       : []),
+    ...(crmNav
+      ? ([
+          {
+            href: "/crm",
+            labelKey: "crm",
+            badge: crmOpenCount > 0 ? crmOpenCount : undefined,
+          },
+        ] as const)
+      : []),
     ...(isOwner
       ? ([
           { href: "/settings/locations", labelKey: "locations" },
           { href: "/settings/branding", labelKey: "branding" },
           { href: "/settings/users", labelKey: "users" },
+          { href: "/settings/audit", labelKey: "audit" },
+          { href: "/settings/privacy", labelKey: "privacy" },
         ] as const)
       : []),
     ...(showEmail
@@ -172,7 +196,7 @@ export function AppShell({
               href={item.href}
               onClick={() => setMobileOpen(false)}
               className={cn(
-                "rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                "flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                 isActive(item.href)
                   ? brandStyle
                     ? "bg-[var(--clinic-brand-accent)] text-white"
@@ -182,7 +206,19 @@ export function AppShell({
                     : "hover:bg-muted",
               )}
             >
-              {t(item.labelKey)}
+              <span>{t(item.labelKey)}</span>
+              {item.badge ? (
+                <span
+                  className={cn(
+                    "inline-flex min-w-5 items-center justify-center rounded-md px-1.5 text-xs font-semibold",
+                    isActive(item.href)
+                      ? "bg-white/20 text-inherit"
+                      : "bg-primary/10 text-primary",
+                  )}
+                >
+                  {item.badge > 99 ? "99+" : item.badge}
+                </span>
+              ) : null}
             </Link>
           ))}
         </nav>

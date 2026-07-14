@@ -13,6 +13,7 @@ export const createPatientSchema = z.object({
   phone: z.string().trim().max(40).optional().or(z.literal("")),
   email: z.string().trim().email().max(255).optional().or(z.literal("")),
   dateOfBirth: z.string().trim().max(10).optional().or(z.literal("")),
+  nextControlAt: z.string().trim().max(10).optional().or(z.literal("")),
   address: z.string().trim().max(255).optional().or(z.literal("")),
   medicalHistory: z.string().trim().max(4000).optional().or(z.literal("")),
   notes: z.string().trim().max(4000).optional().or(z.literal("")),

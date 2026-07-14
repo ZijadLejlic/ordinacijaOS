@@ -16,6 +16,10 @@ import {
   PatientForm,
 } from "@/components/patients/patient-forms";
 import {
+  ExportPatientLink,
+  RequestErasureButton,
+} from "@/components/privacy/privacy-forms";
+import {
   DocumentUploadForm,
   DocumentsList,
   ImageUploadForm,
@@ -31,6 +35,10 @@ import {
   canWritePatients,
   canWriteTreatmentPlan,
 } from "@/lib/patients/rbac";
+import {
+  canExportPatientData,
+  canRequestPatientErasure,
+} from "@/lib/privacy/rbac";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -73,6 +81,8 @@ export default async function PatientDetailPage({ params }: Props) {
   }
 
   const canWrite = canWritePatients(profile!.role) && patient.is_active;
+  const canExport = canExportPatientData(profile!.role);
+  const canRequestErasure = canRequestPatientErasure(profile!.role);
   const canViewOdontogram = canAccessOdontogram(profile!.role);
   const canEditOdontogram =
     canWriteOdontogram(profile!.role) && patient.is_active;
@@ -168,9 +178,15 @@ export default async function PatientDetailPage({ params }: Props) {
             <p className="text-destructive text-sm">{t("inactive")}</p>
           ) : null}
         </div>
-        {canWrite ? (
-          <DeactivatePatientButton patientId={patient.id} />
-        ) : null}
+        <div className="flex flex-wrap gap-2">
+          {canExport ? <ExportPatientLink patientId={patient.id} /> : null}
+          {canRequestErasure ? (
+            <RequestErasureButton patientId={patient.id} />
+          ) : null}
+          {canWrite ? (
+            <DeactivatePatientButton patientId={patient.id} />
+          ) : null}
+        </div>
       </div>
 
       <Card>
@@ -188,6 +204,7 @@ export default async function PatientDetailPage({ params }: Props) {
               phone: patient.phone ?? "",
               email: patient.email ?? "",
               dateOfBirth: patient.date_of_birth ?? "",
+              nextControlAt: patient.next_control_at ?? "",
               address: patient.address ?? "",
               medicalHistory: patient.medical_history ?? "",
               notes: patient.notes ?? "",

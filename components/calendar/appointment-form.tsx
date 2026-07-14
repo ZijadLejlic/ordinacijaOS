@@ -25,6 +25,8 @@ const KNOWN_ERRORS = [
   "invalid",
   "unauthorized",
   "forbidden",
+  "clinicReadonly",
+  "clinicPendingDelete",
   "featureDisabled",
   "patientNotFound",
   "patientInactive",
@@ -173,6 +175,7 @@ export function AppointmentForm({
           <select
             id="patientId"
             name="patientId"
+            data-testid="appointment-patient"
             className="border-input bg-background h-8 w-full rounded-lg border px-2 text-sm"
             value={patientId}
             onChange={(e) => setPatientId(e.target.value)}

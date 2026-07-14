@@ -37,6 +37,8 @@ const KNOWN_ERRORS = [
   "invalid",
   "unauthorized",
   "forbidden",
+  "clinicReadonly",
+  "clinicPendingDelete",
   "featureDisabled",
   "patientNotFound",
   "createFailed",
@@ -94,6 +96,7 @@ export type PatientFormValues = {
   phone: string;
   email: string;
   dateOfBirth: string;
+  nextControlAt: string;
   address: string;
   medicalHistory: string;
   notes: string;
@@ -169,6 +172,16 @@ export function PatientForm({
             type="date"
             disabled={disabled}
             defaultValue={patient?.dateOfBirth}
+          />
+        </Field>
+        <Field>
+          <FieldLabel htmlFor="nextControlAt">{t("nextControlAt")}</FieldLabel>
+          <Input
+            id="nextControlAt"
+            name="nextControlAt"
+            type="date"
+            disabled={disabled}
+            defaultValue={patient?.nextControlAt}
           />
         </Field>
         <Field>

@@ -4,6 +4,7 @@ import { getLocale } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "@/i18n/navigation";
 import { writeAuditEvent } from "@/lib/audit/log";
+import { getClinicWriteBlock } from "@/lib/clinic/writable";
 import {
   assertCanAddPatientImage,
   assertFeature,
@@ -35,7 +36,10 @@ export type PatientActionState = {
   message?: string;
 } | null;
 
-async function requireClinicalProfile(allowedRoles: readonly AppRole[]) {
+async function requireClinicalProfile(
+  allowedRoles: readonly AppRole[],
+  mode: "read" | "write" = "write",
+) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -60,6 +64,13 @@ async function requireClinicalProfile(allowedRoles: readonly AppRole[]) {
     return { error: "forbidden" as const, supabase, user, profile: null };
   }
 
+  if (mode === "write") {
+    const writeBlock = await getClinicWriteBlock(supabase, profile.clinic_id);
+    if (writeBlock) {
+      return { error: writeBlock, supabase, user, profile };
+    }
+  }
+
   return { error: null, supabase, user, profile };
 }
 
@@ -80,6 +91,7 @@ export async function createPatientAction(
     phone: formData.get("phone") ?? "",
     email: formData.get("email") ?? "",
     dateOfBirth: formData.get("dateOfBirth") ?? "",
+    nextControlAt: formData.get("nextControlAt") ?? "",
     address: formData.get("address") ?? "",
     medicalHistory: formData.get("medicalHistory") ?? "",
     notes: formData.get("notes") ?? "",
@@ -114,6 +126,7 @@ export async function createPatientAction(
       phone: emptyToUndefined(parsed.data.phone) ?? null,
       email: emptyToUndefined(parsed.data.email) ?? null,
       date_of_birth: emptyToUndefined(parsed.data.dateOfBirth) ?? null,
+      next_control_at: emptyToUndefined(parsed.data.nextControlAt) ?? null,
       address: emptyToUndefined(parsed.data.address) ?? null,
       medical_history: emptyToUndefined(parsed.data.medicalHistory) ?? null,
       notes: emptyToUndefined(parsed.data.notes) ?? null,
@@ -148,6 +161,7 @@ export async function updatePatientAction(
     phone: formData.get("phone") ?? "",
     email: formData.get("email") ?? "",
     dateOfBirth: formData.get("dateOfBirth") ?? "",
+    nextControlAt: formData.get("nextControlAt") ?? "",
     address: formData.get("address") ?? "",
     medicalHistory: formData.get("medicalHistory") ?? "",
     notes: formData.get("notes") ?? "",
@@ -181,6 +195,7 @@ export async function updatePatientAction(
       phone: emptyToUndefined(parsed.data.phone) ?? null,
       email: emptyToUndefined(parsed.data.email) ?? null,
       date_of_birth: emptyToUndefined(parsed.data.dateOfBirth) ?? null,
+      next_control_at: emptyToUndefined(parsed.data.nextControlAt) ?? null,
       address: emptyToUndefined(parsed.data.address) ?? null,
       medical_history: emptyToUndefined(parsed.data.medicalHistory) ?? null,
       notes: emptyToUndefined(parsed.data.notes) ?? null,
@@ -638,7 +653,7 @@ export async function deleteImageAction(
 export async function createSignedFileUrlAction(
   path: string,
 ): Promise<{ url?: string; error?: string }> {
-  const auth = await requireClinicalProfile(READ_ROLES);
+  const auth = await requireClinicalProfile(READ_ROLES, "read");
   if (auth.error || !auth.profile) {
     return { error: auth.error ?? "forbidden" };
   }

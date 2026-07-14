@@ -7,6 +7,7 @@ import { assertCanCreateLocation } from "@/lib/entitlements";
 import { canManageLocations } from "@/lib/locations/rbac";
 import { createClient } from "@/lib/supabase/server";
 import type { Json } from "@/lib/supabase/database.types";
+import { getClinicWriteBlock } from "@/lib/clinic/writable";
 import {
   createLocationSchema,
   setLocationActiveSchema,
@@ -49,6 +50,11 @@ async function requireLocationManager() {
 
   if (!profile?.is_active || !canManageLocations(profile.role)) {
     return { error: "forbidden" as const, supabase, user, profile: null };
+  }
+
+  const writeBlock = await getClinicWriteBlock(supabase, profile.clinic_id);
+  if (writeBlock) {
+    return { error: writeBlock, supabase, user, profile: profile as ProfileRow };
   }
 
   return { error: null, supabase, user, profile: profile as ProfileRow };

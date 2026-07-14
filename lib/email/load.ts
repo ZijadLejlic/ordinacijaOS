@@ -1,4 +1,5 @@
 import {
+  EMAIL_TEMPLATE_KEYS,
   EMAIL_TEMPLATE_LOCALES,
   type EmailTemplateKey,
   type EmailTemplateLocale,
@@ -22,6 +23,8 @@ async function ensureTemplates(
   });
 }
 
+const KEY_ORDER = EMAIL_TEMPLATE_KEYS as readonly string[];
+
 /** Server-only loader (not a Server Action). */
 export async function loadEmailTemplatesForClinic(
   clinicId: string,
@@ -36,8 +39,10 @@ export async function loadEmailTemplatesForClinic(
     .order("locale", { ascending: true });
 
   return (data ?? [])
-    .filter((row) =>
-      EMAIL_TEMPLATE_LOCALES.includes(row.locale as EmailTemplateLocale),
+    .filter(
+      (row) =>
+        KEY_ORDER.includes(row.template_key) &&
+        EMAIL_TEMPLATE_LOCALES.includes(row.locale as EmailTemplateLocale),
     )
     .map((row) => ({
       id: row.id,
@@ -45,5 +50,11 @@ export async function loadEmailTemplatesForClinic(
       locale: row.locale as EmailTemplateLocale,
       subject: row.subject,
       bodyText: row.body_text,
-    }));
+    }))
+    .sort((a, b) => {
+      const keyDiff =
+        KEY_ORDER.indexOf(a.templateKey) - KEY_ORDER.indexOf(b.templateKey);
+      if (keyDiff !== 0) return keyDiff;
+      return a.locale.localeCompare(b.locale);
+    });
 }

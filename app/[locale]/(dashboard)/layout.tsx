@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { AppShell } from "@/components/dashboard/app-shell";
+import { ClinicReadonlyBanner } from "@/components/clinic/readonly-banner";
 import { ImpersonationBanner } from "@/components/platform/impersonation-banner";
 import {
   hasCustomColors,
@@ -11,9 +12,14 @@ import {
   CLINIC_BRANDING_BUCKET,
 } from "@/lib/branding/storage";
 import { clinicHasFeature } from "@/lib/entitlements";
+import { canAccessCrm } from "@/lib/crm/rbac";
+import { countOpenCrmNotifications } from "@/lib/crm/load";
 import { canAccessExpenses } from "@/lib/expenses/rbac";
 import { getOperatorIdFromCookie } from "@/lib/operators/session";
 import { createClient } from "@/lib/supabase/server";
+import type { Database } from "@/lib/supabase/database.types";
+
+type ClinicStatus = Database["public"]["Enums"]["clinic_status"];
 
 type Props = {
   children: React.ReactNode;
@@ -36,7 +42,9 @@ export default async function DashboardLayout({ children, params }: Props) {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name, role, clinic_id, clinics(name, branding_json)")
+    .select(
+      "full_name, role, clinic_id, clinics(name, branding_json, status, grace_ends_at)",
+    )
     .eq("id", user!.id)
     .maybeSingle();
 
@@ -47,6 +55,8 @@ export default async function DashboardLayout({ children, params }: Props) {
   const clinic = profile!.clinics as {
     name: string;
     branding_json: unknown;
+    status: ClinicStatus;
+    grace_ends_at: string | null;
   } | null;
 
   const operatorId = await getOperatorIdFromCookie();
@@ -60,7 +70,7 @@ export default async function DashboardLayout({ children, params }: Props) {
     operatorName = op?.display_name ?? null;
   }
 
-  const [showExpenses, brandingEnabled] = await Promise.all([
+  const [showExpenses, brandingEnabled, showCrm] = await Promise.all([
     canAccessExpenses(profile!.role)
       ? clinicHasFeature(
           supabase,
@@ -69,7 +79,15 @@ export default async function DashboardLayout({ children, params }: Props) {
         )
       : Promise.resolve(false),
     clinicHasFeature(supabase, profile!.clinic_id, "branding_custom"),
+    canAccessCrm(profile!.role)
+      ? clinicHasFeature(supabase, profile!.clinic_id, "crm_light")
+      : Promise.resolve(false),
   ]);
+
+  let crmOpenCount = 0;
+  if (showCrm) {
+    crmOpenCount = await countOpenCrmNotifications(profile!.clinic_id);
+  }
 
   let shellBranding: {
     logoUrl: string | null;
@@ -101,6 +119,13 @@ export default async function DashboardLayout({ children, params }: Props) {
   return (
     <div className="flex min-h-full flex-1 flex-col">
       <ImpersonationBanner />
+      {clinic ? (
+        <ClinicReadonlyBanner
+          status={clinic.status}
+          graceEndsAt={clinic.grace_ends_at}
+          isOwner={profile!.role === "owner"}
+        />
+      ) : null}
       <AppShell
         clinicName={clinic?.name ?? t("clinicFallback")}
         role={profile!.role}
@@ -108,6 +133,8 @@ export default async function DashboardLayout({ children, params }: Props) {
         operatorName={operatorName}
         isOwner={profile!.role === "owner"}
         showExpenses={showExpenses}
+        showCrm={showCrm}
+        crmOpenCount={crmOpenCount}
         branding={shellBranding}
       >
         {children}

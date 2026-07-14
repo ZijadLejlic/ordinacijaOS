@@ -10,6 +10,7 @@ import {
   updateServiceSchema,
 } from "@/lib/validations/service";
 import type { Database, Json } from "@/lib/supabase/database.types";
+import { getClinicWriteBlock } from "@/lib/clinic/writable";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
 
@@ -41,6 +42,11 @@ async function requireClinicMember(allowedRoles: readonly AppRole[]) {
 
   if (!profile?.is_active || !allowedRoles.includes(profile.role)) {
     return { error: "forbidden" as const, supabase, user, profile: null };
+  }
+
+  const writeBlock = await getClinicWriteBlock(supabase, profile.clinic_id);
+  if (writeBlock) {
+    return { error: writeBlock, supabase, user, profile };
   }
 
   return { error: null, supabase, user, profile };

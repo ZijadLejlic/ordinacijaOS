@@ -67,7 +67,8 @@
     "invalidCredentials": "Pogrešan email ili lozinka.",
     "locked": "Previše neuspjelih pokušaja. Pokušaj ponovo za 15 minuta.",
     "confirmEmail": "Provjeri email i potvrdi nalog, zatim se prijavi.",
-    "missingClinic": "Nalog nema povezanu ordinaciju. Registruj se kao vlasnik."
+    "missingClinic": "Nalog nema povezanu ordinaciju. Registruj se kao vlasnik.",
+    "emailTaken": "Ovaj email već ima nalog. Prijavi se umjesto registracije."
   },
   "Mfa": {
     "enrollTitle": "Uključi 2FA",
@@ -180,7 +181,9 @@
       "createFailed": "Rashod nije kreiran.",
       "saveFailed": "Izmjena nije sačuvana.",
       "expenseNotFound": "Rashod nije pronađen.",
-      "alreadyVoid": "Rashod je već storniran."
+      "alreadyVoid": "Rashod je već storniran.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmjene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmjene nisu dozvoljene."
     }
   },
   "Invoices": {
@@ -290,7 +293,9 @@
       "planNotAllowed": "Plan rata nije dozvoljen za ovu fakturu.",
       "planExists": "Već postoji aktivni plan rata.",
       "planNotFound": "Plan nije pronađen.",
-      "planNotActive": "Plan nije aktivan."
+      "planNotActive": "Plan nije aktivan.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmjene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmjene nisu dozvoljene."
     }
   },
   "Platform": {
@@ -355,7 +360,9 @@
       "alreadyImpersonating": "Impersonacija je već aktivna.",
       "sessionSwitchFailed": "Prebacivanje sesije nije uspjelo.",
       "notImpersonating": "Nema aktivne impersonacije.",
-      "impersonationMismatch": "Sesija ne odgovara impersonaciji."
+      "impersonationMismatch": "Sesija ne odgovara impersonaciji.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmjene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmjene nisu dozvoljene."
     }
   },
   "Users": {
@@ -423,7 +430,9 @@
       "cannotDeactivateSelf": "Ne možeš deaktivirati vlastiti nalog.",
       "userNotFound": "Korisnik nije pronađen.",
       "missingAppUrl": "Nedostaje NEXT_PUBLIC_APP_URL.",
-      "resetFailed": "Reset link nije kreiran."
+      "resetFailed": "Reset link nije kreiran.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmjene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmjene nisu dozvoljene."
     }
   },
   "Operators": {
@@ -456,7 +465,9 @@
       "pinTaken": "Ovaj PIN već koristi drugi operator na istom nalogu.",
       "notFound": "Operator nije pronađen.",
       "locked": "Previše pokušaja. Sačekaj 15 minuta.",
-      "failed": "Akcija nije uspjela."
+      "failed": "Akcija nije uspjela.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmjene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmjene nisu dozvoljene."
     }
   },
   "Locations": {
@@ -505,7 +516,9 @@
       "createFailed": "Lokacija nije kreirana.",
       "saveFailed": "Izmjena nije sačuvana. Pokušaj ponovo.",
       "locationNotFound": "Lokacija nije pronađena.",
-      "lastLocation": "Zadrži barem jednu aktivnu lokaciju."
+      "lastLocation": "Zadrži barem jednu aktivnu lokaciju.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmjene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmjene nisu dozvoljene."
     }
   },
   "Branding": {
@@ -540,7 +553,9 @@
       "saveFailed": "Izmjena nije sačuvana. Pokušaj ponovo.",
       "uploadFailed": "Logo nije uploadan.",
       "logoTooLarge": "Logo mora biti 2 MB ili manji.",
-      "logoInvalidType": "Koristi JPEG, PNG, WebP, HEIC ili HEIF."
+      "logoInvalidType": "Koristi JPEG, PNG, WebP, HEIC ili HEIF.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmjene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmjene nisu dozvoljene."
     }
   },
   "Onboarding": {
@@ -616,7 +631,9 @@
       "emailTaken": "Email je već registrovan.",
       "inviteExists": "Pozivnica za ovaj email već postoji.",
       "inviteFailed": "Slanje pozivnice nije uspjelo.",
-      "emailFailed": "Email nije poslan. Provjeri EMAIL_FROM / Resend."
+      "emailFailed": "Email nije poslan. Provjeri EMAIL_FROM / Resend.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmjene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmjene nisu dozvoljene."
     }
   },
   "Import": {
@@ -661,7 +678,9 @@
       "noRows": "Nema redova za import.",
       "tooManyRows": "Maksimalno 500 redova po fajlu.",
       "hasRowErrors": "Ispravi greške u CSV-u prije importa.",
-      "importFailed": "Import nije uspio. Pokušaj ponovo."
+      "importFailed": "Import nije uspio. Pokušaj ponovo.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmjene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmjene nisu dozvoljene."
     }
   },
   "Pin": {
@@ -679,7 +698,9 @@
       "locked": "Nalog je privremeno zaključan (15 min) zbog pogrešnih PIN-ova.",
       "forbidden": "PIN switch nije dostupan za ovu ulogu.",
       "unauthorized": "Morate biti prijavljeni.",
-      "notFound": "Operator nije pronađen."
+      "notFound": "Operator nije pronađen.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmjene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmjene nisu dozvoljene."
     }
   },
   "Invite": {
@@ -710,7 +731,10 @@
     "locations": "Lokacije",
     "branding": "Branding",
     "email": "Email šabloni",
+    "crm": "CRM",
     "import": "Import",
+    "audit": "Audit log",
+    "privacy": "Privatnost",
     "logout": "Odjava",
     "menu": "Meni",
     "closeMenu": "Zatvori meni",
@@ -749,6 +773,7 @@
     "phone": "Telefon",
     "email": "Email",
     "dateOfBirth": "Datum rođenja",
+    "nextControlAt": "Sljedeća kontrola",
     "address": "Adresa",
     "medicalHistory": "Medicinska anamneza",
     "notes": "Napomene",
@@ -817,7 +842,9 @@
       "imageConvertFailed": "Slika se nije mogla konvertovati u WebP.",
       "imageNotFound": "Slika nije pronađena.",
       "signedUrlFailed": "Signed URL nije kreiran.",
-      "saveFailed": "Izmjena nije sačuvana. Pokušaj ponovo."
+      "saveFailed": "Izmjena nije sačuvana. Pokušaj ponovo.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmjene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmjene nisu dozvoljene."
     }
   },
   "Services": {
@@ -869,7 +896,9 @@
       "forbidden": "Samo vlasnik može upravljati uslugama.",
       "createFailed": "Usluga nije kreirana.",
       "serviceNotFound": "Usluga nije pronađena.",
-      "saveFailed": "Izmjena nije sačuvana. Pokušaj ponovo."
+      "saveFailed": "Izmjena nije sačuvana. Pokušaj ponovo.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmjene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmjene nisu dozvoljene."
     }
   },
   "Odontogram": {
@@ -904,7 +933,9 @@
       "forbidden": "Nemate dozvolu za odontogram.",
       "featureDisabled": "Odontogram nije uključen u vašem paketu.",
       "patientNotFound": "Pacijent nije pronađen.",
-      "saveFailed": "Izmjena nije sačuvana. Pokušaj ponovo."
+      "saveFailed": "Izmjena nije sačuvana. Pokušaj ponovo.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmjene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmjene nisu dozvoljene."
     }
   },
   "TreatmentPlan": {
@@ -952,7 +983,9 @@
       "planInactive": "Plan je arhiviran.",
       "serviceNotFound": "Usluga nije pronađena.",
       "createFailed": "Nije kreirano. Pokušaj ponovo.",
-      "saveFailed": "Izmjena nije sačuvana. Pokušaj ponovo."
+      "saveFailed": "Izmjena nije sačuvana. Pokušaj ponovo.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmjene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmjene nisu dozvoljene."
     }
   },
   "Calendar": {
@@ -1021,7 +1054,9 @@
       "appointmentNotSendable": "Podsjetnik se ne šalje za otkazane/no-show termine.",
       "templateNotFound": "Email šablon nije pronađen.",
       "sendFailed": "Email nije poslan. Pokušaj ponovo.",
-      "missingActorEmail": "Vaš nalog nema email."
+      "missingActorEmail": "Vaš nalog nema email.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmjene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmjene nisu dozvoljene."
     }
   },
   "EmailTemplates": {
@@ -1031,6 +1066,12 @@
     "upsellDescription": "Ova funkcija nije uključena u vašem paketu.",
     "reminderCardTitle": "Podsjetnik na termin",
     "reminderCardDescription": "Šablon se šalje ručno iz kalendara ili kao test na vaš email.",
+    "birthdayCardTitle": "Rođendan",
+    "birthdayCardDescription": "CRM poruka za rođendan. Šalje se ručno iz CRM inboxa.",
+    "recallCardTitle": "Recall (povratak)",
+    "recallCardDescription": "CRM poruka kad pacijent nije bio 180+ dana. Šalje se ručno iz CRM inboxa.",
+    "controlCardTitle": "Kontrola",
+    "controlCardDescription": "CRM poruka za sljedeću kontrolu (datum na kartonu). Šalje se ručno iz CRM inboxa.",
     "subject": "Naslov",
     "body": "Tekst poruke",
     "varsHint": "Dostupne varijable: {vars}",
@@ -1045,7 +1086,10 @@
       "en": "Engleski"
     },
     "keys": {
-      "appointment_reminder": "Podsjetnik na termin"
+      "appointment_reminder": "Podsjetnik na termin",
+      "birthday": "Rođendan",
+      "recall": "Recall",
+      "control": "Kontrola"
     },
     "errors": {
       "invalid": "Provjeri unesene podatke.",
@@ -1058,7 +1102,46 @@
       "missingActorEmail": "Vaš nalog nema email.",
       "patientNoEmail": "Pacijent nema email adresu.",
       "appointmentNotFound": "Termin nije pronađen.",
-      "appointmentNotSendable": "Podsjetnik se ne šalje za otkazane/no-show termine."
+      "appointmentNotSendable": "Podsjetnik se ne šalje za otkazane/no-show termine.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmjene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmjene nisu dozvoljene."
+    }
+  },
+  "Crm": {
+    "title": "CRM",
+    "subtitle": "In-app obavijesti: rođendan, recall i kontrola. Recepcija eksplicitno šalje email.",
+    "upsellTitle": "CRM light nije uključen",
+    "upsellDescription": "Ova funkcija je dostupna na Professional i višim paketima.",
+    "inboxTitle": "Otvorene obavijesti",
+    "inboxDescription": "Sistem generiše listu; vi odlučujete kome poslati poruku.",
+    "empty": "Nema otvorenih CRM obavijesti.",
+    "send": "Pošalji email",
+    "dismiss": "Otkaži",
+    "noEmail": "Nema emaila",
+    "kinds": {
+      "birthday": "Rođendan",
+      "recall": "Recall",
+      "control": "Kontrola"
+    },
+    "columns": {
+      "kind": "Tip",
+      "patient": "Pacijent",
+      "dueOn": "Datum",
+      "email": "Email",
+      "actions": "Akcije"
+    },
+    "errors": {
+      "invalid": "Provjeri unos.",
+      "unauthorized": "Morate biti prijavljeni.",
+      "forbidden": "Nemate dozvolu za CRM.",
+      "featureDisabled": "CRM light nije uključen u vašem paketu.",
+      "notFound": "Obavijest nije pronađena.",
+      "notOpen": "Obavijest više nije otvorena.",
+      "patientNoEmail": "Pacijent nema email adresu.",
+      "templateNotFound": "Email šablon nije pronađen.",
+      "sendFailed": "Slanje nije uspjelo. Pokušaj ponovo.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmjene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmjene nisu dozvoljene."
     }
   },
   "Waitlist": {
@@ -1100,7 +1183,146 @@
       "appointmentOverlap": "Ovaj doktor već ima preklapajući termin.",
       "waitlistNotFound": "Stavka liste nije pronađena.",
       "createFailed": "Nije kreirano. Pokušaj ponovo.",
-      "saveFailed": "Izmjena nije sačuvana. Pokušaj ponovo."
+      "saveFailed": "Izmjena nije sačuvana. Pokušaj ponovo.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmjene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmjene nisu dozvoljene."
+    }
+  },
+  "AuditLog": {
+    "title": "Audit log",
+    "subtitle": "Pregled događaja u ordinaciji: ko, šta, kada i detalji promjene.",
+    "backDashboard": "← Kontrolna tabla",
+    "filterTitle": "Filter",
+    "filterDescription": "Filtriraj po tipu događaja.",
+    "eventLabel": "Događaj",
+    "allEvents": "Svi događaji",
+    "applyFilter": "Primijeni",
+    "listTitle": "Događaji",
+    "listDescription": "Najnoviji događaji prvi. Samo vlasnik može pregledati audit.",
+    "empty": "Nema audit događaja za odabrani filter.",
+    "prev": "Prethodna",
+    "next": "Sljedeća",
+    "pageInfo": "Stranica {page} / {totalPages} · ukupno {total}",
+    "columns": {
+      "when": "Kada",
+      "actor": "Ko",
+      "event": "Šta",
+      "details": "Detalji (stara/nova)"
+    },
+    "events": {
+      "patient": {
+        "created": "Pacijent kreiran",
+        "updated": "Pacijent ažuriran",
+        "deactivated": "Pacijent deaktiviran"
+      },
+      "appointment": {
+        "created": "Termin kreiran",
+        "updated": "Termin ažuriran",
+        "cancelled": "Termin otkazan"
+      },
+      "invoice": {
+        "created": "Faktura kreirana",
+        "voided": "Faktura stornirana"
+      },
+      "payment": {
+        "recorded": "Uplata zabilježena"
+      },
+      "invite": {
+        "created": "Pozivnica poslana",
+        "revoked": "Pozivnica opozvana"
+      },
+      "user": {
+        "deactivated": "Korisnik deaktiviran"
+      },
+      "gdpr": {
+        "erasure_requested": "GDPR brisanje zatraženo",
+        "erasure_rejected": "GDPR brisanje odbijeno",
+        "patient_erased": "GDPR hard delete završen",
+        "patient_exported": "GDPR export pacijenta"
+      },
+      "operator": {
+        "switched": "PIN operator switch"
+      },
+      "auth": {
+        "login_lockout": "Login lockout"
+      }
+    }
+  },
+  "Privacy": {
+    "title": "Privatnost / GDPR",
+    "subtitle": "Backup klinike, export pacijenta i zahtjevi za hard delete (owner approve).",
+    "backDashboard": "← Kontrolna tabla",
+    "clinicZipTitle": "Backup klinike (ZIP)",
+    "clinicZipDescription": "On-demand export za ownera: pacijenti, računi i meta podataka dokumenata (§8.3).",
+    "clinicZipHint": "ZIP sadrži patients, invoices (+ linije i uplate) i documents/images meta. Ne uključuje binarne fajlove ni puni karton (odontogram, plan terapije) — to je odvojeni GDPR JSON po pacijentu.",
+    "clinicZipClosureNote": "Pri zatvaranju naloga (D45): isti export → 7 dana grace → hard delete (automatski job noću).",
+    "clinicZipDownload": "Preuzmi ZIP",
+    "exportCardTitle": "Export pacijenta",
+    "exportCardDescription": "JSON export je dostupan na kartonu pacijenta (Export JSON).",
+    "exportHint": "Otvorite pacijenta → Export JSON. Uključuje karton, alergije, dokumente (meta), termine, fakture.",
+    "erasureCardTitle": "Zahtjevi za brisanje",
+    "erasureCardDescription": "Nakon odobrenja, podaci pacijenta i storage objekti se trajno brišu (D35).",
+    "emptyRequests": "Nema GDPR zahtjeva.",
+    "exportJson": "Export JSON",
+    "requestErasure": "Zatraži brisanje",
+    "confirmRequest": "Zatražiti hard delete ovog pacijenta? Owner mora odobriti.",
+    "confirmApprove": "Odobriti TRAJNO brisanje? Ovo se ne može poništiti.",
+    "approve": "Odobri i obriši",
+    "reject": "Odbij",
+    "rejectReasonPlaceholder": "Razlog (opcionalno)",
+    "submitting": "Sačekaj…",
+    "patientRemoved": "Pacijent obrisan",
+    "columns": {
+      "patient": "Pacijent",
+      "status": "Status",
+      "requestedAt": "Zatraženo",
+      "actions": "Akcije"
+    },
+    "status": {
+      "pending": "Na čekanju",
+      "rejected": "Odbijeno",
+      "completed": "Završeno",
+      "failed": "Neuspjelo"
+    },
+    "errors": {
+      "unauthorized": "Morate biti prijavljeni.",
+      "forbidden": "Nemate dozvolu.",
+      "patientNotFound": "Pacijent nije pronađen.",
+      "alreadyPending": "Već postoji zahtjev na čekanju.",
+      "requestFailed": "Zahtjev nije kreiran.",
+      "notFound": "Zahtjev nije pronađen.",
+      "storageDeleteFailed": "Brisanje fajlova nije uspjelo.",
+      "eraseFailed": "Hard delete nije uspio.",
+      "mfaRequired": "Owner MFA (AAL2) je obavezan.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmjene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmjene nisu dozvoljene."
+    }
+  },
+  "ClinicLifecycle": {
+    "readonlyTitle": "Klinika je u režimu samo-za-čitanje",
+    "readonlyBody": "Izmjene su privremeno blokirane. Preuzmite ZIP backup prije brisanja.",
+    "readonlyBodyWithGrace": "Izmjene su blokirane do {date}. Preuzmite ZIP backup; nakon grace perioda nalog se trajno briše.",
+    "pendingDeleteTitle": "Nalog je zakazan za brisanje",
+    "pendingDeleteBody": "Podaci će biti trajno obrisani. Export više nije garantovan nakon hard delete-a.",
+    "exportCta": "Privacy / backup",
+    "closeCardTitle": "Zatvaranje naloga",
+    "closeCardDescription": "Export → 7 dana grace (readonly) → hard delete (D45).",
+    "closeHint": "Najprije preuzmite ZIP backup. Zatim možete zatvoriti nalog: 7 dana readonly, pa trajno brisanje.",
+    "closeConfirmPrompt": "Upišite tačan naziv klinike za potvrdu:",
+    "closeConfirm": "Zatvoriti nalog? Nakon 7 dana podaci se trajno brišu.",
+    "closeAccount": "Zatvori nalog",
+    "closing": "Zatvaranje…",
+    "closureInProgressTitle": "Zatvaranje u toku",
+    "closureInProgressBody": "Nalog je readonly. Grace ističe {date}. Hard delete slijedi automatski.",
+    "errors": {
+      "unauthorized": "Morate biti prijavljeni.",
+      "forbidden": "Nemate dozvolu.",
+      "mfaRequired": "Owner MFA (AAL2) je obavezan.",
+      "alreadyClosing": "Zatvaranje je već pokrenuto.",
+      "notActive": "Klinika nije aktivna.",
+      "closureFailed": "Zatvaranje nije uspjelo.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmjene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmjene nisu dozvoljene."
     }
   }
 }

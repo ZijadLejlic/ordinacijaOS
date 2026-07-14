@@ -20,6 +20,7 @@ import {
   createInviteSchema,
 } from "@/lib/validations/invite";
 import type { Database } from "@/lib/supabase/database.types";
+import { getClinicWriteBlock } from "@/lib/clinic/writable";
 
 type AppRole = Database["public"]["Enums"]["app_role"];
 
@@ -47,6 +48,11 @@ async function requireOwnerProfile() {
 
   if (!profile?.is_active || profile.role !== "owner") {
     return { error: "forbidden" as const, supabase, user, profile: null };
+  }
+
+  const writeBlock = await getClinicWriteBlock(supabase, profile.clinic_id);
+  if (writeBlock) {
+    return { error: writeBlock, supabase, user, profile };
   }
 
   return { error: null, supabase, user, profile };

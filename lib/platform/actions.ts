@@ -93,7 +93,16 @@ export async function updateClinicStatusAction(
 
   const { error } = await service
     .from("clinics")
-    .update({ status: parsed.data.status })
+    .update({
+      status: parsed.data.status,
+      ...(parsed.data.status === "active"
+        ? {
+            grace_ends_at: null,
+            readonly_started_at: null,
+            closure_reason: null,
+          }
+        : {}),
+    })
     .eq("id", parsed.data.clinicId);
 
   if (error) {

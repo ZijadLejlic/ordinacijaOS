@@ -41,7 +41,22 @@ async function appHomePath(
   return `/${locale}/dashboard`;
 }
 
+function isServerActionRequest(request: NextRequest) {
+  // Server Actions POST to the page URL. Any NextResponse.redirect() here returns
+  // a normal HTTP redirect instead of text/x-component → client throws
+  // "An unexpected response was received from the server."
+  return request.method === "POST" && request.headers.has("next-action");
+}
+
 export async function middleware(request: NextRequest) {
+  // Never let i18n or auth redirects touch Server Actions — only refresh cookies.
+  // Auth gates still apply on the document navigation after the action redirects.
+  if (isServerActionRequest(request)) {
+    const passthrough = NextResponse.next({ request });
+    const { response } = await updateSession(request, passthrough);
+    return response;
+  }
+
   const i18nResponse = handleI18n(request);
   const { response, user, supabase } = await updateSession(request, i18nResponse);
 

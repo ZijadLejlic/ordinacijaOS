@@ -13,6 +13,7 @@ import {
   canWriteCalendar,
   canWriteWaitlist,
 } from "@/lib/calendar/rbac";
+import { getClinicWriteBlock } from "@/lib/clinic/writable";
 import { assertFeature, clinicHasFeature } from "@/lib/entitlements";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -70,6 +71,11 @@ async function requireCalendarWriter() {
 
   if (!profile?.is_active || !canWriteCalendar(profile.role)) {
     return { error: "forbidden" as const, supabase, user, profile: null };
+  }
+
+  const writeBlock = await getClinicWriteBlock(supabase, profile.clinic_id);
+  if (writeBlock) {
+    return { error: writeBlock, supabase, user, profile: profile as ProfileRow };
   }
 
   return { error: null, supabase, user, profile: profile as ProfileRow };

@@ -7,6 +7,7 @@ import { assertFeature } from "@/lib/entitlements";
 import { isValidFdi } from "@/lib/odontogram/fdi";
 import { canWriteTreatmentPlan } from "@/lib/patients/rbac";
 import { createClient } from "@/lib/supabase/server";
+import { getClinicWriteBlock } from "@/lib/clinic/writable";
 import {
   addTreatmentPlanItemSchema,
   createTreatmentPlanSchema,
@@ -41,6 +42,11 @@ async function requireTreatmentPlanWriter() {
 
   if (!profile?.is_active || !canWriteTreatmentPlan(profile.role)) {
     return { error: "forbidden" as const, supabase, user, profile: null };
+  }
+
+  const writeBlock = await getClinicWriteBlock(supabase, profile.clinic_id);
+  if (writeBlock) {
+    return { error: writeBlock, supabase, user, profile };
   }
 
   return { error: null, supabase, user, profile };

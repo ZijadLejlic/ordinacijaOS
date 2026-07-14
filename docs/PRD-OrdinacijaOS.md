@@ -599,12 +599,12 @@ Online naplata usluga pacijentima (avans preko portala): **nadogradnja poslije**
 ### Faza 3 — SaaS ops & trust
 
 17. ~~Email šabloni + reminderi~~ *(slice 3A: `/settings/email` BS/EN edit; kalendar send; `email_templates` + `outbound_messages`; feature `email_reminders`)*
-18. CRM light notifikacije
-19. Audit log UI
-20. GDPR export/delete (owner approve)
-21. Clinic export ZIP / backup UX
-22. Trial expiry → readonly → delete job
-23. E2E + tenant isolation CI
+18. ~~CRM light notifikacije~~ *(slice 3B: `/crm` inbox; birthday/recall/control; `crm_notifications`; feature `crm_light`; recepcija šalje)*
+19. ~~Audit log UI~~ *(slice 3C: `/settings/audit`; owner-only RLS SELECT; filter + pagination)*
+20. ~~GDPR export/delete (owner approve)~~ *(slice 3C: `/settings/privacy` + patient chart; `gdpr_erasure_requests`; hard delete RPC; JSON export API)*
+21. ~~Clinic export ZIP / backup UX~~ *(slice 3C: `/settings/privacy` ZIP; `GET /api/privacy/clinic/export`; pacijenti+računi+docs meta; D45)*
+22. ~~Trial expiry → readonly → delete job~~ *(slice 3C: `clinic_is_writable` RLS; owner close; cron `/api/cron/clinic-lifecycle`; hard delete RPC)*
+23. ~~E2E + tenant isolation CI~~ *(Playwright: signup→onboarding, termin, faktura+PDF, isolation UI; Vitest RLS patients/appointments/storage; `.github/workflows/e2e.yml` + `security.yml`)*
 24. Consent draw-sign + doc templates
 25. Inventar basic
 
@@ -640,9 +640,11 @@ Online naplata usluga pacijentima (avans preko portala): **nadogradnja poslije**
 - [x] Email reminder šablon edit + slanje (test) *(Faza 3A: `/settings/email` + kalendar send; Resend; outbound log)*
 - [x] Branding: logo + boje vidljivi u app shellu *(Faza 2G; feature `branding_custom`)*
 - [x] CSV import pacijenata i usluga *(Faza 2H: dry-run + commit; RBAC §3.2)*
-- [ ] GDPR export; delete zahtjev čeka owner approve pa hard delete
-- [ ] Klinika A ne može pročitati podatke klinike B (automatski test)
-- [ ] Storage objekti nisu javno listable; samo signed URL
+- [x] GDPR export; delete zahtjev čeka owner approve pa hard delete *(Faza 3C: JSON export + erasure queue)*
+- [x] Clinic ZIP backup (pacijenti, računi, docs meta) *(Faza 3C: `/settings/privacy` + `/api/privacy/clinic/export`)*
+- [x] Trial expiry → readonly → delete *(Faza 3C: lifecycle job + owner close; D6/D45)*
+- [x] Klinika A ne može pročitati podatke klinike B (automatski test)
+- [x] Storage objekti nisu javno listable; samo signed URL
 - [ ] Full responsive: login, kalendar, karton, faktura na mobilnom
 - [x] Marketing: pricing vidljiv, CTA signup, Privacy/Terms/DPA linkovi, cookie banner *(skeleton: landing + pricing + signup CTA; Privacy/Terms/cookie banner TBD)*
 
