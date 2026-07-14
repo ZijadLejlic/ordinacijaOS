@@ -6,7 +6,7 @@
 
 | Polje | Vrijednost |
 |---|---|
-| Status | Faza 3C done — item 23 E2E + tenant isolation CI |
+| Status | Faza 3 done — item 25 Inventar basic |
 
 | Izvor | PRD §0.1, §5, §8, §11 |
 | Ažurirati | Pri scaffoldu i svakoj arhitekturnoj odluci |
@@ -67,6 +67,7 @@ Zaključati **kako** gradimo DentOrd (stack, patterni, granice), da agent/develo
 | Clinic lifecycle (Faza 3C / D6 / D45) | Trial/unpaid → `readonly` (7d grace) → `pending_delete` → hard delete; owner close via `/settings/privacy`; cron `GET /api/cron/clinic-lifecycle`; RLS `clinic_is_writable()` |
 | E2E + tenant isolation CI (item 23) | Playwright `e2e/` — signup→MFA→onboarding step 1, termin+overlap, faktura+PDF, UI isolation; Vitest `lib/security/tenant-isolation.test.ts` — patients/appointments/storage; workflows `e2e.yml` + `security.yml` |
 | Consent draw-sign (Faza 3D / D20) | `/settings/consent` — BS/EN predlošci (`general_treatment`, `data_processing`, `radiography`); karton draw-sign → PDF + PNG u `patient-files`; `consent_forms` / `consent_signatures`; feature `consent_draw_sign` (Pro+) |
+| Inventar basic (Faza 3E / §6.12) | `/inventory` — materijali (qty + unit + low-stock prag); ±1 adjust; nav badge; `inventory_items` + RLS; feature `inventory_basic` (Pro+); bez auto-skidanja/barkoda/roka |
 | Marketing (Faza 1) | `(marketing)/` landing + `/pricing` + signup CTA; display prices mirror PRD §4.1 |
 | Observability (Faza 1) | Sentry (`instrumentation*.ts`, optional DSN); PostHog (`lib/analytics/posthog.ts`, EU host, no patient PII) |
 
@@ -247,3 +248,4 @@ Prati PRD §11. Tech doc se širi po fazama; ne specifikovati Enterprise module 
 | 2026-07-14 | Item 23: Playwright E2E (signup/termin/faktura/isolation) + Vitest tenant isolation patients/appts/storage CI |
 | 2026-07-14 | Fix allocate_invoice_number ambiguity (migration + app fallback); nest AuditLog.events keys for next-intl |
 | 2026-07-14 | Faza 3D / D20: consent templates + draw-sign PDF (`consent_forms` / `consent_signatures`) |
+| 2026-07-14 | Faza 3E / §6.12: inventar basic `/inventory` + `inventory_items` + low-stock nav badge |

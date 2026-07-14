@@ -384,11 +384,19 @@ Migracija `phase3b_crm_light`:
 
 **Migracija:** `supabase/migrations/20260714000000_phase3b_crm_light.sql` — primijenjena na remote (`next_control_at`, `crm_notifications`, `can_access_crm` verified).
 
-**Još nije u DB (skica):**
+### Faza 3E — Inventar basic (implementirano)
 
-```text
-(inventar tables — item 25)
-```
+Migracija `phase3e_inventory_basic`:
+
+| Tabela / helper | Napomena |
+|---|---|
+| `inventory_items` | name, unit, quantity, low_stock_threshold, notes, is_active; soft deactivate |
+| `can_access_inventory` | owner + doctor + assistant + reception |
+| `can_write_inventory` | same (manual +/− qty) |
+
+**App:** `/inventory` — CRUD + ±1 adjust; low-stock badge u nav; feature `inventory_basic` (Pro+). Audit: `inventory_item.created` / `updated` / `qty_adjusted` / `activated` / `deactivated` (bez PII). Van scope: auto-skidanje, barkod, rok (Premium+).
+
+**Migracija:** `supabase/migrations/20260714060000_phase3e_inventory_basic.sql` — primijenjena na remote.
 
 ### Faza 3D — Consent draw-sign + doc templates (implementirano)
 
@@ -506,6 +514,7 @@ Location create must call `assertCanCreateLocation`; image upload must call `ass
 | `phase3c_clinic_lifecycle` | grace columns; `clinic_is_writable` RLS; closure + lifecycle + hard_delete RPCs (D6/D45) |
 | `phase3d_consent_draw_sign` | `consent_forms` / `consent_signatures` + RLS + seed (D20) |
 | `phase3d_consent_hooks` | clinic create seed + GDPR erase consents |
+| `phase3e_inventory_basic` | `inventory_items` + RLS + `can_access/write_inventory` (§6.12) |
 
 ---
 
@@ -538,3 +547,4 @@ Location create must call `assertCanCreateLocation`; image upload must call `ass
 | 2026-07-14 | Faza 3C: clinic ZIP backup app-layer (§8.3 / D45) — no new table |
 | 2026-07-14 | Faza 3C: clinic lifecycle (D6/D45) — grace columns, writable RLS, closure + cron hard delete |
 | 2026-07-14 | Faza 3D: consent_forms / consent_signatures + draw-sign (D20); GDPR + clinic create hooks |
+| 2026-07-14 | Faza 3E: inventory_items + low-stock inventar basic (§6.12 / item 25) |

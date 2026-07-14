@@ -13,6 +13,7 @@ import { canReadEmailTemplates } from "@/lib/email/rbac";
 import { canReadConsentForms } from "@/lib/consent/rbac";
 import { canAccessExpenses } from "@/lib/expenses/rbac";
 import { canAccessImport } from "@/lib/import/rbac";
+import { canAccessInventory } from "@/lib/inventory/rbac";
 import { canAccessInvoices } from "@/lib/invoices/rbac";
 import { canAccessPatients, canReadServices } from "@/lib/patients/rbac";
 import { PRODUCT_NAME, BRAND_LOGO } from "@/lib/brand/constants";
@@ -30,6 +31,7 @@ type NavItem = {
     | "/services"
     | "/invoices"
     | "/expenses"
+    | "/inventory"
     | "/crm"
     | "/settings/users"
     | "/settings/locations"
@@ -46,6 +48,7 @@ type NavItem = {
     | "services"
     | "invoices"
     | "expenses"
+    | "inventory"
     | "crm"
     | "settings"
     | "users"
@@ -71,6 +74,8 @@ type AppShellProps = {
   operatorName?: string | null;
   isOwner: boolean;
   showExpenses?: boolean;
+  showInventory?: boolean;
+  inventoryLowCount?: number;
   showCrm?: boolean;
   crmOpenCount?: number;
   showConsent?: boolean;
@@ -85,6 +90,8 @@ export function AppShell({
   operatorName,
   isOwner,
   showExpenses = false,
+  showInventory = false,
+  inventoryLowCount = 0,
   showCrm = false,
   crmOpenCount = 0,
   showConsent = false,
@@ -94,6 +101,7 @@ export function AppShell({
   const showImport = canAccessImport(role);
   const showEmail = canReadEmailTemplates(role);
   const showConsentNav = showConsent && canReadConsentForms(role);
+  const inventoryNav = showInventory && canAccessInventory(role);
   const crmNav = showCrm && canAccessCrm(role);
   const t = useTranslations("Nav");
   const pathname = usePathname();
@@ -115,6 +123,15 @@ export function AppShell({
       : []),
     ...(showExpenses && canAccessExpenses(role)
       ? ([{ href: "/expenses", labelKey: "expenses" }] as const)
+      : []),
+    ...(inventoryNav
+      ? ([
+          {
+            href: "/inventory",
+            labelKey: "inventory",
+            badge: inventoryLowCount > 0 ? inventoryLowCount : undefined,
+          },
+        ] as const)
       : []),
     ...(crmNav
       ? ([

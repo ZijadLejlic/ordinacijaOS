@@ -16,6 +16,8 @@ import { canAccessCrm } from "@/lib/crm/rbac";
 import { canReadConsentForms } from "@/lib/consent/rbac";
 import { countOpenCrmNotifications } from "@/lib/crm/load";
 import { canAccessExpenses } from "@/lib/expenses/rbac";
+import { canAccessInventory } from "@/lib/inventory/rbac";
+import { countLowStockItems } from "@/lib/inventory/load";
 import { getOperatorIdFromCookie } from "@/lib/operators/session";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/supabase/database.types";
@@ -71,26 +73,35 @@ export default async function DashboardLayout({ children, params }: Props) {
     operatorName = op?.display_name ?? null;
   }
 
-  const [showExpenses, brandingEnabled, showCrm, showConsent] = await Promise.all([
-    canAccessExpenses(profile!.role)
-      ? clinicHasFeature(
-          supabase,
-          profile!.clinic_id,
-          "expenses_reports_excel",
-        )
-      : Promise.resolve(false),
-    clinicHasFeature(supabase, profile!.clinic_id, "branding_custom"),
-    canAccessCrm(profile!.role)
-      ? clinicHasFeature(supabase, profile!.clinic_id, "crm_light")
-      : Promise.resolve(false),
-    canReadConsentForms(profile!.role)
-      ? clinicHasFeature(supabase, profile!.clinic_id, "consent_draw_sign")
-      : Promise.resolve(false),
-  ]);
+  const [showExpenses, brandingEnabled, showCrm, showConsent, showInventory] =
+    await Promise.all([
+      canAccessExpenses(profile!.role)
+        ? clinicHasFeature(
+            supabase,
+            profile!.clinic_id,
+            "expenses_reports_excel",
+          )
+        : Promise.resolve(false),
+      clinicHasFeature(supabase, profile!.clinic_id, "branding_custom"),
+      canAccessCrm(profile!.role)
+        ? clinicHasFeature(supabase, profile!.clinic_id, "crm_light")
+        : Promise.resolve(false),
+      canReadConsentForms(profile!.role)
+        ? clinicHasFeature(supabase, profile!.clinic_id, "consent_draw_sign")
+        : Promise.resolve(false),
+      canAccessInventory(profile!.role)
+        ? clinicHasFeature(supabase, profile!.clinic_id, "inventory_basic")
+        : Promise.resolve(false),
+    ]);
 
   let crmOpenCount = 0;
   if (showCrm) {
     crmOpenCount = await countOpenCrmNotifications(profile!.clinic_id);
+  }
+
+  let inventoryLowCount = 0;
+  if (showInventory) {
+    inventoryLowCount = await countLowStockItems(profile!.clinic_id);
   }
 
   let shellBranding: {
@@ -137,6 +148,8 @@ export default async function DashboardLayout({ children, params }: Props) {
         operatorName={operatorName}
         isOwner={profile!.role === "owner"}
         showExpenses={showExpenses}
+        showInventory={showInventory}
+        inventoryLowCount={inventoryLowCount}
         showCrm={showCrm}
         crmOpenCount={crmOpenCount}
         showConsent={showConsent}

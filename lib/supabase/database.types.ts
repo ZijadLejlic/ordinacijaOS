@@ -886,6 +886,63 @@ export type Database = {
           },
         ]
       }
+      inventory_items: {
+        Row: {
+          clinic_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          low_stock_threshold: number
+          name: string
+          notes: string | null
+          quantity: number
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          clinic_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          low_stock_threshold?: number
+          name: string
+          notes?: string | null
+          quantity?: number
+          unit?: string
+          updated_at?: string
+        }
+        Update: {
+          clinic_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          low_stock_threshold?: number
+          name?: string
+          notes?: string | null
+          quantity?: number
+          unit?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_items_clinic_id_fkey"
+            columns: ["clinic_id"]
+            isOneToOne: false
+            referencedRelation: "clinics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_items_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoice_lines: {
         Row: {
           clinic_id: string
@@ -2023,6 +2080,7 @@ export type Database = {
       can_access_appointments: { Args: never; Returns: boolean }
       can_access_crm: { Args: never; Returns: boolean }
       can_access_expenses: { Args: never; Returns: boolean }
+      can_access_inventory: { Args: never; Returns: boolean }
       can_access_invoices: { Args: never; Returns: boolean }
       can_access_patients: { Args: never; Returns: boolean }
       can_access_treatment_plan: { Args: never; Returns: boolean }
@@ -2037,6 +2095,7 @@ export type Database = {
       can_write_consent_forms: { Args: never; Returns: boolean }
       can_write_email_templates: { Args: never; Returns: boolean }
       can_write_expenses: { Args: never; Returns: boolean }
+      can_write_inventory: { Args: never; Returns: boolean }
       can_write_invoices: { Args: never; Returns: boolean }
       can_write_odontogram: { Args: never; Returns: boolean }
       can_write_patients: { Args: never; Returns: boolean }

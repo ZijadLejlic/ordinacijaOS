@@ -88,7 +88,11 @@ export async function middleware(request: NextRequest) {
     path === "/invoices" ||
     path.startsWith("/invoices/") ||
     path === "/expenses" ||
-    path.startsWith("/expenses/");
+    path.startsWith("/expenses/") ||
+    path === "/inventory" ||
+    path.startsWith("/inventory/") ||
+    path === "/crm" ||
+    path.startsWith("/crm/");
 
   const platformAdmin = isPlatformAdmin(user);
   const impersonation = readImpersonationCookieFromRequest(
