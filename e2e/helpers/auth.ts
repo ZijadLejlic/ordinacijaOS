@@ -22,7 +22,7 @@ export async function loginAs(
   } else {
     await page.waitForURL(
       (url) =>
-        !url.pathname.includes("/login") && !url.pathname.includes("/mfa/"),
+        !url.pathname.includes("/bs/login") && !url.pathname.includes("/mfa/"),
       { timeout: 60_000 },
     );
   }

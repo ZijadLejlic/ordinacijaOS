@@ -113,7 +113,10 @@ export default async function PatientsPage({ params, searchParams }: Props) {
                 <TableRow key={patient.id}>
                   <TableCell>
                     <Link
-                      href={`/patients/${patient.id}`}
+                      href={{
+                        pathname: "/patients/[patientId]",
+                        params: { patientId: patient.id },
+                      }}
                       className="font-medium underline-offset-4 hover:underline"
                     >
                       {patient.last_name} {patient.first_name}

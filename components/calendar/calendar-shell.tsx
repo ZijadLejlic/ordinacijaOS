@@ -124,7 +124,10 @@ export function CalendarShell({
       );
       const doc = next.doctorId ?? doctorFilter;
       if (doc) params.set("doctorId", doc);
-      router.push(`/calendar?${params.toString()}`);
+      router.push({
+        pathname: "/calendar",
+        query: Object.fromEntries(params.entries()),
+      });
     },
     [anchor, doctorFilter, router, view],
   );

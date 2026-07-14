@@ -4,6 +4,8 @@ import {
   EMAIL_SUPPORT,
   PRODUCT_NAME,
 } from "@/lib/brand/constants";
+import { getPathname } from "@/i18n/navigation";
+import type { AppLocale } from "@/i18n/routing";
 
 function appUrl() {
   const url = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "");
@@ -38,7 +40,15 @@ export type StaffInviteEmailInput = {
 };
 
 export async function sendStaffInviteEmail(input: StaffInviteEmailInput) {
-  const inviteUrl = `${appUrl()}/${input.locale}/invite/${input.token}`;
+  const locale = input.locale as AppLocale;
+  const path = getPathname({
+    locale,
+    href: {
+      pathname: "/invite/[token]",
+      params: { token: input.token },
+    },
+  });
+  const inviteUrl = `${appUrl()}${path}`;
   const subject = `Pozivnica za ${input.clinicName} — ${PRODUCT_NAME}`;
   const html = `
     <p>Pozdrav ${escapeHtml(input.fullName)},</p>

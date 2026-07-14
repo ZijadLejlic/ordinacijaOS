@@ -443,5 +443,11 @@ export async function stopImpersonationAction(): Promise<void> {
     operatorId: null,
   });
 
-  redirect({ href: `/platform/clinics/${clinicId}`, locale });
+  redirect({
+    href: {
+      pathname: "/platform/clinics/[clinicId]",
+      params: { clinicId },
+    },
+    locale,
+  });
 }

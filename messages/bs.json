@@ -1,12 +1,105 @@
 {
   "Marketing": {
     "nav": {
+      "features": "Funkcije",
       "pricing": "Cijene",
+      "tour": "Tour",
+      "whyDentord": "Zašto DentOrd",
+      "faq": "FAQ",
+      "demo": "Demo",
+      "contact": "Kontakt",
+      "blog": "Blog",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "dpa": "DPA",
       "login": "Prijava",
-      "signup": "Registracija"
+      "signup": "Registruj ordinaciju",
+      "openMenu": "Otvori meni",
+      "closeMenu": "Zatvori meni"
+    },
+    "pages": {
+      "features": {
+        "eyebrow": "Funkcije",
+        "title": "Sve što vašoj ordinaciji treba.",
+        "description": "Karton, odontogram, termini, fakture, inventar i još — na jednom mjestu.",
+        "comingSoon": "Puna stranica funkcija stiže uskoro. U međuvremenu pogledajte cijene ili se registrujte."
+      },
+      "whyDentord": {
+        "eyebrow": "Zašto DentOrd",
+        "title": "Zašto ordinacije biraju DentOrd?",
+        "description": "Napravljen za naš region — bosanski jezik, EUR + PDV, EU hosting.",
+        "comingSoon": "Detaljno poređenje i benefiti stižu uskoro."
+      },
+      "tour": {
+        "eyebrow": "Tour",
+        "title": "Od registracije do prvog pacijenta.",
+        "description": "Korak-po-korak pregled kako DentOrd izgleda u svakodnevnom radu.",
+        "comingSoon": "Interaktivni tour stiže uskoro."
+      },
+      "demo": {
+        "eyebrow": "Demo",
+        "title": "Pogledajte DentOrd iznutra.",
+        "description": "Isprobajte demo ordinaciju s primjerima pacijenata — bez registracije.",
+        "comingSoon": "Live demo pristup stiže uskoro."
+      },
+      "faq": {
+        "eyebrow": "FAQ",
+        "title": "Česta pitanja",
+        "description": "Odgovori o registraciji, cijenama, sigurnosti i svakodnevnom korištenju.",
+        "comingSoon": "Puna FAQ stranica stiže uskoro."
+      },
+      "contact": {
+        "eyebrow": "Kontakt",
+        "title": "Tu smo za vas.",
+        "description": "Javite nam se — odgovaramo isti radni dan.",
+        "comingSoon": "Kontakt forma stiže uskoro. Pišite nam na support@dentord.com."
+      },
+      "blog": {
+        "eyebrow": "Blog",
+        "title": "Blog",
+        "description": "Savjeti za vođenje ordinacije i novosti o DentOrdu.",
+        "comingSoon": "Prvi članci stižu uskoro."
+      },
+      "privacy": {
+        "eyebrow": "Pravno",
+        "title": "Privacy Policy",
+        "description": "Kako štitimo podatke vaše ordinacije i pacijenata.",
+        "comingSoon": "Puna politika privatnosti stiže uskoro."
+      },
+      "terms": {
+        "eyebrow": "Pravno",
+        "title": "Terms of Service",
+        "description": "Uslovi korištenja DentOrd platforme.",
+        "comingSoon": "Puni uslovi korištenja stižu uskoro."
+      },
+      "dpa": {
+        "eyebrow": "Pravno",
+        "title": "Data Processing Agreement",
+        "description": "Ugovor o obradi podataka (GDPR) između vas i DentOrda.",
+        "comingSoon": "Puni DPA stiže uskoro."
+      }
     },
     "footer": {
-      "legalSoon": "Privacy / Terms uskoro"
+      "blurb": "Softver za stomatološke ordinacije — kartoni, termini, fakture i zalihe na jednom mjestu.",
+      "product": "Proizvod",
+      "company": "Kompanija",
+      "legal": "Pravno"
+    },
+    "finalCta": {
+      "titles": {
+        "default": "Registrujte ordinaciju danas — besplatno do kraja 2026.",
+        "demo": "Svidjelo vam se? Registrujte svoju ordinaciju.",
+        "contact": "Ne želite čekati poziv? Registrujte se sami za 5 minuta.",
+        "tour": "To je sve. Ozbiljno."
+      },
+      "subtitles": {
+        "demo": "Isti alati, vaša ordinacija, vaši podaci.",
+        "contact": "Bez kartice. Besplatno do 31.12.2026.",
+        "tour": "Registrujte ordinaciju i prođite ove korake uživo — besplatno do kraja 2026."
+      },
+      "primary": "Registruj ordinaciju besplatno",
+      "secondary": "Pozovite me",
+      "microcopy": "Besplatno do 31.12.2026 · Bez kartice · Postavka za 5 minuta"
     },
     "hero": {
       "headline": "Kalendar, kartoni i fakture — u jednom mjestu.",

@@ -3,6 +3,7 @@
 import { getLocale } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "@/i18n/navigation";
+import { publicLocalePath } from "@/i18n/path";
 import { assertCanInviteStaff } from "@/lib/entitlements/limits";
 import {
   sendPasswordResetEmail,
@@ -412,7 +413,7 @@ export async function resetUserPasswordAction(
       type: "recovery",
       email: authUser.user.email,
       options: {
-        redirectTo: `${appUrl}/${locale}/login`,
+        redirectTo: `${appUrl}${publicLocalePath(locale, "/login")}`,
       },
     });
 

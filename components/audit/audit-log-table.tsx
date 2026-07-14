@@ -70,11 +70,13 @@ export function AuditLogTable({
 
   const queryFor = useMemo(() => {
     return (nextPage: number) => {
-      const params = new URLSearchParams();
-      if (eventName) params.set("event", eventName);
-      if (nextPage > 1) params.set("page", String(nextPage));
-      const q = params.toString();
-      return q ? `/settings/audit?${q}` : "/settings/audit";
+      const query: Record<string, string> = {};
+      if (eventName) query.event = eventName;
+      if (nextPage > 1) query.page = String(nextPage);
+      return {
+        pathname: "/settings/audit" as const,
+        query,
+      };
     };
   }, [eventName]);
 

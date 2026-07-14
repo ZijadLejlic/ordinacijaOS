@@ -1,12 +1,105 @@
 {
   "Marketing": {
     "nav": {
+      "features": "Features",
       "pricing": "Pricing",
+      "tour": "Tour",
+      "whyDentord": "Why DentOrd",
+      "faq": "FAQ",
+      "demo": "Demo",
+      "contact": "Contact",
+      "blog": "Blog",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "dpa": "DPA",
       "login": "Log in",
-      "signup": "Sign up"
+      "signup": "Register your clinic",
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu"
+    },
+    "pages": {
+      "features": {
+        "eyebrow": "Features",
+        "title": "Everything your clinic needs.",
+        "description": "Charts, odontogram, scheduling, invoices, inventory and more — in one place.",
+        "comingSoon": "The full features page is coming soon. In the meantime, see pricing or register."
+      },
+      "whyDentord": {
+        "eyebrow": "Why DentOrd",
+        "title": "Why clinics choose DentOrd?",
+        "description": "Built for our region — Bosnian language, EUR + VAT, EU hosting.",
+        "comingSoon": "Detailed comparison and benefits are coming soon."
+      },
+      "tour": {
+        "eyebrow": "Tour",
+        "title": "From signup to your first patient.",
+        "description": "A step-by-step look at how DentOrd works in daily practice.",
+        "comingSoon": "The interactive tour is coming soon."
+      },
+      "demo": {
+        "eyebrow": "Demo",
+        "title": "See DentOrd from the inside.",
+        "description": "Try a demo clinic with sample patients — no signup required.",
+        "comingSoon": "Live demo access is coming soon."
+      },
+      "faq": {
+        "eyebrow": "FAQ",
+        "title": "Frequently asked questions",
+        "description": "Answers about signup, pricing, security and day-to-day use.",
+        "comingSoon": "The full FAQ page is coming soon."
+      },
+      "contact": {
+        "eyebrow": "Contact",
+        "title": "We're here for you.",
+        "description": "Get in touch — we reply the same business day.",
+        "comingSoon": "The contact form is coming soon. Email us at support@dentord.com."
+      },
+      "blog": {
+        "eyebrow": "Blog",
+        "title": "Blog",
+        "description": "Tips for running a clinic and DentOrd product news.",
+        "comingSoon": "First articles are coming soon."
+      },
+      "privacy": {
+        "eyebrow": "Legal",
+        "title": "Privacy Policy",
+        "description": "How we protect your clinic and patient data.",
+        "comingSoon": "The full privacy policy is coming soon."
+      },
+      "terms": {
+        "eyebrow": "Legal",
+        "title": "Terms of Service",
+        "description": "Terms for using the DentOrd platform.",
+        "comingSoon": "The full terms of service are coming soon."
+      },
+      "dpa": {
+        "eyebrow": "Legal",
+        "title": "Data Processing Agreement",
+        "description": "GDPR data processing agreement between you and DentOrd.",
+        "comingSoon": "The full DPA is coming soon."
+      }
     },
     "footer": {
-      "legalSoon": "Privacy / Terms coming soon"
+      "blurb": "Dental practice software — charts, scheduling, invoices and inventory in one place.",
+      "product": "Product",
+      "company": "Company",
+      "legal": "Legal"
+    },
+    "finalCta": {
+      "titles": {
+        "default": "Register your clinic today — free through the end of 2026.",
+        "demo": "Liked what you saw? Register your own clinic.",
+        "contact": "Don't want to wait for a call? Sign up yourself in 5 minutes.",
+        "tour": "That's everything. Seriously."
+      },
+      "subtitles": {
+        "demo": "The same tools, your clinic, your data.",
+        "contact": "No card required. Free until Dec 31, 2026.",
+        "tour": "Register your clinic and walk through these steps live — free through the end of 2026."
+      },
+      "primary": "Register your clinic free",
+      "secondary": "Call me back",
+      "microcopy": "Free until Dec 31, 2026 · No card · Set up in 5 minutes"
     },
     "hero": {
       "headline": "Scheduling, charts, and invoices — in one place.",

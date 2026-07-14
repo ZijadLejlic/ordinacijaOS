@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { BrandLogo } from "@/components/brand/brand-logo";
+import { FinalCta } from "@/components/marketing/final-cta";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -59,6 +60,7 @@ export default async function MarketingHomePage({ params }: Props) {
           {t("hero.trialNote")}
         </p>
       </section>
+      <FinalCta />
     </main>
   );
 }

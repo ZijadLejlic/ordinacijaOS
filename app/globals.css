@@ -82,9 +82,10 @@
   --sidebar-border: color-mix(in oklab, #0f1b3d 10%, white);
   --sidebar-ring: #0b6ef5;
 
-  /* Marketing — DentOrd logo blues */
+  /* Marketing — DentOrd logo blues (Website-DentOrd §2.1) */
   --marketing-ink: #0f1b3d;
   --marketing-accent: #0b6ef5;
+  --marketing-deep: #0047c7;
   --marketing-cyan: #2ec8f0;
   --marketing-mist: #e8f4ff;
   --marketing-wash: #f5faff;

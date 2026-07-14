@@ -149,7 +149,10 @@ export function InvoicesTable({
           <TableRow key={row.id}>
             <TableCell>
               <Link
-                href={`/invoices/${row.id}`}
+                href={{
+                  pathname: "/invoices/[invoiceId]",
+                  params: { invoiceId: row.id },
+                }}
                 className="underline-offset-4 hover:underline"
               >
                 {row.number}
@@ -424,7 +427,10 @@ export function CreateInvoiceForm({
         <p className="text-sm text-green-700">
           {t("created")}{" "}
           <Link
-            href={`/invoices/${state.invoiceId}`}
+            href={{
+              pathname: "/invoices/[invoiceId]",
+              params: { invoiceId: state.invoiceId },
+            }}
             className="underline-offset-4 hover:underline"
           >
             {t("openInvoice")}

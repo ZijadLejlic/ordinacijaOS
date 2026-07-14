@@ -146,7 +146,13 @@ export async function createPatientAction(
   });
 
   revalidatePath(`/${locale}/patients`);
-  redirect({ href: `/patients/${patient.id}`, locale });
+  redirect({
+    href: {
+      pathname: "/patients/[patientId]",
+      params: { patientId: patient.id },
+    },
+    locale,
+  });
   return null;
 }
 

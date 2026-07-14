@@ -101,7 +101,10 @@ function CrmRow({
       <TableCell>{t(`kinds.${row.kind}`)}</TableCell>
       <TableCell>
         <Link
-          href={`/patients/${row.patientId}`}
+          href={{
+            pathname: "/patients/[patientId]",
+            params: { patientId: row.patientId },
+          }}
           className="font-medium underline-offset-4 hover:underline"
         >
           {name}

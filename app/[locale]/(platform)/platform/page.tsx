@@ -69,7 +69,10 @@ export default async function PlatformHomePage({ params }: Props) {
                   </TableCell>
                   <TableCell className="text-right">
                     <Link
-                      href={`/platform/clinics/${clinic.id}`}
+                      href={{
+                        pathname: "/platform/clinics/[clinicId]",
+                        params: { clinicId: clinic.id },
+                      }}
                       className="underline-offset-4 hover:underline"
                     >
                       {t("open")}
