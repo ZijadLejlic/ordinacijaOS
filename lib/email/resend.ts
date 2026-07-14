@@ -163,6 +163,68 @@ export async function sendTemplatedEmail(input: TemplatedEmailInput) {
   return { id: data?.id ?? null };
 }
 
+export type LeadNotificationEmailInput = {
+  leadId: string;
+  name: string;
+  clinicName: string;
+  phone: string;
+  email: string | null;
+  preferredTime: string;
+  message: string | null;
+  locale: string;
+  sourcePage: string;
+};
+
+/** Notify support@ of a new marketing callback lead (W13). */
+export async function sendLeadNotificationEmail(
+  input: LeadNotificationEmailInput,
+) {
+  const subject = `[Lead] ${input.clinicName} — ${input.name}`;
+  const html = `
+    <p>Novi zahtjev „Pozovite me“ s marketing sitea.</p>
+    <ul>
+      <li><strong>Ime:</strong> ${escapeHtml(input.name)}</li>
+      <li><strong>Ordinacija:</strong> ${escapeHtml(input.clinicName)}</li>
+      <li><strong>Telefon:</strong> ${escapeHtml(input.phone)}</li>
+      <li><strong>Email:</strong> ${escapeHtml(input.email ?? "—")}</li>
+      <li><strong>Termin:</strong> ${escapeHtml(input.preferredTime)}</li>
+      <li><strong>Locale:</strong> ${escapeHtml(input.locale)}</li>
+      <li><strong>Izvor:</strong> ${escapeHtml(input.sourcePage)}</li>
+      <li><strong>Lead ID:</strong> ${escapeHtml(input.leadId)}</li>
+    </ul>
+    <p><strong>Poruka:</strong></p>
+    <p>${escapeHtml(input.message ?? "—")}</p>
+  `;
+
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("Missing RESEND_API_KEY");
+    }
+    console.info("[email:dev] lead notification", {
+      to: EMAIL_SUPPORT,
+      subject,
+      leadId: input.leadId,
+    });
+    return { id: "dev-skip" };
+  }
+
+  const resend = new Resend(apiKey);
+  const { data, error } = await resend.emails.send({
+    from: fromAddress(),
+    to: EMAIL_SUPPORT,
+    replyTo: input.email || replyToAddress(),
+    subject,
+    html,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return { id: data?.id ?? null };
+}
+
 function escapeHtml(value: string) {
   return value
     .replaceAll("&", "&amp;")

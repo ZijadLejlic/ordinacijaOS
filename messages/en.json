@@ -99,45 +99,1100 @@
       },
       "primary": "Register your clinic free",
       "secondary": "Call me back",
-      "microcopy": "Free until Dec 31, 2026 · No card · Set up in 5 minutes"
+      "microcopy": "Free until Dec 31, 2026 · No card · Set up in 5 minutes",
+      "secondaryDemo": "Try the live demo"
     },
-    "hero": {
-      "headline": "Scheduling, charts, and invoices — in one place.",
-      "support": "Cloud software for dental clinics. Multi-tenant from day one.",
-      "ctaPrimary": "Start free",
-      "ctaSecondary": "See plans",
-      "trialNote": "Free Professional until 31 Dec 2026. No card required."
+    "home": {
+      "hero": {
+        "badge": "Free for all clinics until Dec 31, 2026",
+        "headline": "Your clinic, finally organized.",
+        "support": "DentOrd brings patient charts, odontogram, appointments, invoices and inventory together — in one simple app.",
+        "ctaPrimary": "Register your clinic free",
+        "ctaSecondary": "See how it works",
+        "microcopy": "Free until Dec 31, 2026 · No card · Set up in 5 minutes",
+        "browserUrl": "app.dentord.com",
+        "mock": {
+          "kpiPatients": "Patients today",
+          "kpiRevenue": "Revenue (today)",
+          "kpiAppointments": "Appointments",
+          "scheduleTitle": "Today's schedule",
+          "appt1": "Amina Hodžić · Check-up",
+          "appt2": "Emir Begić · Filling",
+          "appt3": "Lejla Softić · Hygiene",
+          "time1": "09:00",
+          "time2": "10:30",
+          "time3": "12:00"
+        }
+      },
+      "trust": {
+        "eu": "Data on EU servers",
+        "gdpr": "GDPR compliant",
+        "backup": "Daily backups",
+        "support": "Support in Bosnian"
+      },
+      "problem": {
+        "eyebrow": "The problem",
+        "title": "Paper charts and Excel sheets cost you time every day.",
+        "pains": {
+          "charts": "Lost or incomplete charts when you need them.",
+          "double": "Double bookings and schedule mix-ups.",
+          "invoices": "Hand-written invoices and VAT mistakes.",
+          "payments": "Nobody knows who collected what — until month-end."
+        },
+        "solutionEyebrow": "The solution",
+        "solution": "DentOrd puts it all in one place — available to every team member by role, from any device."
+      },
+      "features": {
+        "eyebrow": "Features",
+        "title": "Everything you need for day-to-day work.",
+        "learnMore": "Learn more",
+        "items": {
+          "charts": {
+            "title": "Charts and odontogram",
+            "body": "A full patient chart with history, allergies and an FDI odontogram. Everything one click away."
+          },
+          "calendar": {
+            "title": "Appointment calendar",
+            "body": "Day or week by doctor, appointment statuses and a waitlist. Fewer calls, fewer mix-ups."
+          },
+          "invoices": {
+            "title": "Invoices and finance",
+            "body": "Invoices in EUR with VAT, payments, installments and outstanding balances — no Excel."
+          },
+          "reminders": {
+            "title": "Email reminders",
+            "body": "Automatic appointment reminders and recall for patients who haven't visited in a while."
+          },
+          "documents": {
+            "title": "Documents and consents",
+            "body": "On-screen consent signatures and a PDF archive right in the patient chart."
+          },
+          "inventory": {
+            "title": "Inventory",
+            "body": "Material stock, minimum levels and alerts before you run out."
+          }
+        }
+      },
+      "tour": {
+        "eyebrow": "Quick start",
+        "title": "From signup to your first patient in 5 minutes.",
+        "steps": {
+          "1": "Register your clinic",
+          "2": "Add services and your team",
+          "3": "Book the first appointment"
+        },
+        "cta": "See the full tour"
+      },
+      "security": {
+        "eyebrow": "Security",
+        "title": "Patient data deserves bank-grade security.",
+        "items": {
+          "eu": {
+            "title": "EU hosting",
+            "body": "Data lives on EU servers (Supabase EU) — closer to you and aligned with regulations."
+          },
+          "isolation": {
+            "title": "Full clinic isolation",
+            "body": "Each clinic sees only its own data. Row Level Security on every row."
+          },
+          "rbac": {
+            "title": "Role-based access",
+            "body": "Owner, doctor, reception — everyone sees what they need, nothing more."
+          },
+          "gdpr": {
+            "title": "GDPR: export and erase",
+            "body": "Export data or start erasure when the law and the patient require it."
+          }
+        },
+        "disclaimer": "DentOrd is a records tool — medical decisions are always made by the doctor."
+      },
+      "pricing": {
+        "eyebrow": "Pricing",
+        "title": "Simple prices. Right now — free.",
+        "badge": "Free until Dec 31, 2026",
+        "vat": "incl. VAT",
+        "from": "from €{amount}/mo",
+        "perMonth": "€{amount}/mo",
+        "popular": "Most popular",
+        "cta": "Compare plans"
+      },
+      "faq": {
+        "eyebrow": "FAQ",
+        "title": "Frequently asked questions",
+        "cta": "All questions",
+        "items": {
+          "free": {
+            "q": "What does “free until Dec 31, 2026” mean?",
+            "a": "You sign up and use the full Professional plan with no charge through the end of 2026. No credit card needed. From Jan 1, 2027 you pick a plan and continue."
+          },
+          "card": {
+            "q": "Do I need a credit card?",
+            "a": "No. Registration and use during the free period do not require a card."
+          },
+          "setup": {
+            "q": "How long does setup take?",
+            "a": "Onboarding has three steps: clinic details, services, and inviting your team. Most clinics are ready in about 5 minutes."
+          },
+          "data": {
+            "q": "Where is data stored?",
+            "a": "On EU servers. Your clinic is isolated from others; we run daily backups and follow GDPR."
+          }
+        }
+      }
     },
     "pricing": {
-      "title": "Plans",
-      "subtitle": "Prices in EUR, shown with VAT. Free trial 2026 = Professional.",
-      "price": "€{amount}/mo",
-      "custom": "€60+/mo",
-      "cta": "Sign up",
-      "vatNote": "Stripe billing from 1 Jan 2027. Until then, payment records in-app only.",
+      "eyebrow": "Pricing",
+      "title": "Free until Dec 31, 2026. After that — from €15 per month.",
+      "subtitle": "Sign up today and use the full Professional plan with zero cost through the end of 2026. No card required.",
+      "freeBadge": "Free until Dec 31, 2026",
+      "popular": "Most popular",
+      "vat": "incl. VAT",
+      "perMonth": "€{amount}/mo",
+      "from": "from €{amount}/mo",
+      "cta": "Sign up free",
+      "annualNote": "From 2027, annual billing includes 2 months free.",
       "limits": {
         "doctors": "Doctors: {count}",
         "users": "Users: {count}",
-        "locations": "Locations: {count}"
+        "locations": "Locations: {count}",
+        "images": "Images/X-rays per patient: {count}",
+        "unlimited": "unlimited"
+      },
+      "availability": {
+        "yes": "Yes",
+        "no": "No",
+        "metered": "metered*"
+      },
+      "compare": {
+        "eyebrow": "Compare",
+        "title": "What’s included in each plan?",
+        "description": "Full feature matrix — the same data as in the product.",
+        "featureColumn": "Feature",
+        "expand": "Show",
+        "collapse": "Hide",
+        "footnote": "* SMS/WhatsApp and AI are metered add-ons once channel billing is enabled — not included in the free 2026 period."
+      },
+      "faq": {
+        "eyebrow": "FAQ",
+        "title": "Pricing questions",
+        "items": {
+          "free": {
+            "q": "What does free until 2026 mean?",
+            "a": "You sign up and use the full Professional plan with no charge until Dec 31, 2026. No credit card needed. AI, SMS/WhatsApp and the patient portal are not part of the free period."
+          },
+          "card": {
+            "q": "Do I need a credit card?",
+            "a": "No. Registration and use during the free period do not require a card."
+          },
+          "billing2027": {
+            "q": "What happens on Jan 1, 2027?",
+            "a": "Subscription billing starts. You choose a plan (Starter, Professional, Premium AI or Enterprise) and keep working — your data stays. Annual billing from then on includes 2 months free."
+          },
+          "changePlan": {
+            "q": "Can I change plans?",
+            "a": "Yes. You can upgrade or downgrade as your clinic needs change. Higher-plan limits become available immediately; downgrades keep existing data while hard-blocking new entries beyond the new limits."
+          },
+          "limits": {
+            "q": "What if I hit a limit?",
+            "a": "Limits are hard — exceeding them is not allowed. The app warns you and suggests a higher plan. Doctors, users, locations and images per patient depend on your plan."
+          }
+        }
       },
       "plans": {
         "starter": {
           "name": "Starter",
-          "blurb": "Solo and small clinics."
+          "blurb": "For small and solo clinics"
         },
         "professional": {
           "name": "Professional",
-          "blurb": "MVP default and free trial."
+          "blurb": "Everything a typical clinic needs"
         },
         "premium_ai": {
           "name": "Premium AI",
-          "blurb": "AI plus advanced modules."
+          "blurb": "AI assistant and advanced analytics"
         },
         "enterprise": {
           "name": "Enterprise",
-          "blurb": "Portal, mini site, lab."
+          "blurb": "Patient portal, multiple locations, no limits"
+        }
+      },
+      "features": {
+        "patients_chart": "Patient charts",
+        "odontogram": "Odontogram",
+        "treatment_plan": "Treatment plan",
+        "calendar_basic": "Basic calendar",
+        "calendar_advanced": "Advanced calendar",
+        "invoices": "Invoices",
+        "expenses_reports_excel": "Expenses & Excel reports",
+        "installments_calculator": "Installment calculator",
+        "email_reminders": "Email reminders",
+        "branding_custom": "Clinic branding",
+        "crm_light": "CRM (recall)",
+        "waitlist_auto": "Waitlist",
+        "consent_draw_sign": "Consent (draw & sign)",
+        "inventory_basic": "Inventory",
+        "sms_whatsapp": "SMS / WhatsApp",
+        "ai_copilot": "AI assistant",
+        "patient_portal": "Patient portal",
+        "mini_website": "Mini website",
+        "online_booking": "Online booking",
+        "lab_technician": "Lab / technician",
+        "marketing_campaigns": "Marketing campaigns"
+      }
+    },
+    "features": {
+      "eyebrow": "Features",
+      "title": "Everything your clinic needs. Nothing it doesn’t.",
+      "subtitle": "Charts, odontogram, scheduling, invoices, reminders, inventory and team — modules that work together, without the clutter.",
+      "ctaPrimary": "Register your clinic free",
+      "ctaSecondary": "See how it works",
+      "proBadge": "Pro",
+      "browserUrl": "app.dentord.com",
+      "modules": {
+        "karton": {
+          "eyebrow": "Patients and charts",
+          "title": "The full patient chart — one click away.",
+          "body": "Contact details, medical history, allergies, documents and X-rays in one place. Your team always sees the same record — no hunting for paper.",
+          "bullets": {
+            "1": "Contact and visit history always available",
+            "2": "Allergies and notes highlighted in the chart",
+            "3": "Documents and X-rays with the patient"
+          },
+          "preview": {
+            "title": "Chart · Amina Hodžić",
+            "row1": "Phone · +387 61 123 456",
+            "row2": "Allergies · Penicillin",
+            "row3": "Documents · 4 · X-rays · 2"
+          }
+        },
+        "odontogram": {
+          "eyebrow": "Odontogram (FDI)",
+          "title": "A visual map of teeth 11–48.",
+          "body": "Click a tooth, set status by surface, and track treatment history. FDI numbering you already know — no paper sketches.",
+          "bullets": {
+            "1": "FDI map of permanent teeth 11–48",
+            "2": "Statuses by tooth and surface",
+            "3": "Event history per tooth"
+          },
+          "preview": {
+            "title": "Odontogram",
+            "row1": "16 · caries (O)",
+            "row2": "26 · filling (MOD)",
+            "row3": "36 · planned extraction"
+          }
+        },
+        "planTerapije": {
+          "eyebrow": "Treatment plan",
+          "title": "What’s next — and what it costs.",
+          "body": "Plan items with prices and statuses. Patients know the sequence; you track what’s done and what’s waiting.",
+          "bullets": {
+            "1": "Items priced from your price list",
+            "2": "Statuses: planned, in progress, done",
+            "3": "A clear view for patient and team"
+          },
+          "preview": {
+            "title": "Treatment plan",
+            "row1": "Hygiene · €40 · done",
+            "row2": "Filling 26 · €55 · in progress",
+            "row3": "Crown 16 · €280 · planned"
+          }
+        },
+        "kalendar": {
+          "eyebrow": "Calendar and appointments",
+          "title": "Schedules by doctor — without double bookings.",
+          "body": "Day or week views, appointment statuses, and a waitlist that suggests a replacement when someone cancels. Fewer calls, fewer mix-ups.",
+          "bullets": {
+            "1": "Day / week by doctor",
+            "2": "Appointment statuses at a glance",
+            "3": "Waitlist auto-suggests a replacement (Pro)"
+          },
+          "preview": {
+            "title": "Calendar · week",
+            "row1": "Mon 09:00 · Amina · check-up",
+            "row2": "Tue 10:30 · Emir · filling",
+            "row3": "Wed 12:00 · Lejla · hygiene"
+          }
+        },
+        "finansije": {
+          "eyebrow": "Invoices and finance",
+          "title": "Invoices in EUR with VAT — no Excel.",
+          "body": "From treatment to invoice, payments and installments. Expenses and monthly reports with Excel export when accounting needs them.",
+          "bullets": {
+            "1": "Invoices in EUR with VAT",
+            "2": "Payments, balances and installments (Pro)",
+            "3": "Expenses and Excel reports (Pro)"
+          },
+          "preview": {
+            "title": "Invoice · INV-2026-0042",
+            "row1": "Total · €95.00",
+            "row2": "VAT 17% · included",
+            "row3": "Status · partially paid"
+          }
+        },
+        "podsjetnici": {
+          "eyebrow": "Email reminders and CRM",
+          "title": "Reminders that cut no-shows.",
+          "body": "Automatic email before appointments and recall for patients who haven’t visited in a while. Reception sends — the system prepares the list.",
+          "bullets": {
+            "1": "Automatic appointment reminders",
+            "2": "Recall for overdue check-ups (Pro)",
+            "3": "Birthdays and control visits in the inbox (Pro)"
+          },
+          "preview": {
+            "title": "CRM inbox",
+            "row1": "Recall · 12 patients",
+            "row2": "Check-ups · 5 this week",
+            "row3": "Birthdays · 3 today"
+          }
+        },
+        "dokumenti": {
+          "eyebrow": "Documents and consents",
+          "title": "Consents with a signature — in the chart.",
+          "body": "Patients sign on screen; the PDF stays archived with the chart. Less paper, a clearer trail for every procedure.",
+          "bullets": {
+            "1": "On-screen consent signatures (Pro)",
+            "2": "PDF archive right in the chart",
+            "3": "Document overview per patient"
+          },
+          "preview": {
+            "title": "Consent · implant",
+            "row1": "Status · signed",
+            "row2": "Date · 14 Jul 2026",
+            "row3": "PDF · ready to archive"
+          }
+        },
+        "inventar": {
+          "eyebrow": "Inventory",
+          "title": "Stock under control before it runs out.",
+          "body": "Materials, minimum levels and alerts when stock drops. Fewer emergency orders mid-day.",
+          "bullets": {
+            "1": "Stock levels by material",
+            "2": "Minimum quantities you define",
+            "3": "Alerts before you run out"
+          },
+          "preview": {
+            "title": "Inventory",
+            "row1": "Composite A2 · 4 pcs · OK",
+            "row2": "Anesthetic · 2 amp · low",
+            "row3": "Gloves M · 120 pairs · OK"
+          }
+        },
+        "tim": {
+          "eyebrow": "Team and roles",
+          "title": "Everyone sees what they need.",
+          "body": "Owner, doctor and reception — clear roles and permissions. Peer payment amounts can be hidden via a clinic setting.",
+          "bullets": {
+            "1": "Roles: owner, doctor, reception",
+            "2": "Role-based access (RBAC)",
+            "3": "Peer amount visibility — clinic setting"
+          },
+          "preview": {
+            "title": "Team",
+            "row1": "Dr. Softić · owner",
+            "row2": "Dr. Begić · doctor",
+            "row3": "A. Hodžić · reception"
+          }
+        },
+        "branding": {
+          "eyebrow": "Your brand",
+          "title": "Logo and colors on invoices and emails.",
+          "body": "Set your clinic logo and colors. Patients see your brand on invoices and reminders — not generic software.",
+          "bullets": {
+            "1": "Clinic logo on invoices",
+            "2": "Brand colors in the app and PDF",
+            "3": "Consistent look in email reminders"
+          },
+          "preview": {
+            "title": "Branding",
+            "row1": "Logo · uploaded",
+            "row2": "Accent · your clinic blue",
+            "row3": "Invoice · with your brand"
+          }
         }
       }
+    },
+    "faq": {
+      "eyebrow": "FAQ",
+      "title": "Frequently asked questions",
+      "subtitle": "Answers about signup, pricing, security and everyday use.",
+      "categories": {
+        "gettingStarted": {
+          "eyebrow": "Getting started",
+          "title": "How to begin",
+          "items": {
+            "register": {
+              "q": "How do I register?",
+              "a": "Click “Register your clinic”, enter your clinic name, your name and email. Confirm your account and enter onboarding. No credit card required."
+            },
+            "setup": {
+              "q": "How long does setup take?",
+              "a": "Onboarding has three steps: clinic details, services and inviting your team. Most clinics start working in about 5 minutes."
+            },
+            "import": {
+              "q": "Can I migrate existing patients?",
+              "a": "Yes. You can import patients and services from a CSV file in settings. The system walks you through a dry-run preview before saving."
+            },
+            "education": {
+              "q": "Do I need training?",
+              "a": "Not required. The interface is straightforward; the site tour shows the workflow. For questions, email support@dentord.com — we reply the same business day."
+            }
+          }
+        },
+        "pricing": {
+          "eyebrow": "Pricing",
+          "title": "Free period, cards and billing",
+          "items": {
+            "free": {
+              "q": "What does “free until Dec 31, 2026” mean?",
+              "a": "You sign up and use the full Professional plan at no charge through 2026. No credit card required. AI, SMS/WhatsApp and the patient portal are not part of the free period."
+            },
+            "card": {
+              "q": "Do I need a credit card?",
+              "a": "No. Registration and use during the free period do not require a card."
+            },
+            "billing": {
+              "q": "What happens when billing starts?",
+              "a": "From Jan 1, 2027 you choose a plan and continue — your data stays. Annual billing from then on includes 2 months free."
+            },
+            "cancel": {
+              "q": "Can I cancel anytime?",
+              "a": "Yes. You can close your clinic: first export your data (ZIP), then a short grace period, then permanent deletion. Details are in privacy settings."
+            }
+          }
+        },
+        "security": {
+          "eyebrow": "Security and data",
+          "title": "Where it lives and who sees it",
+          "items": {
+            "storage": {
+              "q": "Where is data stored?",
+              "a": "On EU servers (Supabase EU). Data stays in the EU, closer to you and aligned with regulations."
+            },
+            "visibility": {
+              "q": "Who can see my clinic’s data?",
+              "a": "Only users in your clinic, according to their roles. Other clinics cannot see your rows — Row Level Security on every record."
+            },
+            "backup": {
+              "q": "How does backup work?",
+              "a": "We run daily backups. You can also export your data (ZIP) from privacy settings whenever you need."
+            },
+            "delete": {
+              "q": "How do I delete patient data?",
+              "a": "GDPR erasure requires clinic owner approval. The flow is in privacy settings — a hard delete from the database once approved."
+            },
+            "export": {
+              "q": "Can I export all my data?",
+              "a": "Yes. The owner can download a ZIP export (patients, invoices, document metadata) from privacy settings."
+            }
+          }
+        },
+        "usage": {
+          "eyebrow": "Everyday use",
+          "title": "Devices, team and locations",
+          "items": {
+            "mobile": {
+              "q": "Does it work on phone/tablet?",
+              "a": "Yes. DentOrd is fully responsive — it works in the browser on phone, tablet and desktop."
+            },
+            "users": {
+              "q": "How many users can I add?",
+              "a": "It depends on the plan. Starter up to 3, Professional up to 10, Premium AI up to 20; Enterprise by agreement. During the free period you get Professional limits."
+            },
+            "locations": {
+              "q": "Can I have two locations?",
+              "a": "Yes, depending on the plan. Professional supports up to 2 locations; higher plans more. During the free period Professional limits apply."
+            },
+            "invite": {
+              "q": "How do I invite a doctor or reception?",
+              "a": "The owner sends an invite by email from user settings. Your colleague sets a password and joins. Plan limits are checked before the invite is sent."
+            }
+          }
+        }
+      }
+    },
+    "contact": {
+      "eyebrow": "Contact",
+      "title": "We’re here for you.",
+      "subtitle": "Get in touch — we reply the same business day.",
+      "writeUs": {
+        "title": "Write to us",
+        "body": "For support and general questions — we reply the same business day.",
+        "supportLabel": "Support",
+        "helloLabel": "General inquiries"
+      },
+      "form": {
+        "title": "Call me back",
+        "body": "Leave your details — we’ll call you at a time that works for you.",
+        "name": "Full name",
+        "clinicName": "Clinic name",
+        "phone": "Phone",
+        "phoneHint": "e.g. +387 61 123 456",
+        "email": "Email",
+        "emailHint": "Recommended — easier to confirm the call",
+        "preferredTime": "When should we call?",
+        "preferredTimeOptions": {
+          "morning": "Morning",
+          "afternoon": "Afternoon",
+          "anytime": "Anytime"
+        },
+        "message": "Message",
+        "messageHint": "Optional — up to 1000 characters",
+        "gdpr": "I agree that DentOrd may contact me about my inquiry.",
+        "submit": "Send request",
+        "submitting": "Sending…",
+        "honeypot": "Do not fill in this field",
+        "success": "Thank you! We’ll call you at the selected time.",
+        "successTour": "In the meantime, see the tour",
+        "errors": {
+          "invalid": "Check the fields and try again.",
+          "rateLimited": "Too many requests from this address. Try again in an hour.",
+          "failed": "Could not send. Email us at support@dentord.com or try again."
+        }
+      }
+    },
+    "seo": {
+      "home": {
+        "title": "DentOrd — Dental practice management software",
+        "description": "Cloud software for dental clinics: charts, scheduling, invoices and inventory. Free until Dec 31, 2026."
+      },
+      "pricing": {
+        "title": "Pricing — DentOrd",
+        "description": "Starter, Professional, Premium AI and Enterprise plans. Prices in EUR with VAT. Free through 2026."
+      },
+      "features": {
+        "title": "Features — DentOrd",
+        "description": "Charts, odontogram, scheduling, invoices, inventory and CRM — dental practice software."
+      },
+      "whyDentord": {
+        "title": "Why DentOrd",
+        "description": "Built for our region: Bosnian language, EUR + VAT, EU hosting and GDPR."
+      },
+      "tour": {
+        "title": "Tour — DentOrd",
+        "description": "A step-by-step look at DentOrd: from signup to your first patient."
+      },
+      "demo": {
+        "title": "Demo — DentOrd",
+        "description": "Try a demo clinic with sample patients — no signup required."
+      },
+      "faq": {
+        "title": "FAQ — DentOrd",
+        "description": "Answers about signup, pricing, security and day-to-day use of DentOrd."
+      },
+      "contact": {
+        "title": "Contact — DentOrd",
+        "description": "Get in touch — we reply the same business day. support@dentord.com."
+      },
+      "blog": {
+        "title": "Blog — DentOrd",
+        "description": "Tips for running a clinic and DentOrd product news."
+      },
+      "privacy": {
+        "title": "Privacy Policy — DentOrd",
+        "description": "How we protect your clinic and patient data (GDPR, EU hosting)."
+      },
+      "terms": {
+        "title": "Terms of Service — DentOrd",
+        "description": "Terms for using the DentOrd platform for dental clinics."
+      },
+      "dpa": {
+        "title": "DPA — DentOrd",
+        "description": "GDPR data processing agreement between your clinic and DentOrd."
+      }
+    },
+    "cookieConsent": {
+      "title": "Cookies",
+      "description": "We use essential cookies to run the site. Analytics (PostHog) load only with your consent — no patient personal data.",
+      "accept": "Accept",
+      "reject": "Essential only",
+      "privacyLink": "Privacy Policy"
+    },
+    "tour": {
+      "eyebrow": "Product tour",
+      "title": "From signup to everyday work.",
+      "subtitle": "Nineteen short steps — how DentOrd looks from first login to dashboard, calendar, and billing.",
+      "ctaPrimary": "Register your clinic free",
+      "ctaSecondary": "Try the live demo",
+      "browserUrl": "app.dentord.com",
+      "chapterNavLabel": "Tour chapters",
+      "minutesBadge": "~{minutes} min",
+      "chapters": {
+        "signup": {
+          "title": "Registration",
+          "eyebrow": "Start"
+        },
+        "setup": {
+          "title": "Clinic setup",
+          "eyebrow": "Onboarding"
+        },
+        "patient": {
+          "title": "First patient",
+          "eyebrow": "Chart"
+        },
+        "appointments": {
+          "title": "Appointments",
+          "eyebrow": "Calendar"
+        },
+        "billing": {
+          "title": "Billing",
+          "eyebrow": "Finance"
+        },
+        "daily": {
+          "title": "Everyday work",
+          "eyebrow": "Ops"
+        }
+      },
+      "steps": {
+        "register": {
+          "title": "Register your clinic — no card",
+          "body": "Email, password, clinic name and owner. You get full Professional until the end of 2026.",
+          "a1": "Signup form — no card required",
+          "a2": "Clinic name becomes your workspace"
+        },
+        "confirm": {
+          "title": "Confirm email and sign in",
+          "body": "After confirmation you enter the app. Owner accounts use MFA to protect patient data.",
+          "note": "Owner MFA is required (D11) — other roles are not."
+        },
+        "basics": {
+          "title": "Basics and working hours",
+          "body": "In three onboarding steps you set address, timezone, and clinic hours.",
+          "a1": "Europe/Sarajevo by default",
+          "a2": "Hours by weekday"
+        },
+        "services": {
+          "title": "Service price list",
+          "body": "Add services manually or import CSV. Prices in EUR with VAT — ready for invoices.",
+          "a1": "Manual entry or CSV import",
+          "a2": "EUR + VAT per line"
+        },
+        "team": {
+          "title": "Invite your team",
+          "body": "Doctors and reception get an email invite — each with their own role and permissions.",
+          "a1": "Invite link in the inbox",
+          "a2": "Role defines what they see"
+        },
+        "newPatient": {
+          "title": "New patient in minutes",
+          "body": "Contact, medical history, and allergies on one form — no paper charts.",
+          "a1": "Name, phone (+387), email",
+          "a2": "Allergies and notes visible immediately"
+        },
+        "chart": {
+          "title": "Chart: documents and X-rays",
+          "body": "Everything that belongs to the patient — consents, PDFs, and images — in one place.",
+          "a1": "Documents in the chart",
+          "a2": "X-ray gallery with history"
+        },
+        "odontogram": {
+          "title": "Odontogram (FDI)",
+          "body": "Click a tooth → surface status. Treatment history stays tied to that tooth.",
+          "a1": "Map 11–48",
+          "a2": "Status by surface",
+          "a3": "History per tooth"
+        },
+        "plan": {
+          "title": "Treatment plan with prices",
+          "body": "Items, statuses, and amounts — patients always know what is next and what it costs.",
+          "a1": "Priced line items",
+          "a2": "Status: proposed / in progress / done"
+        },
+        "calendar": {
+          "title": "Calendar by doctor",
+          "body": "Day or week, filter by doctor, new appointment in a few clicks.",
+          "a1": "Week view",
+          "a2": "New appointment with patient and service"
+        },
+        "reminder": {
+          "title": "Automatic email reminder",
+          "body": "Patients get a reminder before the visit — fewer no-shows, fewer phone calls.",
+          "note": "Templates in your language, with clinic branding (Pro)."
+        },
+        "waitlist": {
+          "title": "Waitlist when someone cancels",
+          "body": "Cancelled slot → waitlist suggests a replacement. Reception confirms in a few clicks.",
+          "a1": "Automatic suggestion",
+          "a2": "Confirm from waitlist"
+        },
+        "invoice": {
+          "title": "Invoice from treatment",
+          "body": "From a finished treatment you generate an EUR invoice with VAT and clinic branding.",
+          "a1": "Lines with VAT",
+          "a2": "PDF ready to send"
+        },
+        "payments": {
+          "title": "Payments and installments",
+          "body": "Record payments or split into installments — the calculator replaces spreadsheets.",
+          "a1": "Partial payments",
+          "a2": "Installment plan"
+        },
+        "reports": {
+          "title": "Reports and Excel",
+          "body": "Monthly revenue, expenses, and Excel export for accounting.",
+          "a1": "Period overview",
+          "a2": "Excel export"
+        },
+        "dashboard": {
+          "title": "Morning dashboard",
+          "body": "Today’s appointments, new patients, and revenue — one screen before the first patient.",
+          "a1": "KPI cards",
+          "a2": "Appointment list",
+          "a3": "Quick links"
+        },
+        "crm": {
+          "title": "CRM recall",
+          "body": "Patients who have not visited in a while — send an email in a few clicks.",
+          "a1": "Recall list",
+          "a2": "Email from template"
+        },
+        "inventory": {
+          "title": "Inventory and minimums",
+          "body": "Material stock with alerts when you drop below the minimum.",
+          "a1": "Stock levels",
+          "a2": "Low-stock badge"
+        },
+        "settings": {
+          "title": "Roles and audit",
+          "body": "Who sees what, who changed what — team settings and an activity trail.",
+          "a1": "RBAC by role",
+          "a2": "Audit events"
+        }
+      },
+      "previews": {
+        "signup": {
+          "title": "Sign up",
+          "row1": "Email and password",
+          "row2": "Clinic name",
+          "row3": "No card"
+        },
+        "onboarding": {
+          "title": "Onboarding · step 1",
+          "row1": "Clinic address",
+          "row2": "Europe/Sarajevo",
+          "row3": "Working hours"
+        },
+        "services": {
+          "title": "Price list",
+          "row1": "Check-up · €25",
+          "row2": "Filling · €45",
+          "row3": "Hygiene · €35"
+        },
+        "team": {
+          "title": "Invites",
+          "row1": "Dr Softic · doctor",
+          "row2": "Reception · invite sent",
+          "row3": "Role = access"
+        },
+        "patients": {
+          "title": "Patients",
+          "row1": "Amina Hodzic",
+          "row2": "Emir Begic",
+          "row3": "Lejla Softic"
+        },
+        "chart": {
+          "title": "Chart · Amina Hodzic",
+          "row1": "Allergy: penicillin",
+          "row2": "Documents: 3",
+          "row3": "X-rays: 2"
+        },
+        "odontogram": {
+          "title": "Odontogram",
+          "row1": "Tooth 16 · caries",
+          "row2": "Tooth 26 · filling",
+          "row3": "Tooth 36 · healthy"
+        },
+        "plan": {
+          "title": "Treatment plan",
+          "row1": "Filling 16 · €45",
+          "row2": "Hygiene · €35",
+          "row3": "Check-up · booked"
+        },
+        "calendar": {
+          "title": "Calendar",
+          "row1": "09:00 Amina",
+          "row2": "10:30 Emir",
+          "row3": "12:00 Lejla",
+          "row4": "14:00 Haris"
+        },
+        "reminder": {
+          "title": "Email reminder",
+          "row1": "Visit tomorrow 09:00",
+          "row2": "Local-language template",
+          "row3": "Sent automatically"
+        },
+        "waitlist": {
+          "title": "Waitlist",
+          "row1": "Cancelled: 11:00",
+          "row2": "Suggest: Sara Delic",
+          "row3": "Confirm swap"
+        },
+        "invoice": {
+          "title": "Invoice FA-2026-014",
+          "row1": "Filling · €45",
+          "row2": "VAT 17%",
+          "row3": "Total €52.65"
+        },
+        "payments": {
+          "title": "Payments",
+          "row1": "Paid €30",
+          "row2": "Remaining €22.65",
+          "row3": "2 installments"
+        },
+        "reports": {
+          "title": "Reports",
+          "row1": "Revenue this month",
+          "row2": "Expenses",
+          "row3": "Excel export"
+        },
+        "dashboard": {
+          "title": "Dashboard",
+          "row1": "Patients today",
+          "row2": "Revenue",
+          "row3": "Appointments",
+          "row4": "Amina · check-up"
+        },
+        "crm": {
+          "title": "CRM recall",
+          "row1": "No visit 6+ mo.",
+          "row2": "8 patients",
+          "row3": "Send email"
+        },
+        "inventory": {
+          "title": "Inventory",
+          "row1": "Composite A2 · 12",
+          "row2": "Anesthetic · low",
+          "row3": "Gloves M · 8"
+        },
+        "settings": {
+          "title": "Team settings",
+          "row1": "Owner · MFA",
+          "row2": "Doctor · chart",
+          "row3": "Audit log"
+        }
+      }
+    },
+    "demo": {
+      "eyebrow": "Demo",
+      "title": "See DentOrd from the inside.",
+      "subtitle": "Try a demo clinic with sample patients — no registration, no commitment.",
+      "browserUrl": "app.dentord.com",
+      "live": {
+        "eyebrow": "Live demo",
+        "title": "Open the demo clinic",
+        "body": "Read-only access to a seed clinic with fictional data. Browse charts, calendar, and invoices — edits are disabled.",
+        "point1": "About 10 sample patients",
+        "point2": "Week of appointments, odontogram, inventory",
+        "point3": "No card and no commitment",
+        "cta": "Open demo clinic",
+        "opening": "Opening…",
+        "unavailable": "Live demo is not connected in this environment. Browse the gallery below or the tour.",
+        "microcopy": "Demo mode · read-only · Register your clinic when ready",
+        "errors": {
+          "unavailable": "Demo is currently unavailable.",
+          "failed": "Could not open the demo. Please try again."
+        }
+      },
+      "gallery": {
+        "eyebrow": "Screenshots",
+        "title": "Key screens",
+        "description": "See how the dashboard, chart, calendar, and billing look — click to enlarge.",
+        "close": "Close",
+        "items": {
+          "dashboard": {
+            "title": "Dashboard",
+            "caption": "KPIs and today’s appointments on one screen.",
+            "row1": "12 patients",
+            "row2": "€480 today",
+            "row3": "8 appointments"
+          },
+          "patients": {
+            "title": "Patients",
+            "caption": "Search and list with contacts.",
+            "row1": "Amina Hodzic",
+            "row2": "Emir Begic",
+            "row3": "Lejla Softic"
+          },
+          "odontogram": {
+            "title": "Odontogram",
+            "caption": "FDI map with tooth statuses.",
+            "row1": "Tooth 16",
+            "row2": "Tooth 26",
+            "row3": "History"
+          },
+          "calendar": {
+            "title": "Calendar",
+            "caption": "Weekly view by doctor.",
+            "row1": "Mon 09:00",
+            "row2": "Tue 10:30",
+            "row3": "Wed 12:00"
+          },
+          "invoice": {
+            "title": "Invoices",
+            "caption": "EUR + VAT, clinic branding.",
+            "row1": "FA-2026-014",
+            "row2": "€52.65",
+            "row3": "Partially paid"
+          },
+          "crm": {
+            "title": "CRM",
+            "caption": "Recall for patients who have not visited.",
+            "row1": "6+ months",
+            "row2": "8 candidates",
+            "row3": "Email template"
+          },
+          "inventory": {
+            "title": "Inventory",
+            "caption": "Stock and low-stock alerts.",
+            "row1": "Composite",
+            "row2": "Anesthetic · low",
+            "row3": "Gloves"
+          },
+          "settings": {
+            "title": "Team & roles",
+            "caption": "RBAC and clinic settings.",
+            "row1": "Owner",
+            "row2": "Doctor",
+            "row3": "Reception"
+          }
+        }
+      }
+    },
+    "whyDentord": {
+      "eyebrow": "Why DentOrd",
+      "title": "Why clinics choose DentOrd?",
+      "subtitle": "Instead of paper and Excel — one app with local defaults, EUR + VAT, EU hosting, and clear roles for the whole team.",
+      "beforeAfter": {
+        "eyebrow": "Before / after",
+        "title": "The same work — less chaos.",
+        "description": "Six things clinics usually handle with paper or spreadsheets — and how they look in DentOrd.",
+        "beforeLabel": "Before",
+        "afterLabel": "With DentOrd",
+        "rows": {
+          "charts": {
+            "before": "Paper charts or folders — finding a record takes minutes.",
+            "after": "A full digital chart with history, allergies and documents in one click."
+          },
+          "appointments": {
+            "before": "Double bookings, schedule confusion and endless phone calls.",
+            "after": "Calendar by doctor, appointment statuses and a waitlist that suggests fills."
+          },
+          "invoices": {
+            "before": "Manual invoices, VAT mistakes and unclear who collected what.",
+            "after": "Invoices in EUR with VAT, payments, installments and outstanding balances."
+          },
+          "reminders": {
+            "before": "Reminders by hand — or not at all. More no-shows.",
+            "after": "Automatic email reminders and recall for patients overdue for a check-up."
+          },
+          "reports": {
+            "before": "Month-end means hours in Excel.",
+            "after": "Reports and Excel export when you need them — without rebuilding sheets."
+          },
+          "team": {
+            "before": "Everyone sees everything, or nobody knows what’s current.",
+            "after": "Owner / doctor / reception roles — each person sees what they need."
+          }
+        }
+      },
+      "region": {
+        "eyebrow": "Region",
+        "title": "Built for our region.",
+        "description": "Not a rushed localisation — defaults and language are set for BiH and nearby markets from day one.",
+        "items": {
+          "language": {
+            "title": "Bosnian first",
+            "body": "UI and communication in Bosnian; English is secondary (D37)."
+          },
+          "currency": {
+            "title": "EUR + VAT",
+            "body": "Prices and invoices in euros with VAT — no manual rework for local practice."
+          },
+          "phone": {
+            "title": "Phone +387",
+            "body": "Default dialling prefix aligned with BiH (D46)."
+          },
+          "timezone": {
+            "title": "Europe/Sarajevo",
+            "body": "Appointments and reminders in your timezone from the start (D47)."
+          },
+          "support": {
+            "title": "Support in your language",
+            "body": "Write to us in Bosnian — we reply the same business day."
+          }
+        }
+      },
+      "security": {
+        "eyebrow": "Security & trust",
+        "title": "Patient data deserves bank-grade security.",
+        "items": {
+          "eu": {
+            "title": "EU hosting",
+            "body": "Data lives on EU servers (Supabase EU) — closer to you and aligned with regulations."
+          },
+          "isolation": {
+            "title": "Full clinic isolation",
+            "body": "Each clinic sees only its own data. Row Level Security on every row."
+          },
+          "rbac": {
+            "title": "Role-based access",
+            "body": "Owner, doctor, reception — each sees what they need, nothing more."
+          },
+          "gdpr": {
+            "title": "GDPR: export & delete",
+            "body": "Export data or start deletion when the law and the patient require it."
+          },
+          "backup": {
+            "title": "Daily backups",
+            "body": "Regular backups so one bad day doesn’t erase months of work."
+          },
+          "audit": {
+            "title": "Audit trail",
+            "body": "Key changes stay recorded — who changed what and when."
+          }
+        },
+        "disclaimer": "DentOrd is a records tool — clinical decisions always belong to the doctor."
+      },
+      "roadmap": {
+        "eyebrow": "Vision",
+        "title": "Grows with you.",
+        "description": "The foundation is ready today. Next steps arrive when you’re ready — no date promises.",
+        "items": {
+          "ai": {
+            "title": "AI assistant",
+            "body": "Help with documentation drafts — always under your control before saving to the chart."
+          },
+          "messaging": {
+            "title": "SMS / WhatsApp reminders",
+            "body": "Extra reminder channels when they are ready for billing and compliance."
+          },
+          "portal": {
+            "title": "Patient portal",
+            "body": "Multi-location and a patient portal — at Enterprise level, when your clinic needs it."
+          }
+        },
+        "note": "These features are not part of the free 2026 period and activate by plan / metered model — no fixed v1 date."
+      }
+    },
+    "blog": {
+      "eyebrow": "Blog",
+      "title": "Blog",
+      "subtitle": "Tips for running a clinic, digitalisation, and DentOrd product news.",
+      "readingTime": "{minutes} min read",
+      "backToIndex": "All articles",
+      "related": "Related articles",
+      "empty": {
+        "title": "First articles coming soon",
+        "body": "We’re preparing content on clinic operations and digitalisation. In the meantime, take the tour or register."
+      },
+      "categories": {
+        "practice": "Running a practice",
+        "digitalization": "Digitalisation",
+        "news": "DentOrd news"
+      }
+    },
+    "legal": {
+      "lastUpdated": "Last updated",
+      "toc": "Contents"
     }
   },
   "Auth": {
@@ -1555,5 +2610,10 @@
       "notFound": "Consent not found.",
       "signedUrlFailed": "Could not open the PDF."
     }
+  },
+  "DemoBanner": {
+    "title": "This is a demo clinic",
+    "body": "Data is fictional. Edits are disabled — register your own clinic for full access.",
+    "cta": "Register yours →"
   }
 }

@@ -8,13 +8,25 @@ import { BrandLogo } from "@/components/brand/brand-logo";
 import { buttonVariants } from "@/components/ui/button";
 import { LocaleSwitcher } from "@/components/marketing/locale-switcher";
 import { MARKETING_NAV_LINKS } from "@/components/marketing/marketing-nav";
-import { PRODUCT_NAME } from "@/lib/brand/constants";
 import { cn } from "@/lib/utils";
 
-export function MarketingHeader() {
+type MarketingHeaderProps = {
+  /** W11 — Blog in navbar only when ≥ 2 published posts. */
+  showBlogNav?: boolean;
+};
+
+export function MarketingHeader({ showBlogNav = false }: MarketingHeaderProps) {
   const t = useTranslations("Marketing.nav");
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+
+  const navLinks = showBlogNav
+    ? [
+        ...MARKETING_NAV_LINKS.slice(0, 4),
+        { href: "/blog" as const, labelKey: "blog" as const },
+        ...MARKETING_NAV_LINKS.slice(4),
+      ]
+    : MARKETING_NAV_LINKS;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -51,11 +63,10 @@ export function MarketingHeader() {
           className="inline-flex shrink-0 items-center gap-2.5 text-[var(--marketing-ink)]"
         >
           <BrandLogo variant="full" className="h-8 w-auto max-w-[9.5rem]" />
-          <span className="sr-only">{PRODUCT_NAME}</span>
         </Link>
 
         <nav className="hidden flex-1 items-center justify-center gap-1 lg:flex">
-          {MARKETING_NAV_LINKS.map((item) => (
+          {navLinks.map((item) => (
             <Link
               key={item.href}
               href={item.href}
@@ -107,7 +118,7 @@ export function MarketingHeader() {
         >
           <nav className="mx-auto flex h-[calc(100dvh-4rem)] w-full max-w-[1200px] flex-col px-6 pb-8 pt-4">
             <div className="flex flex-1 flex-col gap-1 overflow-y-auto">
-              {MARKETING_NAV_LINKS.map((item) => (
+              {navLinks.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}

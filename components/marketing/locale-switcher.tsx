@@ -26,7 +26,7 @@ export function LocaleSwitcher({
         "inline-flex items-center gap-0.5 rounded-lg border p-0.5 text-xs font-medium",
         tone === "dark"
           ? "border-white/20 text-white/70"
-          : "border-[color-mix(in_oklab,var(--marketing-ink)_14%,transparent)] text-[color-mix(in_oklab,var(--marketing-ink)_55%,transparent)]",
+          : "border-[color-mix(in_oklab,var(--marketing-ink)_14%,transparent)] text-[color-mix(in_oklab,var(--marketing-ink)_68%,transparent)]",
         className,
       )}
       role="group"

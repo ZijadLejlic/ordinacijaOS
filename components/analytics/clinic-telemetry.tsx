@@ -8,14 +8,25 @@ type Props = {
   userId: string;
   clinicId: string;
   role: string;
+  isDemo?: boolean;
 };
 
 /** Sets PostHog + Sentry context with clinic_id/role only (D33). */
-export function ClinicTelemetry({ userId, clinicId, role }: Props) {
+export function ClinicTelemetry({
+  userId,
+  clinicId,
+  role,
+  isDemo = false,
+}: Props) {
   useEffect(() => {
     setClinicErrorContext({ clinicId, role });
-    identifyClinicUser({ userId, clinicId, role });
-  }, [userId, clinicId, role]);
+    identifyClinicUser({
+      userId,
+      clinicId,
+      role,
+      skipIdentify: isDemo,
+    });
+  }, [userId, clinicId, role, isDemo]);
 
   return null;
 }

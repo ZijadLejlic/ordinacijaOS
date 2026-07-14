@@ -1,8 +1,9 @@
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { routing } from "@/i18n/routing";
+import { CookieConsentBanner } from "@/components/analytics/cookie-consent-banner";
 import { PosthogProvider } from "@/components/analytics/posthog-provider";
+import { routing } from "@/i18n/routing";
 
 type Props = {
   children: React.ReactNode;
@@ -26,9 +27,8 @@ export default async function LocaleLayout({ children, params }: Props) {
   return (
     <NextIntlClientProvider messages={messages}>
       <PosthogProvider>
-        <div lang={locale} className="flex min-h-full flex-1 flex-col">
-          {children}
-        </div>
+        <div className="flex min-h-full flex-1 flex-col">{children}</div>
+        <CookieConsentBanner />
       </PosthogProvider>
     </NextIntlClientProvider>
   );

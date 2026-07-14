@@ -46,7 +46,7 @@ export default async function DashboardLayout({ children, params }: Props) {
   const { data: profile } = await supabase
     .from("profiles")
     .select(
-      "full_name, role, clinic_id, clinics(name, branding_json, status, grace_ends_at)",
+      "full_name, role, clinic_id, clinics(name, branding_json, status, grace_ends_at, is_demo)",
     )
     .eq("id", user!.id)
     .maybeSingle();
@@ -60,6 +60,7 @@ export default async function DashboardLayout({ children, params }: Props) {
     branding_json: unknown;
     status: ClinicStatus;
     grace_ends_at: string | null;
+    is_demo: boolean;
   } | null;
 
   const operatorId = await getOperatorIdFromCookie();
@@ -139,6 +140,7 @@ export default async function DashboardLayout({ children, params }: Props) {
           status={clinic.status}
           graceEndsAt={clinic.grace_ends_at}
           isOwner={profile!.role === "owner"}
+          isDemo={clinic.is_demo}
         />
       ) : null}
       <AppShell

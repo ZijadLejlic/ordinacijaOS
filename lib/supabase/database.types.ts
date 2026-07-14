@@ -458,6 +458,7 @@ export type Database = {
           created_at: string
           grace_ends_at: string | null
           id: string
+          is_demo: boolean
           name: string
           phone_country_default: string
           plan_id: string
@@ -474,6 +475,7 @@ export type Database = {
           created_at?: string
           grace_ends_at?: string | null
           id?: string
+          is_demo?: boolean
           name: string
           phone_country_default?: string
           plan_id: string
@@ -490,6 +492,7 @@ export type Database = {
           created_at?: string
           grace_ends_at?: string | null
           id?: string
+          is_demo?: boolean
           name?: string
           phone_country_default?: string
           plan_id?: string
@@ -1137,6 +1140,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      leads: {
+        Row: {
+          clinic_name: string
+          created_at: string
+          email: string | null
+          id: string
+          ip_hash: string | null
+          locale: string
+          message: string | null
+          name: string
+          phone: string
+          preferred_time: string
+          source_page: string
+          status: string
+        }
+        Insert: {
+          clinic_name: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          ip_hash?: string | null
+          locale?: string
+          message?: string | null
+          name: string
+          phone: string
+          preferred_time: string
+          source_page?: string
+          status?: string
+        }
+        Update: {
+          clinic_name?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          ip_hash?: string | null
+          locale?: string
+          message?: string | null
+          name?: string
+          phone?: string
+          preferred_time?: string
+          source_page?: string
+          status?: string
+        }
+        Relationships: []
       }
       odontogram_events: {
         Row: {

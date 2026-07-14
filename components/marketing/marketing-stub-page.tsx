@@ -1,6 +1,10 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { FinalCta } from "@/components/marketing/final-cta";
 import { SectionShell } from "@/components/marketing/section-shell";
+import {
+  generateMarketingMetadata,
+  type MarketingSeoPage,
+} from "@/lib/seo/marketing";
 
 export type MarketingStubPageKey =
   | "features"
@@ -20,6 +24,13 @@ type Props = {
   finalCtaKey?: "default" | "demo" | "contact" | "tour";
 };
 
+export async function generateStubMetadata(
+  locale: string,
+  pageKey: MarketingStubPageKey,
+) {
+  return generateMarketingMetadata(locale, pageKey as MarketingSeoPage);
+}
+
 export async function MarketingStubPage({
   params,
   pageKey,
@@ -37,7 +48,7 @@ export async function MarketingStubPage({
         title={t("title")}
         description={t("description")}
       >
-        <p className="max-w-[65ch] text-sm text-[color-mix(in_oklab,var(--marketing-ink)_55%,transparent)] md:text-base">
+        <p className="max-w-[65ch] text-sm text-[color-mix(in_oklab,var(--marketing-ink)_68%,transparent)] md:text-base">
           {t("comingSoon")}
         </p>
       </SectionShell>

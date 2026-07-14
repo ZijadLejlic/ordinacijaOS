@@ -647,7 +647,7 @@ Online naplata usluga pacijentima (avans preko portala): **nadogradnja poslije**
 - [x] Klinika A ne može pročitati podatke klinike B (automatski test)
 - [x] Storage objekti nisu javno listable; samo signed URL
 - [ ] Full responsive: login, kalendar, karton, faktura na mobilnom
-- [x] Marketing: pricing vidljiv, CTA signup, Privacy/Terms/DPA linkovi, cookie banner *(skeleton: landing + pricing + signup CTA; Privacy/Terms/cookie banner TBD)*
+- [x] Marketing: pricing vidljiv, CTA signup, Privacy/Terms/DPA linkovi, cookie banner *(1c: SEO metadata/OG/JSON-LD + cookie banner + PostHog gate; core page content još u Fazi 2)*
 
 ### 12.2 E2E prioritet (CI release blockers)
 

@@ -13,14 +13,39 @@ type Props = {
   status: ClinicStatus;
   graceEndsAt: string | null;
   isOwner: boolean;
+  isDemo?: boolean;
 };
 
 export function ClinicReadonlyBanner({
   status,
   graceEndsAt,
   isOwner,
+  isDemo = false,
 }: Props) {
   const t = useTranslations("ClinicLifecycle");
+  const tDemo = useTranslations("DemoBanner");
+
+  if (isDemo) {
+    return (
+      <div
+        role="status"
+        className="border-b border-[color-mix(in_oklab,#0B6EF5_35%,transparent)] bg-[#E8F4FF] px-4 py-3 text-[#0F1B3D]"
+      >
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-medium">{tDemo("title")}</p>
+            <p className="text-sm opacity-90">{tDemo("body")}</p>
+          </div>
+          <Link
+            href="/signup"
+            className="text-sm font-medium text-[#0B6EF5] underline underline-offset-4"
+          >
+            {tDemo("cta")}
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (status === "active") return null;
 

@@ -48,17 +48,32 @@ export async function FinalCta({
           >
             {t("primary")}
           </Link>
-          <Link
-            href="/contact"
-            className={cn(
-              buttonVariants({ variant: "outline", size: "lg" }),
-              "h-11 rounded-[10px] border-[color-mix(in_oklab,var(--marketing-ink)_22%,transparent)] bg-transparent px-5 text-[var(--marketing-ink)] hover:bg-white/70",
-            )}
-          >
-            {t("secondary")}
-          </Link>
+          {titleKey === "contact" ? null : titleKey === "tour" ? (
+            <Link
+              href="/demo"
+              className={cn(
+                buttonVariants({ variant: "outline", size: "lg" }),
+                "h-11 rounded-[10px] border-[color-mix(in_oklab,var(--marketing-ink)_22%,transparent)] bg-transparent px-5 text-[var(--marketing-ink)] hover:bg-white/70",
+              )}
+            >
+              {t("secondaryDemo")}
+              <span aria-hidden className="ml-1">
+                →
+              </span>
+            </Link>
+          ) : (
+            <Link
+              href="/contact"
+              className={cn(
+                buttonVariants({ variant: "outline", size: "lg" }),
+                "h-11 rounded-[10px] border-[color-mix(in_oklab,var(--marketing-ink)_22%,transparent)] bg-transparent px-5 text-[var(--marketing-ink)] hover:bg-white/70",
+              )}
+            >
+              {t("secondary")}
+            </Link>
+          )}
         </div>
-        <p className="mt-4 text-sm text-[color-mix(in_oklab,var(--marketing-ink)_55%,transparent)]">
+        <p className="mt-4 text-sm text-[color-mix(in_oklab,var(--marketing-ink)_68%,transparent)]">
           {t("microcopy")}
         </p>
       </div>

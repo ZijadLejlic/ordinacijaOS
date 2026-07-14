@@ -53,7 +53,9 @@ export default async function DashboardPage({ params }: Props) {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role, clinic_id, clinics(name, trial_ends_at, status, timezone)")
+    .select(
+      "role, clinic_id, clinics(name, trial_ends_at, status, timezone, is_demo)",
+    )
     .eq("id", user!.id)
     .maybeSingle();
 
@@ -63,6 +65,7 @@ export default async function DashboardPage({ params }: Props) {
         trial_ends_at: string | null;
         status: string;
         timezone: string;
+        is_demo: boolean;
       }
     | null
     | undefined;
@@ -114,6 +117,7 @@ export default async function DashboardPage({ params }: Props) {
           userId={user!.id}
           clinicId={profile.clinic_id}
           role={profile.role}
+          isDemo={clinic?.is_demo === true}
         />
       ) : null}
 

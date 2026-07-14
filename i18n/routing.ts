@@ -34,6 +34,7 @@ export const routing = defineRouting({
       bs: "/kontakt",
     },
     "/blog": "/blog",
+    "/blog/[slug]": "/blog/[slug]",
     "/privacy": "/privacy",
     "/terms": "/terms",
     "/dpa": "/dpa",

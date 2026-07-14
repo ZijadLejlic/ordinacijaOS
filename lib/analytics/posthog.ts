@@ -1,4 +1,5 @@
 import posthog from "posthog-js";
+import { hasAnalyticsConsent } from "@/lib/analytics/consent";
 
 export type AnalyticsProps = {
   clinic_id?: string;
@@ -27,11 +28,21 @@ export function isPosthogEnabled() {
   return Boolean(process.env.NEXT_PUBLIC_POSTHOG_KEY);
 }
 
+/** True when key is present and user accepted analytics cookies (W18). */
+export function canUsePosthog() {
+  return isPosthogEnabled() && hasAnalyticsConsent();
+}
+
+/**
+ * Init PostHog only after analytics consent (PRD §13.4 / W18).
+ * No-ops when key missing, SSR, already initialized, or consent denied/undecided.
+ */
 export function initPosthog() {
   const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
   const host =
     process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://eu.i.posthog.com";
   if (!key || typeof window === "undefined" || initialized) return;
+  if (!hasAnalyticsConsent()) return;
 
   posthog.init(key, {
     api_host: host,
@@ -43,9 +54,18 @@ export function initPosthog() {
   initialized = true;
 }
 
+/** Stop capturing if the user later rejects analytics. */
+export function optOutPosthog() {
+  if (typeof window === "undefined") return;
+  if (initialized) {
+    posthog.opt_out_capturing();
+    posthog.reset();
+  }
+}
+
 /** Product analytics without patient PII (D33). */
 export function trackEvent(event: string, props?: AnalyticsProps) {
-  if (!isPosthogEnabled() || typeof window === "undefined") return;
+  if (!canUsePosthog() || typeof window === "undefined" || !initialized) return;
   posthog.capture(event, sanitizeProps(props));
 }
 
@@ -53,8 +73,11 @@ export function identifyClinicUser(input: {
   userId: string;
   clinicId: string;
   role: string;
+  /** Marketing demo clinic — skip conversion identify (W8). */
+  skipIdentify?: boolean;
 }) {
-  if (!isPosthogEnabled() || typeof window === "undefined") return;
+  if (!canUsePosthog() || typeof window === "undefined" || !initialized) return;
+  if (input.skipIdentify) return;
   posthog.identify(input.userId, {
     clinic_id: input.clinicId,
     role: input.role,

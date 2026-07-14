@@ -68,8 +68,10 @@ Zaključati **kako** gradimo DentOrd (stack, patterni, granice), da agent/develo
 | E2E + tenant isolation CI (item 23) | Playwright `e2e/` — signup→MFA→onboarding step 1, termin+overlap, faktura+PDF, UI isolation; Vitest `lib/security/tenant-isolation.test.ts` — patients/appointments/storage; workflows `e2e.yml` + `security.yml` |
 | Consent draw-sign (Faza 3D / D20) | `/settings/consent` — BS/EN predlošci (`general_treatment`, `data_processing`, `radiography`); karton draw-sign → PDF + PNG u `patient-files`; `consent_forms` / `consent_signatures`; feature `consent_draw_sign` (Pro+) |
 | Inventar basic (Faza 3E / §6.12) | `/inventory` — materijali (qty + unit + low-stock prag); ±1 adjust; nav badge; `inventory_items` + RLS; feature `inventory_basic` (Pro+); bez auto-skidanja/barkoda/roka |
-| Marketing (Faza 1) | `(marketing)/` landing + `/pricing` + signup CTA; display prices mirror PRD §4.1 |
-| Observability (Faza 1) | Sentry (`instrumentation*.ts`, optional DSN); PostHog (`lib/analytics/posthog.ts`, EU host, no patient PII) |
+| Marketing (Faza 1–2a) | `(marketing)/` shell + localized pathnames; SEO helper (`lib/seo/*` metadata/OG/JSON-LD); cookie banner + PostHog consent gate (W18); Home §4.1 sections (`components/marketing/home/*`, `TestimonialsSection` hidden until reviews — W10); display prices mirror PRD §4.1 |
+| Marketing (core pages) | Home · Cijene · Funkcije · FAQ · Kontakt; `public.leads` (W13) + Resend na `support@` + IP rate limit/honeypot (`lib/leads/*`) |
+| Marketing (Faza 4) | Zašto DentOrd; Privacy/Terms/DPA (`lib/legal/*`); blog MDX skeleton (`content/blog/{bs,en}/`, nav ≥2); OG `/api/og`; `app/sitemap.ts` + `app/robots.ts` |
+| Observability (Faza 1) | Sentry (`instrumentation*.ts`, optional DSN); PostHog (`lib/analytics/posthog.ts`, EU host, no patient PII; init only after analytics consent) |
 
 Env template: `.env.example` → kopirati u `.env.local`.
 
@@ -199,7 +201,7 @@ Iz PRD §10 / Decision Log — posebno u 2026 free MVP:
 ## 9. Observability
 
 - Sentry: greške; tag `clinic_id` / `role` via `setClinicErrorContext` (bez patient PII)
-- PostHog: `clinic_id`, `role`, event names — **bez** patient PII (D33); EU host default; disabled bez `NEXT_PUBLIC_POSTHOG_KEY`
+- PostHog: `clinic_id`, `role`, event names — **bez** patient PII (D33); EU host default; disabled bez `NEXT_PUBLIC_POSTHOG_KEY`; **učitava se tek nakon analytics cookie consent** (W18 / PRD §13.4)
 - Support: email `support@dentord.com` (D44)
 
 ---
@@ -249,3 +251,7 @@ Prati PRD §11. Tech doc se širi po fazama; ne specifikovati Enterprise module 
 | 2026-07-14 | Fix allocate_invoice_number ambiguity (migration + app fallback); nest AuditLog.events keys for next-intl |
 | 2026-07-14 | Faza 3D / D20: consent templates + draw-sign PDF (`consent_forms` / `consent_signatures`) |
 | 2026-07-14 | Faza 3E / §6.12: inventar basic `/inventory` + `inventory_items` + low-stock nav badge |
+| 2026-07-14 | Marketing 1c: SEO helper (metadata/OG/JSON-LD) + cookie consent banner + PostHog consent gate |
+| 2026-07-14 | Marketing 2a: Home sections per Website-DentOrd §4.1 (hero→FAQ + FinalCta; testimonials gated W10) |
+| 2026-07-14 | Marketing core: FAQ + Kontakt; `leads` + Resend callback (W13) |
+| 2026-07-14 | Marketing Faza 4: Zašto DentOrd; Privacy/Terms/DPA; blog MDX skeleton; `/api/og`; sitemap/robots |

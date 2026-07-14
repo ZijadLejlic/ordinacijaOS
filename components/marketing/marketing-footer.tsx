@@ -22,7 +22,11 @@ export async function MarketingFooter() {
       <div className="mx-auto grid w-full max-w-[1200px] gap-10 px-6 py-14 md:grid-cols-2 md:px-8 lg:grid-cols-4 lg:gap-8">
         <div className="space-y-4 lg:pr-4">
           <Link href="/" className="inline-flex items-center gap-2.5">
-            <BrandLogo variant="mark" className="h-8 w-8 brightness-0 invert" />
+            <BrandLogo
+            variant="mark"
+            alt=""
+            className="h-8 w-8 brightness-0 invert"
+          />
             <span className="text-lg font-semibold tracking-tight">
               {PRODUCT_NAME}
             </span>

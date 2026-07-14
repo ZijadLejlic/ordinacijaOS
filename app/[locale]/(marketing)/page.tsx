@@ -1,65 +1,49 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Link } from "@/i18n/navigation";
-import { BrandLogo } from "@/components/brand/brand-logo";
+import type { AppLocale } from "@/i18n/routing";
 import { FinalCta } from "@/components/marketing/final-cta";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { FaqTeaser } from "@/components/marketing/home/faq-teaser";
+import { FeatureGrid } from "@/components/marketing/home/feature-grid";
+import { HomeHero } from "@/components/marketing/home/home-hero";
+import { PricingTeaser } from "@/components/marketing/home/pricing-teaser";
+import { ProblemSolution } from "@/components/marketing/home/problem-solution";
+import { SecuritySection } from "@/components/marketing/home/security-section";
+import { TestimonialsSection } from "@/components/marketing/home/testimonials-section";
+import { TourTeaser } from "@/components/marketing/home/tour-teaser";
+import { TrustBar } from "@/components/marketing/home/trust-bar";
+import { JsonLd, softwareApplicationJsonLd } from "@/lib/seo/json-ld";
+import { generateMarketingMetadata } from "@/lib/seo/marketing";
 
 type Props = {
   params: Promise<{ locale: string }>;
 };
 
+export async function generateMetadata({ params }: Props) {
+  const { locale } = await params;
+  return generateMarketingMetadata(locale, "home");
+}
+
 export default async function MarketingHomePage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations("Marketing");
+  const tSeo = await getTranslations("Marketing.seo");
 
   return (
-    <main className="relative flex flex-1 flex-col overflow-hidden">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10"
-        style={{
-          background:
-            "radial-gradient(ellipse 85% 65% at 78% -5%, color-mix(in_oklab, var(--marketing-cyan) 34%, transparent), transparent 55%), radial-gradient(ellipse 70% 55% at 8% 95%, color-mix(in_oklab, var(--marketing-accent) 18%, transparent), transparent 50%), linear-gradient(165deg, var(--marketing-wash) 0%, var(--marketing-surface) 48%, color-mix(in_oklab, var(--marketing-mist) 70%, var(--marketing-surface)) 100%)",
-        }}
+    <main className="flex flex-1 flex-col">
+      <JsonLd
+        data={softwareApplicationJsonLd({
+          description: tSeo("home.description"),
+          locale: locale as AppLocale,
+        })}
       />
-      <div
-        aria-hidden
-        className="marketing-grain pointer-events-none absolute inset-0 -z-10 opacity-[0.28]"
-      />
-
-      <section className="mx-auto flex w-full max-w-5xl flex-1 flex-col justify-center px-6 pb-20 pt-8 md:px-10 md:pb-28 md:pt-12">
-        <div className="w-[min(100%,22rem)] md:w-[min(100%,28rem)]">
-          <BrandLogo priority className="drop-shadow-sm" />
-        </div>
-        <h1 className="mt-10 max-w-xl text-2xl font-medium tracking-tight text-[var(--marketing-ink)] md:text-3xl">
-          {t("hero.headline")}
-        </h1>
-        <p className="mt-4 max-w-md text-base text-[color-mix(in_oklab,var(--marketing-ink)_72%,transparent)] md:text-lg">
-          {t("hero.support")}
-        </p>
-        <div className="mt-10 flex flex-wrap items-center gap-3">
-          <Link
-            href="/signup"
-            className={cn(buttonVariants({ size: "lg" }), "min-w-40")}
-          >
-            {t("hero.ctaPrimary")}
-          </Link>
-          <Link
-            href="/pricing"
-            className={cn(
-              buttonVariants({ variant: "outline", size: "lg" }),
-              "border-[color-mix(in_oklab,var(--marketing-ink)_20%,transparent)] bg-transparent text-[var(--marketing-ink)]",
-            )}
-          >
-            {t("hero.ctaSecondary")}
-          </Link>
-        </div>
-        <p className="mt-6 text-sm text-[color-mix(in_oklab,var(--marketing-ink)_55%,transparent)]">
-          {t("hero.trialNote")}
-        </p>
-      </section>
+      <HomeHero />
+      <TrustBar />
+      <ProblemSolution />
+      <FeatureGrid />
+      <TourTeaser />
+      <SecuritySection />
+      <PricingTeaser />
+      <TestimonialsSection />
+      <FaqTeaser />
       <FinalCta />
     </main>
   );

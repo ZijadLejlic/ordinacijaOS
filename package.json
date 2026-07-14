@@ -12,7 +12,8 @@
     "test:security": "vitest run lib/security/tenant-isolation.test.ts lib/security/rbac-and-lifecycle.test.ts",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:e2e:dev": "PLAYWRIGHT_WEB_SERVER=dev PLAYWRIGHT_REUSE_SERVER=1 playwright test"
+    "test:e2e:dev": "PLAYWRIGHT_WEB_SERVER=dev PLAYWRIGHT_REUSE_SERVER=1 playwright test",
+    "seed:demo": "npx tsx scripts/seed-demo-clinic.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
@@ -25,10 +26,12 @@
     "date-fns": "^4.4.0",
     "date-fns-tz": "^3.2.0",
     "exceljs": "^4.4.0",
+    "gray-matter": "^4.0.3",
     "jszip": "^3.10.1",
     "lucide-react": "^1.24.0",
     "next": "16.2.10",
     "next-intl": "^4.13.2",
+    "next-mdx-remote": "^6.0.0",
     "posthog-js": "^1.399.2",
     "react": "19.2.4",
     "react-dom": "19.2.4",
@@ -43,6 +46,7 @@
     "@playwright/test": "^1.61.1",
     "@tailwindcss/postcss": "^4",
     "@types/exceljs": "^0.5.3",
+    "@types/mdx": "^2.0.14",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

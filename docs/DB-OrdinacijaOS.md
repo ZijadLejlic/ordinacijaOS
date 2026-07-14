@@ -72,6 +72,27 @@ Kolone su **namjera**; tipovi/constrainti se finalizuju u migraciji. `…` = TBD
 | `enabled` | boolean |
 | metered flags | TBD kad metered billing krene (2027) |
 
+#### `leads` (marketing — W13)
+
+Platform tabela **bez** `clinic_id`. Kontakt / „Pozovite me“ forma na marketing siteu.
+
+| Kolona | Napomena |
+|---|---|
+| `id` | uuid PK |
+| `created_at` | timestamptz |
+| `name` | Ime i prezime |
+| `clinic_name` | Naziv ordinacije |
+| `phone` | Telefon (hint +387) |
+| `email` | Opciono |
+| `preferred_time` | `morning` / `afternoon` / `anytime` |
+| `message` | Opciono, max 1000 u app validaciji |
+| `locale` | `bs` / `en` |
+| `source_page` | npr. `contact` |
+| `status` | `new` / `contacted` / `closed` |
+| `ip_hash` | SHA-256(IP + salt) za rate limit (5/h); nije raw IP |
+
+**RLS:** enabled; **nema** policy za `anon`/`authenticated` (deny all). `REVOKE` od API rola; `GRANT` select/insert/update samo `service_role`. Insert + Resend email iz server action (`lib/leads/actions.ts`); čitanje samo platform admin (D41) preko service role — UI lista u `/platform` kasnije.
+
 ### 3.2 Clinic & users
 
 #### `clinics`
@@ -87,6 +108,7 @@ Kolone su **namjera**; tipovi/constrainti se finalizuju u migraciji. `…` = TBD
 | `branding_json` | `{ logo_path?, logo_url?, colors?: { background?, text?, accent? } }` (hex `#RRGGBB`) |
 | `settings_json` | vidi §5 |
 | `status` | `active` \| `readonly` \| `pending_delete` |
+| `is_demo` | marketing seed clinic (W8); unique partial index — max one `true`; skipped by lifecycle + hard delete |
 | `readonly_started_at` | set when entering readonly (trial expiry / owner close / unpaid) |
 | `grace_ends_at` | end of 7-day export window before `pending_delete` |
 | `closure_reason` | `trial_expired` \| `owner_requested` \| `unpaid` |
@@ -223,8 +245,15 @@ Distinct from single-patient GDPR JSON. Audit: `clinic.backup_exported` (counts 
 |---|---|
 | `clinic_is_writable()` | Restrictive RLS on business-table writes while `status <> active` |
 | `request_clinic_closure()` | Owner + MFA → `readonly` + `grace_ends_at = now()+7d` |
-| `run_clinic_lifecycle_transitions()` | service_role: trial/unpaid → readonly; grace expired → `pending_delete` |
-| `hard_delete_clinic(id)` | service_role: storage + clinic cascade + auth users |
+| `run_clinic_lifecycle_transitions()` | service_role: trial/unpaid → readonly; grace expired → `pending_delete`; **skips `is_demo`** |
+| `hard_delete_clinic(id)` | service_role: storage + clinic cascade + auth users; **refuses `is_demo`** |
+
+#### Marketing demo clinic (W8)
+
+- `clinics.is_demo = true` + `status = readonly` (writes blocked by existing RLS/`clinic_is_writable`)
+- Seed: `npx tsx scripts/seed-demo-clinic.ts` → doctor user (`DEMO_CLINIC_EMAIL` / `DEMO_CLINIC_PASSWORD`)
+- App: `openDemoClinicAction` signs visitor in; `ClinicReadonlyBanner` shows demo CTA → `/signup`
+- Exempt from conversion identify in PostHog (`ClinicTelemetry` `skipIdentify`)
 | Cron | `GET /api/cron/clinic-lifecycle` (Bearer `CRON_SECRET`); Vercel daily 03:00 |
 
 App: banner in dashboard shell; close account on `/settings/privacy`.
@@ -515,6 +544,7 @@ Location create must call `assertCanCreateLocation`; image upload must call `ass
 | `phase3d_consent_draw_sign` | `consent_forms` / `consent_signatures` + RLS + seed (D20) |
 | `phase3d_consent_hooks` | clinic create seed + GDPR erase consents |
 | `phase3e_inventory_basic` | `inventory_items` + RLS + `can_access/write_inventory` (§6.12) |
+| `marketing_demo_clinic` | `clinics.is_demo` + lifecycle/hard_delete skip (W8) |
 
 ---
 
@@ -548,3 +578,5 @@ Location create must call `assertCanCreateLocation`; image upload must call `ass
 | 2026-07-14 | Faza 3C: clinic lifecycle (D6/D45) — grace columns, writable RLS, closure + cron hard delete |
 | 2026-07-14 | Faza 3D: consent_forms / consent_signatures + draw-sign (D20); GDPR + clinic create hooks |
 | 2026-07-14 | Faza 3E: inventory_items + low-stock inventar basic (§6.12 / item 25) |
+| 2026-07-14 | Marketing `leads` (W13): platform tabela, RLS deny-all, service_role only |
+| 2026-07-14 | Marketing demo clinic (W8): `clinics.is_demo`, lifecycle/hard_delete skip, seed script |
