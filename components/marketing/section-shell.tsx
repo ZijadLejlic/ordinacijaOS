@@ -50,10 +50,11 @@ export function SectionShell({
             {eyebrow ? (
               <p
                 className={cn(
-                  "text-[13px] font-medium uppercase tracking-[0.08em]",
+                  // deep (not accent) — 13px caps need ≥4.5:1 on wash/mist (a11y)
+                  "text-[13px] font-semibold uppercase tracking-[0.08em]",
                   isNavy
                     ? "text-[var(--marketing-cyan)]"
-                    : "text-[var(--marketing-accent)]",
+                    : "text-[var(--marketing-deep)]",
                 )}
               >
                 {eyebrow}

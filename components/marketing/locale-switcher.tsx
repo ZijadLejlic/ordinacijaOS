@@ -49,7 +49,7 @@ export function LocaleSwitcher({
               }
             }}
             className={cn(
-              "rounded-md px-2 py-1 uppercase transition-colors",
+              "inline-flex min-h-9 min-w-9 items-center justify-center rounded-md px-2.5 uppercase transition-colors",
               active
                 ? tone === "dark"
                   ? "bg-white/15 text-white"

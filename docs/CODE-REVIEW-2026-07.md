@@ -13,6 +13,24 @@
 
 ---
 
+## Status (2026-07-21) — ne čitati A/B kao trenutni backlog
+
+Faze 1–3 su implementirane. Većina A/B stavki ispod je **zatvorena** migracijama / kodom:
+
+| Item | Status |
+|---|---|
+| **A1** profiles self-role lock | ✅ `code_review_a1_profiles_self_update_lock` |
+| **A2** plan limit DB triggers | ✅ `code_review_a2_plan_limit_enforcement` |
+| **A4** tenant isolation tests + CI | ✅ Vitest + Playwright + workflows |
+| **B2** login lockout | ✅ implementirano |
+| **B3** `EMAIL_FROM` silent fallback | ✅ produkcija baca grešku ako nedostaje |
+| **B4/B5** RLS perf + JWT hook funkcija | ✅ u DB; **hook enable u dashboardu još ručno** |
+| **B1** Leaked Password Protection | ❌ još OFF (advisor WARN) — vidi `docs/Production-Ops.md` |
+
+Preostali ops (MX inbox, Vercel env, Supabase toggles): **`docs/Production-Ops.md`**.
+
+---
+
 ## A) KRITIČNI PROBLEMI (moraš popraviti prije produkcije)
 
 ### A1. Privilege escalation — korisnik može sam sebe promovisati u `owner`

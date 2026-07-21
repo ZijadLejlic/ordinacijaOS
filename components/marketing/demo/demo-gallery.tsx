@@ -1,19 +1,23 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { X } from "lucide-react";
 import { BrowserFrame } from "@/components/marketing/browser-frame";
+import { MarketingShot } from "@/components/marketing/marketing-shot";
 import { Reveal } from "@/components/marketing/reveal";
 import { SectionShell } from "@/components/marketing/section-shell";
-import { TourPreview } from "@/components/marketing/tour/tour-preview";
 import {
   DEMO_GALLERY_KEYS,
   type DemoGalleryKey,
-  type TourPreviewKind,
 } from "@/lib/marketing/tour";
+import {
+  marketingShotSrc,
+  type MarketingShotId,
+} from "@/lib/marketing/screenshots";
 
-const GALLERY_PREVIEW: Record<DemoGalleryKey, TourPreviewKind> = {
+const GALLERY_SHOT: Record<DemoGalleryKey, MarketingShotId> = {
   dashboard: "dashboard",
   patients: "patients",
   odontogram: "odontogram",
@@ -42,17 +46,12 @@ export function DemoGallery() {
               <button
                 type="button"
                 onClick={() => setOpen(key)}
-                className="group w-full text-left transition-transform duration-150 hover:-translate-y-[3px]"
+                className="group w-full text-left transition-transform duration-150 hover:-translate-y-[3px] motion-reduce:hover:translate-y-0"
               >
                 <BrowserFrame url={t("browserUrl")} className="w-full">
-                  <TourPreview
-                    kind={GALLERY_PREVIEW[key]}
-                    title={t(`gallery.items.${key}.title`)}
-                    rows={[
-                      t(`gallery.items.${key}.row1`),
-                      t(`gallery.items.${key}.row2`),
-                      t(`gallery.items.${key}.row3`),
-                    ]}
+                  <MarketingShot
+                    id={GALLERY_SHOT[key]}
+                    alt={t(`gallery.items.${key}.title`)}
                   />
                 </BrowserFrame>
                 <p className="mt-3 font-medium text-[var(--marketing-ink)]">
@@ -64,6 +63,29 @@ export function DemoGallery() {
               </button>
             </Reveal>
           ))}
+        </div>
+
+        <div className="mt-14 grid items-end justify-items-center gap-8 sm:grid-cols-2">
+          <figure className="w-full max-w-[280px]">
+            <MarketingShot
+              id="mobile-calendar"
+              alt={t("gallery.mobile.calendarAlt")}
+              phone
+            />
+            <figcaption className="mt-3 text-center text-sm text-[color-mix(in_oklab,var(--marketing-ink)_65%,transparent)]">
+              {t("gallery.mobile.calendar")}
+            </figcaption>
+          </figure>
+          <figure className="w-full max-w-[280px]">
+            <MarketingShot
+              id="mobile-chart"
+              alt={t("gallery.mobile.chartAlt")}
+              phone
+            />
+            <figcaption className="mt-3 text-center text-sm text-[color-mix(in_oklab,var(--marketing-ink)_65%,transparent)]">
+              {t("gallery.mobile.chart")}
+            </figcaption>
+          </figure>
         </div>
       </SectionShell>
 
@@ -91,15 +113,13 @@ export function DemoGallery() {
               <X className="size-5" strokeWidth={2} />
             </button>
             <BrowserFrame url={t("browserUrl")}>
-              <TourPreview
-                kind={GALLERY_PREVIEW[open]}
-                title={t(`gallery.items.${open}.title`)}
-                rows={[
-                  t(`gallery.items.${open}.row1`),
-                  t(`gallery.items.${open}.row2`),
-                  t(`gallery.items.${open}.row3`),
-                ]}
-                annotations={2}
+              <Image
+                src={marketingShotSrc(GALLERY_SHOT[open])}
+                alt={t(`gallery.items.${open}.title`)}
+                width={1200}
+                height={720}
+                className="h-auto w-full"
+                sizes="(max-width: 768px) 100vw, 768px"
               />
             </BrowserFrame>
             <p className="mt-3 text-center text-sm text-white/90">

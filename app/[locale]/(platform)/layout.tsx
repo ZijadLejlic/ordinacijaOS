@@ -1,4 +1,5 @@
-import { setRequestLocale } from "next-intl/server";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages, setRequestLocale } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isPlatformAdmin } from "@/lib/platform/admin";
@@ -11,6 +12,7 @@ type Props = {
 export default async function PlatformLayout({ children, params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const messages = await getMessages();
 
   const supabase = await createClient();
   const {
@@ -25,6 +27,8 @@ export default async function PlatformLayout({ children, params }: Props) {
   }
 
   return (
-    <div className="bg-muted/30 flex min-h-full flex-1 flex-col">{children}</div>
+    <NextIntlClientProvider messages={messages}>
+      <div className="bg-muted/30 flex min-h-full flex-1 flex-col">{children}</div>
+    </NextIntlClientProvider>
   );
 }

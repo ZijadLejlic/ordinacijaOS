@@ -8,7 +8,9 @@ const LOCALE_HEADER = "X-NEXT-INTL-LOCALE";
  * absolute rewrite host (often `localhost`) ≠ server bind host (`0.0.0.0` /
  * `127.0.0.1`). Rebuild the rewrite using the request `Host` header so the
  * rewrite origin matches what the production server compares against.
- * @see https://github.com/vercel/next.js/issues/94342
+ *
+ * Prefer running the Node server with `HOSTNAME=localhost` (see `npm start`)
+ * so next-intl rewrites stay internal. @see https://github.com/vercel/next.js/issues/94342
  */
 export function repairI18nRewrite(
   request: NextRequest,
@@ -17,6 +19,12 @@ export function repairI18nRewrite(
 ): NextResponse {
   const rewriteHeader = response.headers.get("x-middleware-rewrite");
   if (!rewriteHeader) return response;
+
+  // Already a relative internal rewrite — do not pass through NextResponse.rewrite
+  // (relative destinations throw: "URL is malformed").
+  if (rewriteHeader.startsWith("/")) {
+    return response;
+  }
 
   let rewriteUrl: URL;
   try {

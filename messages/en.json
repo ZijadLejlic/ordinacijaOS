@@ -111,6 +111,7 @@
         "ctaSecondary": "See how it works",
         "microcopy": "Free until Dec 31, 2026 · No card · Set up in 5 minutes",
         "browserUrl": "app.dentord.com",
+        "screenshotAlt": "DentOrd dashboard preview with KPI cards and today's appointments",
         "mock": {
           "kpiPatients": "Patients today",
           "kpiRevenue": "Revenue (today)",
@@ -1054,6 +1055,12 @@
             "row2": "Doctor",
             "row3": "Reception"
           }
+        },
+        "mobile": {
+          "calendar": "Mobile calendar",
+          "calendarAlt": "DentOrd calendar on phone — today's appointments",
+          "chart": "Mobile chart",
+          "chartAlt": "DentOrd patient chart on phone"
         }
       }
     },

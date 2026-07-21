@@ -117,50 +117,21 @@
   transform: translateY(0);
 }
 
-.marketing-hero-copy > * {
-  animation: marketing-hero-in 0.55s ease-out both;
-}
-
-.marketing-hero-copy > *:nth-child(1) {
-  animation-delay: 0.05s;
-}
-.marketing-hero-copy > *:nth-child(2) {
-  animation-delay: 0.14s;
-}
-.marketing-hero-copy > *:nth-child(3) {
-  animation-delay: 0.22s;
-}
-.marketing-hero-copy > *:nth-child(4) {
-  animation-delay: 0.3s;
-}
-.marketing-hero-copy > *:nth-child(5) {
-  animation-delay: 0.38s;
-}
-
-.marketing-hero-visual {
-  animation: marketing-hero-in 0.65s ease-out 0.28s both;
-}
-
-@keyframes marketing-hero-in {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
+/*
+ * Hero LCP is the H1 on mobile — do not animate hero copy or the visual.
+ * Scroll reveals (`.marketing-reveal`) cover below-fold motion instead.
+ */
 @media (prefers-reduced-motion: reduce) {
   .marketing-reveal,
-  .marketing-reveal--visible,
-  .marketing-hero-copy > *,
-  .marketing-hero-visual {
+  .marketing-reveal--visible {
     opacity: 1;
     transform: none;
     animation: none;
     transition: none;
+  }
+
+  .marketing-shell * {
+    scroll-behavior: auto !important;
   }
 }
 

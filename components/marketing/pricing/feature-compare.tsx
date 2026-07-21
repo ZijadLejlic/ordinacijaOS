@@ -59,7 +59,7 @@ function PlanFeatureList({
             <span
               className={cn(
                 value === "no"
-                  ? "text-[color-mix(in_oklab,var(--marketing-ink)_45%,transparent)]"
+                  ? "text-[color-mix(in_oklab,var(--marketing-ink)_68%,transparent)]"
                   : "text-[var(--marketing-ink)]",
               )}
             >

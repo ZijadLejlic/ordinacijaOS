@@ -27,12 +27,29 @@ export function Reveal({ children, className, delayMs = 0 }: RevealProps) {
     () => false,
   );
   const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
+  // Start visible for SSR / first paint; only animate if still below fold after mount.
+  const [visible, setVisible] = useState(true);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (reduceMotion) return;
+    if (reduceMotion) {
+      setReady(true);
+      return;
+    }
     const node = ref.current;
     if (!node) return;
+
+    const rect = node.getBoundingClientRect();
+    const inView =
+      rect.top < window.innerHeight * 0.9 && rect.bottom > 0;
+    if (inView) {
+      setVisible(true);
+      setReady(true);
+      return;
+    }
+
+    setVisible(false);
+    setReady(true);
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -47,13 +64,14 @@ export function Reveal({ children, className, delayMs = 0 }: RevealProps) {
     return () => observer.disconnect();
   }, [reduceMotion]);
 
-  const show = reduceMotion || visible;
+  const show = reduceMotion || !ready || visible;
 
   return (
     <div
       ref={ref}
       className={cn(
-        "marketing-reveal",
+        // Only apply opacity:0 after mount when we know the node is below the fold.
+        ready && !reduceMotion && "marketing-reveal",
         show && "marketing-reveal--visible",
         className,
       )}

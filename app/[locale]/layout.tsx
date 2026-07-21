@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { CookieConsentBanner } from "@/components/analytics/cookie-consent-banner";
 import { PosthogProvider } from "@/components/analytics/posthog-provider";
 import { routing } from "@/i18n/routing";
+import { marketingMessages } from "@/lib/i18n/client-messages";
 
 type Props = {
   children: React.ReactNode;
@@ -24,8 +25,10 @@ export default async function LocaleLayout({ children, params }: Props) {
   setRequestLocale(locale);
   const messages = await getMessages();
 
+  // Default client catalog is Marketing-only (cookie banner + marketing pages).
+  // App / auth / platform layouts nest a fuller NextIntlClientProvider.
   return (
-    <NextIntlClientProvider messages={messages}>
+    <NextIntlClientProvider messages={marketingMessages(messages)}>
       <PosthogProvider>
         <div className="flex min-h-full flex-1 flex-col">{children}</div>
         <CookieConsentBanner />

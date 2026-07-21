@@ -62,7 +62,11 @@ export function MarketingHeader({ showBlogNav = false }: MarketingHeaderProps) {
           href="/"
           className="inline-flex shrink-0 items-center gap-2.5 text-[var(--marketing-ink)]"
         >
-          <BrandLogo variant="full" className="h-8 w-auto max-w-[9.5rem]" />
+          <BrandLogo
+            variant="full"
+            priority
+            className="h-8 w-auto max-w-[9.5rem]"
+          />
         </Link>
 
         <nav className="hidden flex-1 items-center justify-center gap-1 lg:flex">
@@ -70,7 +74,7 @@ export function MarketingHeader({ showBlogNav = false }: MarketingHeaderProps) {
             <Link
               key={item.href}
               href={item.href}
-              className="rounded-lg px-3 py-2 text-sm font-medium text-[color-mix(in_oklab,var(--marketing-ink)_72%,transparent)] transition-colors hover:bg-[var(--marketing-wash)] hover:text-[var(--marketing-ink)]"
+              className="inline-flex min-h-10 items-center rounded-lg px-3 py-2 text-sm font-medium text-[color-mix(in_oklab,var(--marketing-ink)_72%,transparent)] transition-colors hover:bg-[var(--marketing-wash)] hover:text-[var(--marketing-ink)]"
             >
               {t(item.labelKey)}
             </Link>

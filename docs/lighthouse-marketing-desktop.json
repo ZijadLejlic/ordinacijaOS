@@ -1,0 +1,21 @@
+{
+  "base": "http://localhost:3020",
+  "formFactor": "desktop",
+  "target": 95,
+  "generatedAt": "2026-07-21T20:53:41.233Z",
+  "results": [
+    {
+      "id": "home",
+      "performance": 99,
+      "accessibility": 100,
+      "seo": 100
+    },
+    {
+      "id": "pricing",
+      "performance": 100,
+      "accessibility": 100,
+      "seo": 100
+    }
+  ],
+  "pass": true
+}

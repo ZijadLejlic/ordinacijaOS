@@ -44,7 +44,7 @@ Zaključati **kako** gradimo DentOrd (stack, patterni, granice), da agent/develo
 | UI | shadcn/ui preset `base-nova` (`components.json`) |
 | Supabase clients | `@supabase/ssr` + `@supabase/supabase-js` u `lib/supabase/` |
 | Validacija | Zod |
-| Deploy target | TBD |
+| Deploy target | Vercel — `dentord.com` / `www.dentord.com` (ops: `docs/Production-Ops.md`) |
 | Auth (Faza 1) | Email/password signup+login; `create_clinic_for_owner` RPC; owner TOTP MFA (D11); staff invites D9 (`/settings/users`, `/invite/[token]`); PIN operators D10 (`/pin`, bcrypt via pgcrypto RPCs); Resend; plan limit hard-block via `lib/entitlements/` |
 | Entitlements (Faza 1) | `lib/entitlements/` — `getClinicEntitlements` / `assertFeature` from `plan_entitlements`; free-2026 override (SMS/AI/portal off); `assertCanInviteStaff`, `assertCanCreateLocation`, `assertCanAddPatientImage` |
 | Platform admin (Faza 1) | `(platform)/platform` — gate via `app_metadata.is_platform_admin` (never `user_metadata`); service-role clinic list/detail; plan + clinic/subscription status updates; owner impersonation with `audit_events` (D41) |
@@ -255,3 +255,4 @@ Prati PRD §11. Tech doc se širi po fazama; ne specifikovati Enterprise module 
 | 2026-07-14 | Marketing 2a: Home sections per Website-DentOrd §4.1 (hero→FAQ + FinalCta; testimonials gated W10) |
 | 2026-07-14 | Marketing core: FAQ + Kontakt; `leads` + Resend callback (W13) |
 | 2026-07-14 | Marketing Faza 4: Zašto DentOrd; Privacy/Terms/DPA; blog MDX skeleton; `/api/og`; sitemap/robots |
+| 2026-07-21 | Production ops checklist (`docs/Production-Ops.md`); `/api/health`; `npm run check:production-ops`; deploy target = Vercel |

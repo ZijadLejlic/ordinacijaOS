@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "HOSTNAME=${HOSTNAME:-localhost} next start",
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -13,7 +13,10 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:dev": "PLAYWRIGHT_WEB_SERVER=dev PLAYWRIGHT_REUSE_SERVER=1 playwright test",
-    "seed:demo": "npx tsx scripts/seed-demo-clinic.ts"
+    "seed:demo": "npx tsx scripts/seed-demo-clinic.ts",
+    "generate:marketing-shots": "node scripts/generate-marketing-screenshots.mjs",
+    "lighthouse:marketing": "node scripts/lighthouse-marketing.mjs",
+    "check:production-ops": "node scripts/check-production-ops.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

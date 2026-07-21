@@ -4,9 +4,10 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useTranslations } from "next-intl";
 import { Check } from "lucide-react";
 import { BrowserFrame } from "@/components/marketing/browser-frame";
-import { TourPreview } from "@/components/marketing/tour/tour-preview";
+import { MarketingShot } from "@/components/marketing/marketing-shot";
 import { trackEvent } from "@/lib/analytics/posthog";
 import { TOUR_CHAPTERS, type TourChapterId } from "@/lib/marketing/tour";
+import { TOUR_PREVIEW_TO_SHOT } from "@/lib/marketing/screenshots";
 import { cn } from "@/lib/utils";
 
 function subscribeReducedMotion(onChange: () => void) {
@@ -81,18 +82,6 @@ export function TourExperience() {
 
   const activeStep =
     FLAT_STEPS.find((s) => s.stepId === activeStepId) ?? FLAT_STEPS[0]!;
-
-  function previewRowsFor(kind: FlatStep["preview"]) {
-    const rows: string[] = [];
-    for (const n of [1, 2, 3, 4] as const) {
-      const key = `previews.${kind}.row${n}` as Parameters<typeof t>[0];
-      const value = t.has(key) ? t(key) : null;
-      if (value) rows.push(value);
-    }
-    return rows;
-  }
-
-  const previewRows = previewRowsFor(activeStep.preview);
 
   return (
     <div className="mx-auto w-full max-w-[1200px] px-6 md:px-8">
@@ -205,11 +194,9 @@ export function TourExperience() {
                         {/* Mobile preview (linear) */}
                         <div className="mt-6 lg:hidden">
                           <BrowserFrame url={t("browserUrl")}>
-                            <TourPreview
-                              kind={step.preview}
-                              title={t(`previews.${step.preview}.title`)}
-                              rows={previewRowsFor(step.preview)}
-                              annotations={step.annotations}
+                            <MarketingShot
+                              id={TOUR_PREVIEW_TO_SHOT[step.preview]}
+                              alt={t(`previews.${step.preview}.title`)}
                             />
                           </BrowserFrame>
                         </div>
@@ -232,11 +219,10 @@ export function TourExperience() {
                 )}
                 key={activeStep.stepId}
               >
-                <TourPreview
-                  kind={activeStep.preview}
-                  title={t(`previews.${activeStep.preview}.title`)}
-                  rows={previewRows}
-                  annotations={activeStep.annotations}
+                <MarketingShot
+                  id={TOUR_PREVIEW_TO_SHOT[activeStep.preview]}
+                  alt={t(`previews.${activeStep.preview}.title`)}
+                  priority={activeStep.stepId === FLAT_STEPS[0]!.stepId}
                 />
               </div>
             </BrowserFrame>

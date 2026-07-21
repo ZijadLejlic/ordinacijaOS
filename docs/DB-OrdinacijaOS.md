@@ -36,7 +36,7 @@ Helpers (SECURITY DEFINER, `search_path = public`, execute samo `authenticated`)
 - `owner_mfa_ok()` — D11: owner s verified MFA mora `aal2` (RLS restrictive)
 - `create_clinic_for_owner(name, full_name, trial_ends_at?)` — signup: clinic + owner + default location + trial subscription (Professional); seeds `settings_json.onboarding` incomplete (Faza 2I). Idempotent: if profile already exists, returns existing `clinic_id` (needed because owners at aal1 cannot SELECT `profiles` under restrictive `owner_mfa_ok` RLS)
 
-**JWT hook (B5):** `custom_access_token_hook` upisuje `clinic_id` + `app_role` u `app_metadata` pri izdavanju tokena. Funkcija je u bazi; **mora se ručno uključiti** u dashboardu: Authentication → Hooks → Custom Access Token → `public.custom_access_token_hook`. Bez toga helperi i dalje rade preko `profiles` fallbacka.
+**JWT hook (B5):** `custom_access_token_hook` upisuje `clinic_id` + `app_role` u `app_metadata` pri izdavanju tokena. Funkcija je u bazi; **mora se ručno uključiti** u dashboardu: Authentication → Hooks → Custom Access Token → `public.custom_access_token_hook`. Bez toga helperi i dalje rade preko `profiles` fallbacka. Ops checklist: `docs/Production-Ops.md` §1.3.
 
 Clinic-scoped policies koriste `clinic_id = (select current_clinic_id())`. Owner write politike su odvojene po `INSERT`/`UPDATE`/`DELETE` (ne `ALL`) da izbjegnu dupli permissive SELECT. `profiles` zadržava dvije UPDATE politike (self + owner). Self `with_check` je pojednostavljen — `role`/`is_active`/`clinic_id` immutability ide kroz `profiles_guard_sensitive_columns` trigger (izbjegava RLS rekurziju).
 
@@ -560,6 +560,7 @@ Location create must call `assertCanCreateLocation`; image upload must call `ass
 | 2026-07-13 | Documented app-layer entitlement helpers (no new migration) |
 | 2026-07-13 | CODE-REVIEW A1/A2: profiles self-update lock, DB plan limit triggers, tenant-isolation test suite |
 | 2026-07-13 | CODE-REVIEW B2/B4/B5: login lockout, RLS performance pass, JWT custom claims hook (dashboard enable pending) |
+| 2026-07-21 | Production ops doc + health/cron probes; JWT hook enable + leaked-password + MX još ručni koraci |
 | 2026-07-13 | D41 platform admin skeleton (app-layer; no new table — flag in `app_metadata`) |
 | 2026-07-13 | Faza 2A clinical core: patients/services/odontogram tables + Patients UI docs |
 | 2026-07-13 | Faza 2A: Services UI documented — owner write via `can_write_services`; D16 location optional |

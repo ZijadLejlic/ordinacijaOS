@@ -7,6 +7,8 @@ import { defineRouting } from "next-intl/routing";
  *
  * Note: `localePrefix: "as-needed"` (§3.1 unprefixed BS) is blocked by a
  * Next.js 16.2.6+ middleware rewrite→307 bug (vercel/next.js#94342).
+ * Production `npm start` sets `HOSTNAME=localhost` so localized BS slugs
+ * (`/bs/cijene` → `/bs/pricing`) stay internal rewrites.
  */
 export const routing = defineRouting({
   locales: ["bs", "en"],

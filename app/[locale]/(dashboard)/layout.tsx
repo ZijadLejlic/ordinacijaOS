@@ -1,4 +1,5 @@
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { AppShell } from "@/components/dashboard/app-shell";
 import { ClinicReadonlyBanner } from "@/components/clinic/readonly-banner";
@@ -32,6 +33,7 @@ type Props = {
 export default async function DashboardLayout({ children, params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const messages = await getMessages();
   const t = await getTranslations("Nav");
 
   const supabase = await createClient();
@@ -133,32 +135,34 @@ export default async function DashboardLayout({ children, params }: Props) {
   }
 
   return (
-    <div className="flex min-h-full flex-1 flex-col">
-      <ImpersonationBanner />
-      {clinic ? (
-        <ClinicReadonlyBanner
-          status={clinic.status}
-          graceEndsAt={clinic.grace_ends_at}
+    <NextIntlClientProvider messages={messages}>
+      <div className="flex min-h-full flex-1 flex-col">
+        <ImpersonationBanner />
+        {clinic ? (
+          <ClinicReadonlyBanner
+            status={clinic.status}
+            graceEndsAt={clinic.grace_ends_at}
+            isOwner={profile!.role === "owner"}
+            isDemo={clinic.is_demo}
+          />
+        ) : null}
+        <AppShell
+          clinicName={clinic?.name ?? t("clinicFallback")}
+          role={profile!.role}
+          fullName={profile!.full_name}
+          operatorName={operatorName}
           isOwner={profile!.role === "owner"}
-          isDemo={clinic.is_demo}
-        />
-      ) : null}
-      <AppShell
-        clinicName={clinic?.name ?? t("clinicFallback")}
-        role={profile!.role}
-        fullName={profile!.full_name}
-        operatorName={operatorName}
-        isOwner={profile!.role === "owner"}
-        showExpenses={showExpenses}
-        showInventory={showInventory}
-        inventoryLowCount={inventoryLowCount}
-        showCrm={showCrm}
-        crmOpenCount={crmOpenCount}
-        showConsent={showConsent}
-        branding={shellBranding}
-      >
-        {children}
-      </AppShell>
-    </div>
+          showExpenses={showExpenses}
+          showInventory={showInventory}
+          inventoryLowCount={inventoryLowCount}
+          showCrm={showCrm}
+          crmOpenCount={crmOpenCount}
+          showConsent={showConsent}
+          branding={shellBranding}
+        >
+          {children}
+        </AppShell>
+      </div>
+    </NextIntlClientProvider>
   );
 }

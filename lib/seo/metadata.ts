@@ -17,10 +17,16 @@ export type MarketingMetadataInput = {
   params?: Record<string, string>;
 };
 
+/** Production canonical host; override with NEXT_PUBLIC_SITE_URL for local audits. */
+function siteOrigin() {
+  const fromEnv = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
+  return fromEnv && fromEnv.length > 0 ? fromEnv : PRODUCT_URL;
+}
+
 function absoluteUrl(path: string) {
   if (path.startsWith("http://") || path.startsWith("https://")) return path;
   const normalized = path.startsWith("/") ? path : `/${path}`;
-  return `${PRODUCT_URL}${normalized}`;
+  return `${siteOrigin()}${normalized}`;
 }
 
 function localizedPath(
@@ -73,7 +79,7 @@ export function buildMarketingMetadata(
   return {
     title: { absolute: input.title },
     description: input.description,
-    metadataBase: new URL(PRODUCT_URL),
+    metadataBase: new URL(siteOrigin()),
     alternates: {
       canonical,
       languages,

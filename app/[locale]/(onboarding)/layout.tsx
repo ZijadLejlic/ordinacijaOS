@@ -1,4 +1,5 @@
-import { setRequestLocale } from "next-intl/server";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages, setRequestLocale } from "next-intl/server";
 
 type Props = {
   children: React.ReactNode;
@@ -9,9 +10,13 @@ type Props = {
 export default async function OnboardingLayout({ children, params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const messages = await getMessages();
+
   return (
-    <div className="bg-background flex min-h-full flex-1 flex-col">
-      {children}
-    </div>
+    <NextIntlClientProvider messages={messages}>
+      <div className="bg-background flex min-h-full flex-1 flex-col">
+        {children}
+      </div>
+    </NextIntlClientProvider>
   );
 }

@@ -54,7 +54,7 @@ export async function PricingGrid() {
                     ? t("from", { amount: 60 })
                     : t("perMonth", { amount: plan.priceMonthly })}
                 </p>
-                <p className="mt-1 text-xs text-[color-mix(in_oklab,var(--marketing-ink)_50%,transparent)]">
+                <p className="mt-1 text-xs text-[color-mix(in_oklab,var(--marketing-ink)_72%,transparent)]">
                   {t("vat")}
                 </p>
 

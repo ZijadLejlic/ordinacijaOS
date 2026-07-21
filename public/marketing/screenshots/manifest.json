@@ -1,0 +1,27 @@
+{
+  "generatedAt": "2026-07-21T20:20:31.262Z",
+  "shots": [
+    "signup",
+    "onboarding-1",
+    "onboarding-2",
+    "onboarding-3",
+    "patients",
+    "chart",
+    "odontogram",
+    "plan",
+    "calendar",
+    "appointment-modal",
+    "waitlist",
+    "invoice",
+    "payments",
+    "reports",
+    "dashboard",
+    "crm",
+    "inventory",
+    "settings",
+    "reminder",
+    "mobile-calendar",
+    "mobile-chart"
+  ],
+  "note": "Content panels for BrowserFrame; phone shots include device chrome."
+}

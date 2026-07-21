@@ -111,6 +111,7 @@
         "ctaSecondary": "Pogledajte kako radi",
         "microcopy": "Besplatno do 31.12.2026 · Bez kartice · Postavka za 5 minuta",
         "browserUrl": "app.dentord.com",
+        "screenshotAlt": "Pregled DentOrd dashboarda s KPI karticama i današnjim terminima",
         "mock": {
           "kpiPatients": "Pacijenti danas",
           "kpiRevenue": "Prihod (danas)",
@@ -1054,6 +1055,12 @@
             "row2": "Doktor",
             "row3": "Recepcija"
           }
+        },
+        "mobile": {
+          "calendar": "Mobilni kalendar",
+          "calendarAlt": "DentOrd kalendar na telefonu — današnji termini",
+          "chart": "Mobilni karton",
+          "chartAlt": "DentOrd karton pacijenta na telefonu"
         }
       }
     },

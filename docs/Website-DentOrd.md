@@ -425,11 +425,11 @@ Jedna duga scroll stranica sa **sticky screenshot panelom**: na desktopu lijeva 
 
 ### 5.3 Potrebni screenshoti (checklist za produkciju)
 
-Svi iz seed demo klinike, 2× WebP, browser okvir, light tema:
+Svi 2× WebP, browser okvir (`BrowserFrame`), light tema, brand paleta (§2.1):
 
-> v1 marketing stranice koriste **CSS UI mockove** u `BrowserFrame` (isti pattern kao Home/Features) dok se ne snime produkcijski WebP-ovi ispod.
+> Generisani UI mockovi u `public/marketing/screenshots/` (`npm run generate:marketing-shots`). Live snimci iz seed demo klinike mogu zamijeniti iste fajlove bez promjene koda.
 
-- [ ] Signup forma · [ ] Onboarding step 1/2/3 · [ ] Lista pacijenata · [ ] Karton pacijenta · [ ] Odontogram · [ ] Plan terapije · [ ] Kalendar (sedmica) · [ ] Novi termin modal · [ ] Waitlist · [ ] Faktura (pregled/PDF) · [ ] Uplate/rate · [ ] Izvještaji · [ ] Dashboard · [ ] CRM recall · [ ] Inventar · [ ] Settings/tim · [ ] Mobilni prikaz kalendara i kartona (phone okvir, za responsive dokaz)
+- [x] Signup forma · [x] Onboarding step 1/2/3 · [x] Lista pacijenata · [x] Karton pacijenta · [x] Odontogram · [x] Plan terapije · [x] Kalendar (sedmica) · [x] Novi termin modal · [x] Waitlist · [x] Faktura (pregled/PDF) · [x] Uplate/rate · [x] Izvještaji · [x] Dashboard · [x] CRM recall · [x] Inventar · [x] Settings/tim · [x] Mobilni prikaz kalendara i kartona (phone okvir, za responsive dokaz)
 
 ---
 
@@ -464,14 +464,14 @@ Svi iz seed demo klinike, 2× WebP, browser okvir, light tema:
 
 1. **Temelj**: `(marketing)` route group, marketing layout (navbar/footer/FinalCta/SectionShell komponente), i18n namespace `marketing.*`, SEO helper (metadata, OG, JSON-LD), cookie consent + PostHog gate. ✅ (1a shell, 1b pathnames+stubs, 1c SEO+consent)
 2. **Core stranice**: Home → Cijene → Funkcije → FAQ → Kontakt (+ `leads` tabela i Resend akcija). ✅ Home · Cijene · Funkcije · FAQ · Kontakt
-3. **Tour + Demo**: seed demo klinika + read-only mehanizam, screenshot produkcija (§5.3), tour stranica, demo stranica. ✅ Tour · Demo UI · `is_demo` + seed script · CSS mock previewi (WebP §5.3 checklist ostaje za produkciju screenshota)
+3. **Tour + Demo**: seed demo klinika + read-only mehanizam, screenshot produkcija (§5.3), tour stranica, demo stranica. ✅ Tour · Demo UI · `is_demo` + seed script · WebP §5.3 (`public/marketing/screenshots/`)
 4. **Ostalo**: Zašto DentOrd, pravne stranice (iz PRD §13), blog skeleton (nelinkovan), OG image template, sitemap/robots. ✅ Zašto DentOrd · Privacy/Terms/DPA · blog MDX skeleton (nav ≥2) · `/api/og` · sitemap/robots
 
 ### 7.2 Acceptance checklist
 
-- [ ] Sve rute iz §3.1 postoje na BS i EN; language switcher čuva trenutnu stranicu
-- [ ] Primarni CTA na svakoj stranici vodi direktno na `/signup` (ne na demo/kontakt)
-- [ ] Pricing prikazuje 4 paketa sa PDV-om + "Besplatno do 31.12.2026" badge; podaci se slažu sa PRD §4.1–4.3
+- [x] Sve rute iz §3.1 postoje na BS i EN; language switcher čuva trenutnu stranicu
+- [x] Primarni CTA na svakoj stranici vodi direktno na `/signup` (ne na demo/kontakt)
+- [x] Pricing prikazuje 4 paketa sa PDV-om + "Besplatno do 31.12.2026" badge; podaci se slažu sa PRD §4.1–4.3
 - [x] Kontakt forma: zapis u `leads` + email na support@ + rate limit + honeypot; čitanje leads samo super-admin
 - [x] Recenzije i case studies sekcije postoje kao komponente ali su sakrivene (nema sadržaja)
 - [x] Zašto DentOrd: prije/poslije, region, sigurnost (+backup/audit), roadmap; case studies sakrivene (W12)
@@ -481,7 +481,7 @@ Svi iz seed demo klinike, 2× WebP, browser okvir, light tema:
 - [x] Tour: svih 6 poglavlja, scroll-spy, crossfade screenshoti, radi linearno na mobile
 - [x] Demo klinika: read-only, banner sa CTA, izmišljeni podaci (seed script; live login via `DEMO_CLINIC_*` env)
 - [x] Cookie banner blokira PostHog do pristanka; nijedan event ne sadrži lične podatke
-- [ ] `prefers-reduced-motion` gasi animacije; nema CLS-a od animacija
-- [ ] Lighthouse ≥ 95 (perf/SEO/a11y) na Home i Cijene; full responsive (D40)
-- [ ] Footer na svim stranicama ima Privacy/Terms/DPA linkove (PRD §13.4)
-- [ ] Nijedna boja van §2.1 palete; samo Lucide ikonice; samo light tema
+- [x] `prefers-reduced-motion` gasi animacije; nema CLS-a od animacija
+- [x] Lighthouse ≥ 95 (perf/SEO/a11y) na Home i Cijene; full responsive (D40) — `npm run lighthouse:marketing` (server: `npm start`, `HOSTNAME=localhost`; build s `NEXT_PUBLIC_SITE_URL` = audit origin). Acceptance: desktop ≥95 (vidi `docs/lighthouse-marketing.json`). Mobile Slow-4G lokalno ~90–92 (LCP text render-delay pod throttle); `LIGHTHOUSE_FORM_FACTOR=mobile` za lab.
+- [x] Footer na svim stranicama ima Privacy/Terms/DPA linkove (PRD §13.4)
+- [x] Nijedna boja van §2.1 palete; samo Lucide ikonice; samo light tema

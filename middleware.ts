@@ -1,7 +1,6 @@
 import createMiddleware from "next-intl/middleware";
 import { type NextRequest, NextResponse } from "next/server";
 import { publicLocalePath } from "@/i18n/path";
-import { repairI18nRewrite } from "@/i18n/repair-rewrite";
 import { routing } from "@/i18n/routing";
 import { mfaPath, resolveOwnerMfaGate } from "@/lib/auth/mfa";
 import { resolveOnboardingGate } from "@/lib/onboarding/gate";
@@ -20,6 +19,10 @@ const handleI18n = createMiddleware(routing);
 /**
  * Strip locale prefix and map localized marketing slugs → internal pathnames
  * so auth gates match filesystem routes (`/cijene` → `/pricing`).
+ *
+ * Pathname rewrites (next-intl) require `HOSTNAME=localhost` on `next start`
+ * so they stay internal under Next.js 16.2.6+ (vercel/next.js#94342).
+ * See `npm start` / `package.json`.
  */
 function stripLocale(pathname: string) {
   const segments = pathname.split("/");
@@ -92,7 +95,9 @@ export async function middleware(request: NextRequest) {
   const session = await updateSession(request, i18nResponse);
   const user = session.user;
   const supabase = session.supabase;
-  let response = repairI18nRewrite(request, session.response, locale);
+  // Keep next-intl rewrite as-is. Pair with `HOSTNAME=localhost` on `npm start`
+  // so pathname rewrites stay internal (Next.js #94342).
+  let response = session.response;
 
   const isAuthPage = path === "/login" || path === "/signup";
   const isInvitePage = path === "/invite" || path.startsWith("/invite/");

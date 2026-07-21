@@ -25,6 +25,7 @@ export function BrandLogo({
         height={40}
         className={cn("h-8 w-8 object-contain", className)}
         priority={priority}
+        fetchPriority={priority ? "high" : "auto"}
       />
     );
   }
@@ -35,8 +36,11 @@ export function BrandLogo({
       alt={alt}
       width={480}
       height={324}
-      className={cn("h-auto w-full object-contain", className)}
+      className={cn("h-8 w-auto object-contain", className)}
       priority={priority}
+      fetchPriority={priority ? "high" : "auto"}
+      sizes="152px"
+      unoptimized
     />
   );
 }

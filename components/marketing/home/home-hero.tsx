@@ -24,15 +24,15 @@ export async function HomeHero() {
       />
 
       <div className="mx-auto grid w-full max-w-[1200px] gap-10 px-6 pb-12 pt-8 md:gap-12 md:px-8 md:pb-16 md:pt-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:items-center lg:gap-14 lg:pb-20">
-        <div className="marketing-hero-copy">
+        <div className="min-w-0">
           <p className="inline-flex max-w-full items-center gap-2 rounded-full bg-[var(--marketing-mist)] px-3.5 py-1.5 text-[13px] font-medium text-[var(--marketing-deep)]">
             <SparklesIcon className="size-3.5 shrink-0 text-[var(--marketing-accent)]" />
             <span className="truncate">{t("badge")}</span>
           </p>
-          <h1 className="mt-6 max-w-xl font-[family-name:var(--font-marketing-display)] text-[2.25rem] leading-[1.1] font-semibold tracking-[-0.02em] text-[var(--marketing-ink)] md:text-[3.5rem] md:leading-[1.08]">
+          <h1 className="mt-6 max-w-xl text-[2.75rem] leading-[1.08] font-semibold tracking-[-0.02em] text-[var(--marketing-ink)] md:font-[family-name:var(--font-marketing-display)] md:text-[3.5rem]">
             {t("headline")}
           </h1>
-          <p className="mt-5 max-w-[36rem] text-lg leading-[1.6] text-[color-mix(in_oklab,var(--marketing-ink)_75%,transparent)] md:text-xl">
+          <p className="mt-5 max-w-[36rem] text-base leading-[1.55] text-[color-mix(in_oklab,var(--marketing-ink)_75%,transparent)] md:text-xl md:leading-[1.6]">
             {t("support")}
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
