@@ -55,6 +55,7 @@ export function RequestErasureButton({ patientId }: { patientId: string }) {
     <Button
       type="button"
       variant="destructive"
+      className="w-full sm:w-auto"
       disabled={pending}
       onClick={() => {
         if (!window.confirm(t("confirmRequest"))) return;
@@ -74,7 +75,7 @@ export function ExportPatientLink({ patientId }: { patientId: string }) {
   return (
     <a
       href={`/api/privacy/patients/${patientId}/export`}
-      className={cn(buttonVariants({ variant: "outline" }))}
+      className={cn(buttonVariants({ variant: "outline" }), "w-full sm:w-auto")}
       download
     >
       {t("exportJson")}

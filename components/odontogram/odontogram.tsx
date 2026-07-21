@@ -70,7 +70,7 @@ function ToothButton({
       type="button"
       onClick={() => onSelect(fdiNumber)}
       className={cn(
-        "flex size-9 flex-col items-center justify-center rounded-md border text-xs font-medium transition-colors",
+        "flex size-7 flex-col items-center justify-center rounded-md border text-[10px] font-medium transition-colors sm:size-9 sm:text-xs",
         TOOTH_STATUS_COLORS[status],
         selected ? "ring-2 ring-primary ring-offset-1" : "",
       )}
@@ -113,28 +113,30 @@ export function Odontogram({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col items-center gap-2 overflow-x-auto">
-        <div className="flex gap-1">
-          {FDI_LAYOUT.upperRow.map((fdi) => (
-            <ToothButton
-              key={fdi}
-              fdiNumber={fdi}
-              status={statusOf(fdi)}
-              selected={selectedFdi === fdi}
-              onSelect={selectTooth}
-            />
-          ))}
-        </div>
-        <div className="flex gap-1">
-          {FDI_LAYOUT.lowerRow.map((fdi) => (
-            <ToothButton
-              key={fdi}
-              fdiNumber={fdi}
-              status={statusOf(fdi)}
-              selected={selectedFdi === fdi}
-              onSelect={selectTooth}
-            />
-          ))}
+      <div className="w-full max-w-full overflow-x-auto pb-1">
+        <div className="mx-auto flex w-max flex-col items-center gap-2">
+          <div className="flex gap-0.5 sm:gap-1">
+            {FDI_LAYOUT.upperRow.map((fdi) => (
+              <ToothButton
+                key={fdi}
+                fdiNumber={fdi}
+                status={statusOf(fdi)}
+                selected={selectedFdi === fdi}
+                onSelect={selectTooth}
+              />
+            ))}
+          </div>
+          <div className="flex gap-0.5 sm:gap-1">
+            {FDI_LAYOUT.lowerRow.map((fdi) => (
+              <ToothButton
+                key={fdi}
+                fdiNumber={fdi}
+                status={statusOf(fdi)}
+                selected={selectedFdi === fdi}
+                onSelect={selectTooth}
+              />
+            ))}
+          </div>
         </div>
       </div>
 

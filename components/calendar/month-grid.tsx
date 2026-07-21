@@ -38,14 +38,15 @@ export function MonthGrid({
 
   return (
     <div className="space-y-2">
-      <div className="grid grid-cols-7 gap-1 text-center text-xs font-medium">
+      <div className="grid grid-cols-7 gap-0.5 text-center text-[10px] font-medium sm:gap-1 sm:text-xs">
         {(labels.length === 7 ? labels : weekdays).map((label) => (
-          <div key={label} className="text-muted-foreground py-1">
-            {label}
+          <div key={label} className="text-muted-foreground truncate py-1">
+            <span className="sm:hidden">{label.slice(0, 1)}</span>
+            <span className="hidden sm:inline">{label}</span>
           </div>
         ))}
       </div>
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
         {days.map((day) => {
           const key = formatDateKey(day, CLINIC_TIMEZONE);
           const inMonth = key.startsWith(currentMonthKey.slice(0, 7));
@@ -59,14 +60,19 @@ export function MonthGrid({
               type="button"
               onClick={() => onSelectDay(day)}
               className={cn(
-                "border-border min-h-24 rounded-lg border p-1.5 text-left align-top",
+                "border-border min-h-14 rounded-md border p-1 text-left align-top sm:min-h-24 sm:rounded-lg sm:p-1.5",
                 inMonth ? "bg-background" : "bg-muted/30 text-muted-foreground",
               )}
             >
-              <div className="mb-1 text-xs font-medium">
-                {formatInTimeZone(day, CLINIC_TIMEZONE, "d")}
+              <div className="flex items-center justify-between gap-0.5 text-xs font-medium">
+                <span>{formatInTimeZone(day, CLINIC_TIMEZONE, "d")}</span>
+                {dayAppts.length > 0 ? (
+                  <span className="bg-sky-100 text-sky-950 inline-flex min-w-4 items-center justify-center rounded px-1 text-[10px] font-semibold sm:hidden">
+                    {dayAppts.length}
+                  </span>
+                ) : null}
               </div>
-              <ul className="space-y-0.5">
+              <ul className="mt-1 hidden space-y-0.5 sm:block">
                 {dayAppts.slice(0, 3).map((a) => (
                   <li key={a.id}>
                     <span

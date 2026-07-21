@@ -182,7 +182,7 @@ export default async function InvoicesPage({ params, searchParams }: Props) {
   const taxId = typeof settings.tax_id === "string" ? settings.tax_id : "";
 
   return (
-    <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-10">
+    <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-6 sm:py-10">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
         <p className="text-muted-foreground text-sm">{t("subtitle")}</p>

@@ -151,15 +151,16 @@ export function CalendarShell({
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
+        <div className="min-w-0">
           <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
           <p className="text-muted-foreground text-sm">{t("subtitle")}</p>
         </div>
         {canWrite ? (
           <Button
             type="button"
+            className="w-full sm:w-auto"
             data-testid="calendar-new-appointment"
             onClick={() => {
               const start = new Date();
@@ -172,17 +173,20 @@ export function CalendarShell({
       </div>
 
       <Card>
-        <CardHeader className="gap-3">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div>
-              <CardTitle className="text-base">{title}</CardTitle>
-              <CardDescription>{t("timezoneHint")}</CardDescription>
+        <CardHeader className="gap-3 px-4 sm:px-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <CardTitle className="text-base leading-snug">{title}</CardTitle>
+              <CardDescription className="hidden sm:block">
+                {t("timezoneHint")}
+              </CardDescription>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
               <Button
                 type="button"
                 size="sm"
                 variant="outline"
+                className="w-full sm:w-auto"
                 onClick={() =>
                   navigate({ date: shiftAnchor(view, anchor, -1) })
                 }
@@ -193,6 +197,7 @@ export function CalendarShell({
                 type="button"
                 size="sm"
                 variant="outline"
+                className="w-full sm:w-auto"
                 onClick={() => navigate({ date: new Date() })}
               >
                 {t("today")}
@@ -201,6 +206,7 @@ export function CalendarShell({
                 type="button"
                 size="sm"
                 variant="outline"
+                className="w-full sm:w-auto"
                 onClick={() =>
                   navigate({ date: shiftAnchor(view, anchor, 1) })
                 }
@@ -210,21 +216,24 @@ export function CalendarShell({
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            {(["day", "week", "month"] as const).map((v) => (
-              <Button
-                key={v}
-                type="button"
-                size="sm"
-                variant={view === v ? "default" : "outline"}
-                onClick={() => navigate({ view: v })}
-              >
-                {t(`views.${v}`)}
-              </Button>
-            ))}
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+            <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
+              {(["day", "week", "month"] as const).map((v) => (
+                <Button
+                  key={v}
+                  type="button"
+                  size="sm"
+                  variant={view === v ? "default" : "outline"}
+                  className="w-full sm:w-auto"
+                  onClick={() => navigate({ view: v })}
+                >
+                  {t(`views.${v}`)}
+                </Button>
+              ))}
+            </div>
             {canPickDoctor ? (
               <select
-                className="border-input bg-background h-7 rounded-lg border px-2 text-sm"
+                className="border-input bg-background h-8 w-full rounded-lg border px-2 text-sm sm:h-7 sm:w-auto sm:min-w-[10rem]"
                 value={doctorFilter}
                 onChange={(e) => {
                   setDoctorFilter(e.target.value);
@@ -241,7 +250,7 @@ export function CalendarShell({
             ) : null}
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 px-2 sm:px-6">
           {flash ? (
             <p className="text-sm text-emerald-700" role="status">
               {t(`messages.${flash}` as "messages.appointmentCreated")}

@@ -256,3 +256,5 @@ Prati PRD §11. Tech doc se širi po fazama; ne specifikovati Enterprise module 
 | 2026-07-14 | Marketing core: FAQ + Kontakt; `leads` + Resend callback (W13) |
 | 2026-07-14 | Marketing Faza 4: Zašto DentOrd; Privacy/Terms/DPA; blog MDX skeleton; `/api/og`; sitemap/robots |
 | 2026-07-21 | Production ops checklist (`docs/Production-Ops.md`); `/api/health`; `npm run check:production-ops`; deploy target = Vercel |
+| 2026-07-21 | D40 mobile: calendar day/week/month, odontogram, invoice search, chart/invoice headers (PRD §12.1) |
+| 2026-07-21 | UAT partner checklist `docs/UAT-Partner.md`; Production-Ops MX ✅ |

@@ -646,7 +646,7 @@ Online naplata usluga pacijentima (avans preko portala): **nadogradnja poslije**
 - [x] Trial expiry → readonly → delete *(Faza 3C: lifecycle job + owner close; D6/D45)*
 - [x] Klinika A ne može pročitati podatke klinike B (automatski test)
 - [x] Storage objekti nisu javno listable; samo signed URL
-- [ ] Full responsive: login, kalendar, karton, faktura na mobilnom
+- [x] Full responsive: login, kalendar, karton, faktura na mobilnom *(2026-07-21: day view bez forced 640px; month compact + badge; calendar toolbar; odontogram scroll; invoice search stack; chart/invoice header CTAs)*
 - [x] Marketing: pricing vidljiv, CTA signup, Privacy/Terms/DPA linkovi, cookie banner *(1c: SEO metadata/OG/JSON-LD + cookie banner + PostHog gate; core page content još u Fazi 2)*
 
 ### 12.2 E2E prioritet (CI release blockers)
@@ -663,6 +663,7 @@ Dodatni blocker: **tenant isolation** suite (clinic A vs B na patients, appointm
 - Demo seed klinika (“Demo Dental”) za sales/test, odvojena od pravih tenanata
 - Shadow mode: partneri mogu paralelno 7–14 dana po svom tempu (nije hard gate)
 - Bug report: email na `support@`
+- **Checklist + partner poruka:** `docs/UAT-Partner.md`
 
 ### 12.4 Performance targets
 
@@ -672,7 +673,7 @@ Dodatni blocker: **tenant isolation** suite (clinic A vs B na patients, appointm
 ### 12.5 Regression
 
 - CI: lint, typecheck, unit, Playwright E2E (tri flow-a + isolation)
-- Ručni smoke checklist za module bez E2E pokrivenosti
+- Ručni smoke checklist: `docs/UAT-Partner.md` §1.2 (moduli bez E2E pokrivenosti)
 
 ---
 

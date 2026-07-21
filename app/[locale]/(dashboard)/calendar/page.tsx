@@ -63,7 +63,7 @@ export default async function CalendarPage({ params, searchParams }: Props) {
   );
   if (!hasBasic) {
     return (
-      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-4 px-4 py-10">
+      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-4 px-4 py-6 sm:py-10">
         <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
         <p className="text-muted-foreground text-sm">
           {t("errors.featureDisabled")}
@@ -202,7 +202,7 @@ export default async function CalendarPage({ params, searchParams }: Props) {
   });
 
   return (
-    <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-10">
+    <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-6 sm:py-10">
       <CalendarShell
         initialView={view}
         initialDate={formatDateKey(anchor, CLINIC_TIMEZONE)}

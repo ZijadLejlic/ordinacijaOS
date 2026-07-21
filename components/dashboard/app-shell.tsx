@@ -176,12 +176,13 @@ export function AppShell({
       className="flex min-h-full flex-1 flex-col md:flex-row"
       style={brandStyle}
     >
-      <header className="bg-background flex items-center justify-between border-b px-4 py-3 md:hidden">
-        <BrandMark clinicName={clinicName} logoUrl={logoUrl} />
+      <header className="bg-background sticky top-0 z-20 flex items-center justify-between gap-3 border-b px-4 py-3 md:hidden">
+        <BrandMark clinicName={clinicName} logoUrl={logoUrl} compact />
         <Button
           type="button"
           variant="ghost"
           size="icon"
+          className="shrink-0"
           aria-label={mobileOpen ? t("closeMenu") : t("menu")}
           aria-expanded={mobileOpen}
           onClick={() => setMobileOpen((open) => !open)}
@@ -273,33 +274,49 @@ export function AppShell({
 function BrandMark({
   clinicName,
   logoUrl,
+  compact = false,
 }: {
   clinicName: string;
   logoUrl: string | null;
+  compact?: boolean;
 }) {
   if (logoUrl) {
     return (
-      <Link href="/dashboard" className="inline-flex items-center gap-2">
+      <Link href="/dashboard" className="inline-flex min-w-0 items-center gap-2">
         {/* eslint-disable-next-line @next/next/no-img-element -- signed URL from private bucket */}
         <img
           src={logoUrl}
           alt={clinicName}
-          className="h-8 w-8 rounded object-contain"
+          className="h-8 w-8 shrink-0 rounded object-contain"
         />
-        <span className="font-semibold tracking-tight">{clinicName}</span>
+        <span
+          className={cn(
+            "font-semibold tracking-tight",
+            compact && "max-w-[11rem] truncate",
+          )}
+        >
+          {clinicName}
+        </span>
       </Link>
     );
   }
 
   return (
-    <Link href="/dashboard" className="inline-flex items-center gap-2">
+    <Link href="/dashboard" className="inline-flex min-w-0 items-center gap-2">
       {/* eslint-disable-next-line @next/next/no-img-element -- static public asset */}
       <img
         src={BRAND_LOGO.mark}
         alt=""
-        className="h-8 w-8 object-contain"
+        className="h-8 w-8 shrink-0 object-contain"
       />
-      <span className="font-semibold tracking-tight">{PRODUCT_NAME}</span>
+      <span
+        className={cn(
+          "font-semibold tracking-tight",
+          compact && "max-w-[11rem] truncate",
+        )}
+      >
+        {PRODUCT_NAME}
+      </span>
     </Link>
   );
 }

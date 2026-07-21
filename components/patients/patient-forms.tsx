@@ -240,12 +240,13 @@ export function DeactivatePatientButton({ patientId }: { patientId: string }) {
   const [error, setError] = useState<string | null>(null);
 
   return (
-    <div className="flex flex-col items-end gap-1">
+    <div className="flex w-full flex-col items-stretch gap-1 sm:w-auto sm:items-end">
       {error ? <FieldError>{error}</FieldError> : null}
       <Button
         type="button"
         variant="destructive"
         size="sm"
+        className="w-full sm:w-auto"
         disabled={pending}
         onClick={() =>
           startTransition(async () => {

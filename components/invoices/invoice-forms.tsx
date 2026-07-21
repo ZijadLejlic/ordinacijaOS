@@ -87,18 +87,18 @@ export function InvoiceSearchForm({
 }) {
   const t = useTranslations("Invoices");
   return (
-    <form className="flex flex-wrap gap-2">
+    <form className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
       <Input
         type="search"
         name="q"
         defaultValue={initialQuery}
         placeholder={t("searchPlaceholder")}
-        className="min-w-[12rem] flex-1"
+        className="min-w-0 w-full flex-1 sm:min-w-[12rem]"
       />
       <select
         name="status"
         defaultValue={initialStatus}
-        className="border-input bg-background h-8 rounded-lg border px-2.5 text-sm"
+        className="border-input bg-background h-8 w-full rounded-lg border px-2.5 text-sm sm:w-auto"
         aria-label={t("statusFilter")}
       >
         <option value="all">{t("statusAll")}</option>
@@ -108,7 +108,7 @@ export function InvoiceSearchForm({
         <option value="void">{t("status.void")}</option>
         <option value="debts">{t("statusDebts")}</option>
       </select>
-      <Button type="submit" variant="outline">
+      <Button type="submit" variant="outline" className="w-full sm:w-auto">
         {t("search")}
       </Button>
     </form>

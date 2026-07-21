@@ -126,9 +126,9 @@ export default async function InvoiceDetailPage({ params }: Props) {
   const activePlan = (plans ?? []).find((p) => p.status === "active");
 
   return (
-    <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-4 py-10">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
+    <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-4 py-6 sm:py-10">
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+        <div className="min-w-0">
           <p className="text-muted-foreground text-sm">
             <Link
               href="/invoices"
@@ -137,7 +137,7 @@ export default async function InvoiceDetailPage({ params }: Props) {
               {t("backToList")}
             </Link>
           </p>
-          <h1 className="text-2xl font-semibold tracking-tight">
+          <h1 className="text-2xl font-semibold tracking-tight break-words">
             {t("invoice")} {number}
           </h1>
           <p className="text-muted-foreground text-sm">
@@ -148,7 +148,7 @@ export default async function InvoiceDetailPage({ params }: Props) {
         {invoice!.pdf_storage_path ? (
           <a
             href={`/api/invoices/${invoice!.id}/pdf`}
-            className="border-border bg-background hover:bg-muted inline-flex h-8 items-center justify-center rounded-lg border px-2.5 text-sm font-medium"
+            className="border-border bg-background hover:bg-muted inline-flex h-9 w-full items-center justify-center rounded-lg border px-2.5 text-sm font-medium sm:h-8 sm:w-auto"
           >
             {t("downloadPdf")}
           </a>

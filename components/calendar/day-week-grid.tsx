@@ -71,12 +71,21 @@ export function DayWeekGrid({
     (_, i) => DAY_START_HOUR + i,
   );
 
+  const isSingleDay = days.length === 1;
+  const minColPx = isSingleDay ? 0 : 112;
+  const gridMinWidth = isSingleDay
+    ? undefined
+    : 48 + days.length * minColPx;
+
   return (
-    <div className="overflow-x-auto">
+    <div className={cn("overflow-x-auto", !isSingleDay && "-mx-1 px-1")}>
       <div
-        className="grid min-w-[640px]"
+        className="grid"
         style={{
-          gridTemplateColumns: `48px repeat(${days.length}, minmax(120px, 1fr))`,
+          gridTemplateColumns: isSingleDay
+            ? "40px minmax(0, 1fr)"
+            : `48px repeat(${days.length}, minmax(${minColPx}px, 1fr))`,
+          minWidth: gridMinWidth,
         }}
       >
         <div />

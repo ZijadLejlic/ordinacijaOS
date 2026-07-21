@@ -69,7 +69,7 @@ export default async function PatientsPage({ params, searchParams }: Props) {
   const { data: patients } = await patientsQuery;
 
   return (
-    <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-4 py-10">
+    <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-4 py-6 sm:py-10">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
