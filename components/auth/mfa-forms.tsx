@@ -17,6 +17,98 @@ import { createClient } from "@/lib/supabase/client";
 import { totpCodeSchema } from "@/lib/validations/auth";
 import { logoutAction } from "@/lib/auth/actions";
 
+const STORE_LINKS = {
+  google: {
+    android:
+      "https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2",
+    ios: "https://apps.apple.com/app/google-authenticator/id388497605",
+  },
+  microsoft: {
+    android:
+      "https://play.google.com/store/apps/details?id=com.azure.authenticator",
+    ios: "https://apps.apple.com/app/microsoft-authenticator/id983156458",
+  },
+} as const;
+
+function StoreLink({ href, children }: { href: string; children: string }) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-primary underline-offset-4 hover:underline"
+    >
+      {children}
+    </a>
+  );
+}
+
+function MfaEnrollGuide() {
+  const t = useTranslations("Mfa");
+
+  return (
+    <div className="space-y-5 text-sm">
+      <section className="space-y-2">
+        <h2 className="text-foreground text-sm font-medium">{t("whyTitle")}</h2>
+        <ul className="text-muted-foreground list-disc space-y-1.5 pl-4 leading-relaxed">
+          <li>{t("whyProtect")}</li>
+          <li>{t("whyCode")}</li>
+          <li>{t("whyOwnerOnly")}</li>
+        </ul>
+      </section>
+
+      <section className="space-y-2">
+        <h2 className="text-foreground text-sm font-medium">
+          {t("stepsTitle")}
+        </h2>
+        <ol className="text-muted-foreground list-decimal space-y-1.5 pl-4 leading-relaxed">
+          <li>{t("stepInstall")}</li>
+          <li>{t("stepScan")}</li>
+          <li>{t("stepEnter")}</li>
+        </ol>
+      </section>
+
+      <section className="bg-muted/50 space-y-3 rounded-lg border p-3">
+        <div className="space-y-1">
+          <h2 className="text-foreground text-sm font-medium">
+            {t("appsTitle")}
+          </h2>
+          <p className="text-muted-foreground text-xs leading-relaxed">
+            {t("appsHint")}
+          </p>
+        </div>
+        <ul className="space-y-2.5">
+          <li>
+            <p className="text-foreground font-medium">{t("googleAuth")}</p>
+            <p className="text-muted-foreground mt-0.5 flex flex-wrap gap-x-3 gap-y-1 text-xs">
+              <StoreLink href={STORE_LINKS.google.android}>
+                {t("android")}
+              </StoreLink>
+              <StoreLink href={STORE_LINKS.google.ios}>{t("iphone")}</StoreLink>
+            </p>
+          </li>
+          <li>
+            <p className="text-foreground font-medium">
+              {t("microsoftAuth")}{" "}
+              <span className="text-muted-foreground font-normal">
+                ({t("microsoftOptional")})
+              </span>
+            </p>
+            <p className="text-muted-foreground mt-0.5 flex flex-wrap gap-x-3 gap-y-1 text-xs">
+              <StoreLink href={STORE_LINKS.microsoft.android}>
+                {t("android")}
+              </StoreLink>
+              <StoreLink href={STORE_LINKS.microsoft.ios}>
+                {t("iphone")}
+              </StoreLink>
+            </p>
+          </li>
+        </ul>
+      </section>
+    </div>
+  );
+}
+
 export function MfaEnrollForm() {
   const t = useTranslations("Mfa");
   const router = useRouter();
@@ -100,26 +192,40 @@ export function MfaEnrollForm() {
   }
 
   if (loading) {
-    return <p className="text-muted-foreground text-sm">{t("loading")}</p>;
+    return (
+      <div className="space-y-6">
+        <MfaEnrollGuide />
+        <p className="text-muted-foreground text-sm">{t("loading")}</p>
+      </div>
+    );
   }
 
   return (
     <div className="space-y-6">
+      <MfaEnrollGuide />
+
       <form onSubmit={onSubmit} className="space-y-6">
-        {qr ? (
-          <div className="flex flex-col items-center gap-3">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={qr}
-              alt={t("qrAlt")}
-              className="bg-background size-48 rounded-md border p-2"
-            />
-            <FieldDescription className="text-center">
-              {t("secretHint")}:{" "}
-              <code className="text-foreground break-all text-xs">{secret}</code>
-            </FieldDescription>
-          </div>
-        ) : null}
+        <div className="space-y-3">
+          <h2 className="text-foreground text-sm font-medium">
+            {t("scanSectionTitle")}
+          </h2>
+          {qr ? (
+            <div className="flex flex-col items-center gap-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={qr}
+                alt={t("qrAlt")}
+                className="bg-background size-48 rounded-md border p-2"
+              />
+              <FieldDescription className="text-center">
+                {t("secretHint")}:{" "}
+                <code className="text-foreground break-all text-xs">
+                  {secret}
+                </code>
+              </FieldDescription>
+            </div>
+          ) : null}
+        </div>
 
         <FieldGroup>
           <Field>

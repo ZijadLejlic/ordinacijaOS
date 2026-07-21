@@ -2,6 +2,7 @@
 
 export type TourPreviewKind =
   | "signup"
+  | "mfa"
   | "onboarding"
   | "services"
   | "team"
@@ -43,10 +44,11 @@ export type TourChapterDef = {
 export const TOUR_CHAPTERS: readonly TourChapterDef[] = [
   {
     id: "signup",
-    minutes: 2,
+    minutes: 3,
     steps: [
       { id: "register", preview: "signup", annotations: 2 },
       { id: "confirm", preview: "signup" },
+      { id: "mfa", preview: "mfa", annotations: 3 },
     ],
   },
   {

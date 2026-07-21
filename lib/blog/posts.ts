@@ -9,12 +9,14 @@ import {
   type BlogPost,
   type BlogPostMeta,
 } from "@/lib/blog/types";
+import { catalogLocale } from "@/i18n/catalog";
 import type { AppLocale } from "@/i18n/routing";
 
 const CONTENT_ROOT = path.join(process.cwd(), "content/blog");
 
+/** MDX lives under content/blog/{bs,en}/ — hr/sr reuse bs (strategy B). */
 function localeDir(locale: string) {
-  return path.join(CONTENT_ROOT, locale);
+  return path.join(CONTENT_ROOT, catalogLocale(locale));
 }
 
 function isCategory(value: unknown): value is BlogCategory {

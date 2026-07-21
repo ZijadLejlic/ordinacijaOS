@@ -2,16 +2,24 @@ import { defineRouting } from "next-intl/routing";
 
 /**
  * Internal keys are English filesystem paths under `app/[locale]/...`.
- * BS marketing slugs are localized (Website-DentOrd §3.1).
- * Public URLs: `/bs/cijene` ↔ `/en/pricing`.
+ * Balkan marketing slugs (bs/hr/sr) are localized (Website-DentOrd §3.1).
+ * Public URLs: `/bs/cijene` ↔ `/hr/cijene` ↔ `/sr/cijene` ↔ `/en/pricing`.
+ *
+ * Content strategy B (D37): hr/sr reuse BS message catalog + BS pathnames
+ * until dedicated translations exist (see `i18n/catalog.ts`).
  *
  * Note: `localePrefix: "as-needed"` (§3.1 unprefixed BS) is blocked by a
  * Next.js 16.2.6+ middleware rewrite→307 bug (vercel/next.js#94342).
  * Production `npm start` sets `HOSTNAME=localhost` so localized BS slugs
  * (`/bs/cijene` → `/bs/pricing`) stay internal rewrites.
  */
+
+/** Shared Balkan marketing slugs (bs + hr + sr). */
+const balkan = <T extends string>(path: T) =>
+  ({ bs: path, hr: path, sr: path }) as const;
+
 export const routing = defineRouting({
-  locales: ["bs", "en"],
+  locales: ["bs", "hr", "sr", "en"],
   defaultLocale: "bs",
   localePrefix: "always",
   /** Stable marketing URLs — no Accept-Language / cookie redirects. */
@@ -19,29 +27,21 @@ export const routing = defineRouting({
   pathnames: {
     "/": "/",
 
-    // Marketing (localized where BS ≠ EN)
-    "/features": {
-      bs: "/funkcije",
-    },
-    "/pricing": {
-      bs: "/cijene",
-    },
-    "/why-dentord": {
-      bs: "/zasto-dentord",
-    },
+    // Marketing (localized where Balkan ≠ EN)
+    "/features": balkan("/funkcije"),
+    "/pricing": balkan("/cijene"),
+    "/why-dentord": balkan("/zasto-dentord"),
     "/tour": "/tour",
     "/demo": "/demo",
     "/faq": "/faq",
-    "/contact": {
-      bs: "/kontakt",
-    },
+    "/contact": balkan("/kontakt"),
     "/blog": "/blog",
     "/blog/[slug]": "/blog/[slug]",
     "/privacy": "/privacy",
     "/terms": "/terms",
     "/dpa": "/dpa",
 
-    // Auth / app (same slug both locales)
+    // Auth / app (same slug all locales)
     "/login": "/login",
     "/signup": "/signup",
     "/pin": "/pin",

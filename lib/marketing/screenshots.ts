@@ -29,6 +29,7 @@ export type MarketingShotId = (typeof MARKETING_SHOT_IDS)[number];
 
 export const TOUR_PREVIEW_TO_SHOT: Record<TourPreviewKind, MarketingShotId> = {
   signup: "signup",
+  mfa: "signup",
   onboarding: "onboarding-1",
   services: "onboarding-2",
   team: "onboarding-3",

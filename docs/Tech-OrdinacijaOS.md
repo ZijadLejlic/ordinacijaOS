@@ -27,7 +27,7 @@ Zaključati **kako** gradimo DentOrd (stack, patterni, granice), da agent/develo
 | Hosting / DB / Auth / Storage | Supabase (EU) | Data residency EU (D34) |
 | UI | shadcn/ui + preset iz `components.json` | Ne inventisati nove primitive |
 | Validacija | Zod na server granicama | Server Actions / Route Handlers |
-| i18n | BS (default) + EN | Routing pod `[locale]` (D37) |
+| i18n | BS (default) + HR + SR (latinica, fallback BS) + EN | Routing pod `[locale]` (D37) |
 | Email | Resend (`dentord.com`) | From `DentOrd <noreply@dentord.com>`; aliases `support@`, `hello@` (D9, D23, D44). Brand constants: `lib/brand/constants.ts` |
 | Errors | Sentry | Tag `clinic_id` gdje je safe |
 | Analytics | PostHog | Bez imena pacijenata (D33) |
@@ -40,7 +40,7 @@ Zaključati **kako** gradimo DentOrd (stack, patterni, granice), da agent/develo
 | Next.js | 16.2.x (App Router) |
 | React | 19.2.x |
 | Package manager | npm |
-| i18n | `next-intl` — locales `bs` (default), `en`; prefix always |
+| i18n | `next-intl` — locales `bs` (default), `hr`, `sr`, `en`; prefix always; hr/sr load `messages/bs.json` (strategy B) |
 | UI | shadcn/ui preset `base-nova` (`components.json`) |
 | Supabase clients | `@supabase/ssr` + `@supabase/supabase-js` u `lib/supabase/` |
 | Validacija | Zod |
@@ -126,8 +126,9 @@ lib/
   entitlements/
   validations/            # Zod schemas
 messages/
-  bs.json
+  bs.json                 # Shared by bs/hr/sr until dedicated HR/SR catalogs
   en.json
+  # TODO: hr.json, sr.json — real translations (see i18n/catalog.ts)
 docs/
   PRD-OrdinacijaOS.md
   Tech-OrdinacijaOS.md
@@ -179,7 +180,7 @@ docs/
 
 | Setting | Default | Decision |
 |---|---|---|
-| Locale UI | `bs` (+ `en`) | D37 |
+| Locale UI | `bs` (+ `hr`/`sr` → BS catalog, `en`) | D37 |
 | Timezone | `Europe/Sarajevo` | D47 |
 | Phone country | `+387` | D46 |
 | Valuta prikaza | EUR sa PDV-om | PRD header |
@@ -258,3 +259,4 @@ Prati PRD §11. Tech doc se širi po fazama; ne specifikovati Enterprise module 
 | 2026-07-21 | Production ops checklist (`docs/Production-Ops.md`); `/api/health`; `npm run check:production-ops`; deploy target = Vercel |
 | 2026-07-21 | D40 mobile: calendar day/week/month, odontogram, invoice search, chart/invoice headers (PRD §12.1) |
 | 2026-07-21 | UAT partner checklist `docs/UAT-Partner.md`; Production-Ops MX ✅ |
+| 2026-07-21 | D37 locales: add `hr`/`sr` (Latin) with BS catalog fallback; language dropdown; hreflang/sitemap |

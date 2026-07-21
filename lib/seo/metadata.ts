@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ogLocaleTag } from "@/i18n/catalog";
 import { getPathname } from "@/i18n/navigation";
 import { routing, type AppLocale, type AppPathname } from "@/i18n/routing";
 import { BRAND_LOGO, PRODUCT_NAME, PRODUCT_URL } from "@/lib/brand/constants";
@@ -90,10 +91,10 @@ export function buildMarketingMetadata(
       siteName: PRODUCT_NAME,
       title: input.title,
       description: input.description,
-      locale: locale === "bs" ? "bs_BA" : "en_US",
+      locale: ogLocaleTag(locale),
       alternateLocale: routing.locales
         .filter((l) => l !== locale)
-        .map((l) => (l === "bs" ? "bs_BA" : "en_US")),
+        .map((l) => ogLocaleTag(l)),
       images: [
         {
           url: ogImage,

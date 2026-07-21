@@ -1,7 +1,7 @@
 import type { AbstractIntlMessages } from "next-intl";
 
-/** Namespaces needed outside the app shell (cookie banner on every page). */
-export const MARKETING_MESSAGE_KEYS = ["Marketing"] as const;
+/** Namespaces needed outside the app shell (cookie banner + locale switcher). */
+export const MARKETING_MESSAGE_KEYS = ["Marketing", "Locale"] as const;
 
 /** Auth / MFA / PIN / invite client forms. */
 export const AUTH_MESSAGE_KEYS = [

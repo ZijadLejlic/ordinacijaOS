@@ -27,7 +27,7 @@
       "whyDentord": {
         "eyebrow": "Zašto DentOrd",
         "title": "Zašto ordinacije biraju DentOrd?",
-        "description": "Napravljen za naš region — bosanski jezik, EUR + PDV, EU hosting.",
+        "description": "Napravljen za BiH, Hrvatsku i Srbiju — jezik našeg regiona, EUR + PDV, EU hosting.",
         "comingSoon": "Detaljno poređenje i benefiti stižu uskoro."
       },
       "tour": {
@@ -106,7 +106,7 @@
       "hero": {
         "badge": "Besplatno za sve ordinacije do 31.12.2026",
         "headline": "Vaša ordinacija, konačno organizovana.",
-        "support": "DentOrd objedinjuje kartone pacijenata, odontogram, termine, fakture i zalihe — u jednoj jednostavnoj aplikaciji, na bosanskom jeziku.",
+        "support": "DentOrd objedinjuje kartone pacijenata, odontogram, termine, fakture i zalihe — u jednoj jednostavnoj aplikaciji, na jeziku našeg regiona.",
         "ctaPrimary": "Registruj ordinaciju besplatno",
         "ctaSecondary": "Pogledajte kako radi",
         "microcopy": "Besplatno do 31.12.2026 · Bez kartice · Postavka za 5 minuta",
@@ -129,7 +129,7 @@
         "eu": "Podaci na EU serverima",
         "gdpr": "GDPR usklađeno",
         "backup": "Dnevni backup",
-        "support": "Podrška na bosanskom"
+        "support": "Podrška na našem jeziku"
       },
       "problem": {
         "eyebrow": "Problem",
@@ -666,7 +666,7 @@
       },
       "whyDentord": {
         "title": "Zašto DentOrd",
-        "description": "Napravljen za naš region: bosanski jezik, EUR + PDV, EU hosting i GDPR."
+        "description": "Napravljen za BiH, Hrvatsku i Srbiju: jezik našeg regiona, EUR + PDV, EU hosting i GDPR."
       },
       "tour": {
         "title": "Tour — DentOrd",
@@ -711,7 +711,7 @@
     "tour": {
       "eyebrow": "Product tour",
       "title": "Od registracije do svakodnevnog rada.",
-      "subtitle": "Devetnaest kratkih koraka — kako DentOrd izgleda od prvog logina do dashboarda, kalendara i naplate.",
+      "subtitle": "Dvadeset kratkih koraka — kako DentOrd izgleda od prvog logina do dashboarda, kalendara i naplate.",
       "ctaPrimary": "Registruj ordinaciju besplatno",
       "ctaSecondary": "Isprobajte live demo",
       "browserUrl": "app.dentord.com",
@@ -752,8 +752,15 @@
         },
         "confirm": {
           "title": "Potvrdite email i prijavite se",
-          "body": "Nakon potvrde ulazite u aplikaciju. Vlasnički nalog koristi MFA radi sigurnosti podataka pacijenata.",
-          "note": "Owner MFA je obavezan (D11) — ostale uloge ne."
+          "body": "Nakon potvrde ulazite u aplikaciju s emailom i lozinkom — spremni za sljedeći korak.",
+          "note": "Link za potvrdu stiže u inbox; bez potvrde nalog nije aktivan."
+        },
+        "mfa": {
+          "title": "Authenticator za vlasnika (2FA)",
+          "body": "Vlasnički nalog štitimo authenticator aplikacijom na telefonu — ne SMS-om. To štiti nalog i podatke pacijenata čak i ako neko sazna lozinku. Obavezno je samo za vlasnika; doktori i recepcija ne moraju.",
+          "a1": "Pripremite telefon i besplatnu app (npr. Google ili Microsoft Authenticator)",
+          "a2": "Nakon prve prijave skenirate QR i unesete 6-cifreni kod (~30 s)",
+          "a3": "Tek tada ulazite u onboarding i postavku ordinacije"
         },
         "basics": {
           "title": "Osnovni podaci i radno vrijeme",
@@ -807,7 +814,7 @@
         "reminder": {
           "title": "Automatski email podsjetnik",
           "body": "Pacijent dobije podsjetnik prije termina — manje no-showova, manje telefonskih poziva.",
-          "note": "Predlošci na bosanskom, s brendom ordinacije (Pro)."
+          "note": "Predlošci na našem jeziku, s brendom ordinacije (Pro)."
         },
         "waitlist": {
           "title": "Waitlist kad neko otkaže",
@@ -866,6 +873,12 @@
           "row2": "Naziv ordinacije",
           "row3": "Bez kartice"
         },
+        "mfa": {
+          "title": "Owner 2FA · authenticator",
+          "row1": "Telefon + authenticator app",
+          "row2": "QR → 6-cifreni kod",
+          "row3": "Samo vlasnik (D11)"
+        },
         "onboarding": {
           "title": "Onboarding · korak 1",
           "row1": "Adresa ordinacije",
@@ -918,7 +931,7 @@
         "reminder": {
           "title": "Email podsjetnik",
           "row1": "Termin sutra 09:00",
-          "row2": "Predložak na bosanskom",
+          "row2": "Predložak na našem jeziku",
           "row3": "Poslano automatski"
         },
         "waitlist": {
@@ -1067,7 +1080,7 @@
     "whyDentord": {
       "eyebrow": "Zašto DentOrd",
       "title": "Zašto ordinacije biraju DentOrd?",
-      "subtitle": "Umjesto papira i Excela — jedna aplikacija na bosanskom, s EUR + PDV-om, EU hostingom i jasnim ulogama za cijeli tim.",
+      "subtitle": "Umjesto papira i Excela — jedna aplikacija na jeziku našeg regiona, s EUR + PDV-om, EU hostingom i jasnim ulogama za cijeli tim.",
       "beforeAfter": {
         "eyebrow": "Prije / poslije",
         "title": "Isti posao — manje haosa.",
@@ -1104,11 +1117,11 @@
       "region": {
         "eyebrow": "Region",
         "title": "Napravljen za naš region.",
-        "description": "Nije lokalizacija na brzinu — defaults i jezik su postavljeni za BiH i okolinu od prvog dana.",
+        "description": "Nije lokalizacija na brzinu — defaults i jezik su postavljeni za BiH, Hrvatsku i Srbiju od prvog dana.",
         "items": {
           "language": {
-            "title": "Bosanski jezik prvi",
-            "body": "Interfejs i komunikacija na bosanskom; engleski je sekundarni jezik (D37)."
+            "title": "Jezik našeg regiona",
+            "body": "Interfejs i komunikacija na jeziku našeg regiona; engleski je sekundarni jezik (D37)."
           },
           "currency": {
             "title": "EUR + PDV",
@@ -1124,7 +1137,7 @@
           },
           "support": {
             "title": "Podrška na našem jeziku",
-            "body": "Pišete nam na bosanskom — odgovaramo isti radni dan."
+            "body": "Pišete nam na našem jeziku — odgovaramo isti radni dan."
           }
         }
       },
@@ -1227,7 +1240,7 @@
   },
   "Mfa": {
     "enrollTitle": "Uključi 2FA",
-    "enrollDescription": "Za vlasnike je TOTP obavezan. Skeniraj QR kod authenticator aplikacijom, zatim unesi 6-cifreni kod.",
+    "enrollDescription": "Jedan kratak korak: authenticator app na telefonu štiti vlasnički nalog i podatke pacijenata.",
     "verifyTitle": "Potvrdi 2FA",
     "verifyDescription": "Unesi kod iz authenticator aplikacije.",
     "code": "Kod",
@@ -1240,7 +1253,23 @@
     "invalidCode": "Unesi tačan 6-cifreni kod.",
     "enrollFailed": "Nije moguće pokrenuti 2FA. Pokušaj ponovo.",
     "noFactor": "Nije pronađen aktivni TOTP faktor. Prijavi se ponovo.",
-    "logout": "Odjava"
+    "logout": "Odjava",
+    "whyTitle": "Šta je authenticator i zašto?",
+    "whyProtect": "Štiti vlasnički nalog i podatke pacijenata — čak i ako neko sazna lozinku.",
+    "whyCode": "Aplikacija na telefonu prikazuje novi 6-cifreni kod otprilike svakih 30 sekundi. To nije SMS.",
+    "whyOwnerOnly": "Obavezno je samo za vlasnika ordinacije. Doktori i recepcija ne moraju.",
+    "stepsTitle": "Kako u 3 koraka",
+    "stepInstall": "Instaliraj authenticator app (linkovi ispod).",
+    "stepScan": "Skeniraj QR kod ovdje u aplikaciji.",
+    "stepEnter": "Unesi 6-cifreni kod koji app prikaže.",
+    "appsTitle": "Preuzmi authenticator",
+    "appsHint": "Besplatne službene aplikacije. Bilo koja TOTP app radi — preporučujemo jednu od ovih.",
+    "googleAuth": "Google Authenticator",
+    "microsoftAuth": "Microsoft Authenticator",
+    "microsoftOptional": "alternativa",
+    "android": "Android",
+    "iphone": "iPhone",
+    "scanSectionTitle": "Skeniraj QR i potvrdi"
   },
   "Dashboard": {
     "title": "Kontrolna tabla",
@@ -2622,5 +2651,12 @@
     "title": "Ovo je demo ordinacija",
     "body": "Podaci su izmišljeni. Izmjene su onemogućene — registrujte svoju ordinaciju za puni pristup.",
     "cta": "Registrujte svoju →"
+  },
+  "Locale": {
+    "label": "Jezik",
+    "bs": "Bosanski",
+    "hr": "Hrvatski",
+    "sr": "Srpski",
+    "en": "English"
   }
 }

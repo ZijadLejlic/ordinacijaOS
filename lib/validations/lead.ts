@@ -16,7 +16,7 @@ export const submitLeadSchema = z.object({
     z.string().trim().max(1000),
   ]),
   gdpr: z.literal("on"),
-  locale: z.enum(["bs", "en"]).default("bs"),
+  locale: z.enum(["bs", "hr", "sr", "en"]).default("bs"),
   sourcePage: z.string().trim().min(1).max(80).default("contact"),
   /** Honeypot — must stay empty. */
   website: z.union([z.literal(""), z.undefined()]),

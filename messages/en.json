@@ -27,7 +27,7 @@
       "whyDentord": {
         "eyebrow": "Why DentOrd",
         "title": "Why clinics choose DentOrd?",
-        "description": "Built for our region — Bosnian language, EUR + VAT, EU hosting.",
+        "description": "Built for the region (BiH, Croatia, Serbia) — support in your language, EUR + VAT, EU hosting.",
         "comingSoon": "Detailed comparison and benefits are coming soon."
       },
       "tour": {
@@ -129,7 +129,7 @@
         "eu": "Data on EU servers",
         "gdpr": "GDPR compliant",
         "backup": "Daily backups",
-        "support": "Support in Bosnian"
+        "support": "Support in your language"
       },
       "problem": {
         "eyebrow": "The problem",
@@ -666,7 +666,7 @@
       },
       "whyDentord": {
         "title": "Why DentOrd",
-        "description": "Built for our region: Bosnian language, EUR + VAT, EU hosting and GDPR."
+        "description": "Built for the region (BiH, Croatia, Serbia): support in your language, EUR + VAT, EU hosting and GDPR."
       },
       "tour": {
         "title": "Tour — DentOrd",
@@ -711,7 +711,7 @@
     "tour": {
       "eyebrow": "Product tour",
       "title": "From signup to everyday work.",
-      "subtitle": "Nineteen short steps — how DentOrd looks from first login to dashboard, calendar, and billing.",
+      "subtitle": "Twenty short steps — how DentOrd looks from first login to dashboard, calendar, and billing.",
       "ctaPrimary": "Register your clinic free",
       "ctaSecondary": "Try the live demo",
       "browserUrl": "app.dentord.com",
@@ -752,8 +752,15 @@
         },
         "confirm": {
           "title": "Confirm email and sign in",
-          "body": "After confirmation you enter the app. Owner accounts use MFA to protect patient data.",
-          "note": "Owner MFA is required (D11) — other roles are not."
+          "body": "After confirmation you enter the app with email and password — ready for the next step.",
+          "note": "The confirmation link arrives in your inbox; without it the account stays inactive."
+        },
+        "mfa": {
+          "title": "Owner authenticator (2FA)",
+          "body": "We protect the owner account with an authenticator app on your phone — not SMS. That keeps the account and patient data safe even if someone learns the password. Required only for the owner; doctors and reception do not need it.",
+          "a1": "Have your phone ready and a free app (e.g. Google or Microsoft Authenticator)",
+          "a2": "After first sign-in you scan a QR and enter a 6-digit code (~30 s)",
+          "a3": "Only then do you reach onboarding and clinic setup"
         },
         "basics": {
           "title": "Basics and working hours",
@@ -865,6 +872,12 @@
           "row1": "Email and password",
           "row2": "Clinic name",
           "row3": "No card"
+        },
+        "mfa": {
+          "title": "Owner 2FA · authenticator",
+          "row1": "Phone + authenticator app",
+          "row2": "QR → 6-digit code",
+          "row3": "Owner only (D11)"
         },
         "onboarding": {
           "title": "Onboarding · step 1",
@@ -1104,11 +1117,11 @@
       "region": {
         "eyebrow": "Region",
         "title": "Built for our region.",
-        "description": "Not a rushed localisation — defaults and language are set for BiH and nearby markets from day one.",
+        "description": "Not a rushed localisation — defaults and language are set for BiH, Croatia and Serbia from day one.",
         "items": {
           "language": {
-            "title": "Bosnian first",
-            "body": "UI and communication in Bosnian; English is secondary (D37)."
+            "title": "Language of the region",
+            "body": "UI and communication in your language; English is secondary (D37)."
           },
           "currency": {
             "title": "EUR + VAT",
@@ -1124,7 +1137,7 @@
           },
           "support": {
             "title": "Support in your language",
-            "body": "Write to us in Bosnian — we reply the same business day."
+            "body": "Write to us in your language — we reply the same business day."
           }
         }
       },
@@ -1227,7 +1240,7 @@
   },
   "Mfa": {
     "enrollTitle": "Enable 2FA",
-    "enrollDescription": "Owners must use TOTP. Scan the QR code with an authenticator app, then enter the 6-digit code.",
+    "enrollDescription": "One short step: an authenticator app on your phone protects the owner account and patient data.",
     "verifyTitle": "Confirm 2FA",
     "verifyDescription": "Enter the code from your authenticator app.",
     "code": "Code",
@@ -1240,7 +1253,23 @@
     "invalidCode": "Enter a valid 6-digit code.",
     "enrollFailed": "Could not start 2FA setup. Try again.",
     "noFactor": "No active TOTP factor found. Sign in again.",
-    "logout": "Log out"
+    "logout": "Log out",
+    "whyTitle": "What is an authenticator and why?",
+    "whyProtect": "It protects the owner account and patient data — even if someone learns the password.",
+    "whyCode": "The app on your phone shows a new 6-digit code about every 30 seconds. It is not SMS.",
+    "whyOwnerOnly": "Required only for the clinic owner. Doctors and reception do not need it.",
+    "stepsTitle": "How in 3 steps",
+    "stepInstall": "Install an authenticator app (links below).",
+    "stepScan": "Scan the QR code on this screen in the app.",
+    "stepEnter": "Enter the 6-digit code the app shows.",
+    "appsTitle": "Get an authenticator",
+    "appsHint": "Free official apps. Any TOTP app works — we recommend one of these.",
+    "googleAuth": "Google Authenticator",
+    "microsoftAuth": "Microsoft Authenticator",
+    "microsoftOptional": "alternative",
+    "android": "Android",
+    "iphone": "iPhone",
+    "scanSectionTitle": "Scan QR and confirm"
   },
   "Dashboard": {
     "title": "Dashboard",
@@ -2622,5 +2651,12 @@
     "title": "This is a demo clinic",
     "body": "Data is fictional. Edits are disabled — register your own clinic for full access.",
     "cta": "Register yours →"
+  },
+  "Locale": {
+    "label": "Language",
+    "bs": "Bosanski",
+    "hr": "Hrvatski",
+    "sr": "Srpski",
+    "en": "English"
   }
 }

@@ -20,7 +20,7 @@
 | Repozitorij | Greenfield (novi repo; nije Avicena) |
 | Domen | dentord.com |
 | Primarni market | Balkan → zatim globalno |
-| UI jezici (start) | BS (default), EN |
+| UI jezici (start) | BS (default), HR, SR (latinica), EN — HR/SR dijele BS sadržaj dok nema pravog prevoda |
 | Valuta prikaza | EUR (cijene prikazane sa PDV-om) |
 
 ---
@@ -67,7 +67,7 @@ Odluke su finalne za v1 planiranje. Agent/developer **ne nagađa** mimo ovog log
 | D34 | Data residency | EU-only (Supabase EU) |
 | D35 | GDPR delete | Hard delete iz baze uz **owner approval** |
 | D36 | Access log kartona | Ne (samo change audit) |
-| D37 | Jezici start | BS + EN |
+| D37 | Jezici start | BS (default) + HR + SR (latinica) + EN. Strategija sadržaja B: `hr`/`sr` fallback na BS katalog dok ne postoji pravi prevod. EN zaseban. |
 | D38 | Marketing site | Full (SEO, blog, pricing, signup CTA, reviews, case studies) |
 | D39 | Deploy model | Modul ide na produkciju čim je gotov; free period = testiranje s partnerima |
 | D40 | Responsive | Full responsive obavezno |
@@ -455,8 +455,9 @@ Javni prodajni site DentOrd (isti Next.js projekat, public route group).
 
 ### 7.1 Jezici i SEO
 
-- BS + EN
-- Full SEO: meta, sitemap, OG, blog
+- BS (default) + HR + SR (latinica) + EN
+- Strategija B: UI copy za `hr`/`sr` trenutno = BS katalog (`i18n/catalog.ts`); TODO pravi HR/SR prevod
+- Full SEO: meta, sitemap, OG, blog, hreflang za `bs`/`hr`/`sr`/`en`
 - Cookie consent + analytics (PostHog i/ili Plausible)
 
 ### 7.2 Stranice (v1)
@@ -577,7 +578,7 @@ Online naplata usluga pacijentima (avans preko portala): **nadogradnja poslije**
 
 > Progress (2026-07-13): **1–7** done (repo, RLS, auth+MFA+invites+PIN, entitlements, **super-admin skeleton**, marketing, Sentry+PostHog). Faza 1 foundation complete.
 
-1. ~~Greenfield repo (Next.js, Supabase, i18n BS/EN, shadcn)~~
+1. ~~Greenfield repo (Next.js, Supabase, i18n BS/HR/SR/EN, shadcn)~~
 2. ~~Multi-tenant schema + RLS~~
 3. ~~Auth, owner 2FA, invites, PIN operators~~
 4. ~~Plans / entitlements~~ *(feature gates + free-2026 overrides; location/image hard-block helpers; invite limits)*

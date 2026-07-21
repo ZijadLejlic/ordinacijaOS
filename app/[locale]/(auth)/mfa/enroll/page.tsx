@@ -19,7 +19,7 @@ export default async function MfaEnrollPage({ params }: Props) {
 
   return (
     <main className="flex flex-1 items-center justify-center px-4 py-12">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-lg">
         <CardHeader>
           <CardTitle>{t("enrollTitle")}</CardTitle>
           <CardDescription>{t("enrollDescription")}</CardDescription>

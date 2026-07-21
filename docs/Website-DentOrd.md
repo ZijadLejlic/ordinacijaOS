@@ -61,7 +61,7 @@
 
 1. **Sve na jednom mjestu** — pacijenti, karton, odontogram, termini, fakture, zalihe.
 2. **Besplatno do 31.12.2026** — bez kartice, bez rizika, puni Professional paket.
-3. **Napravljen za naš region** — bosanski jezik, EUR + PDV, +387, Europe/Sarajevo.
+3. **Napravljen za naš region** — jezik našeg regiona (BiH, Hrvatska, Srbija), EUR + PDV, +387, Europe/Sarajevo.
 4. **Vaši podaci su sigurni** — EU serveri (Supabase EU, D34), GDPR, dnevni backup, potpuna izolacija klinika.
 5. **Počnite za 5 minuta** — signup → 3 koraka onboardinga → radite.
 
@@ -180,23 +180,25 @@ Pravila:
 
 ### 3.1 Rute (W1)
 
-Public route group u istom projektu: `app/[locale]/(marketing)/`. Default locale **BS** bez prefiksa, EN na `/en/...` (postojeći `next-intl` setup + middleware).
+Public route group u istom projektu: `app/[locale]/(marketing)/`. Locales: **`bs`** (default), **`hr`**, **`sr`** (latinica), **`en`** — svi sa prefixom (`localePrefix: "always"`; unprefixed BS blokiran Next.js rewrite bugom — vidi `i18n/routing.ts`).
 
-| Ruta (BS) | Ruta (EN) | Stranica |
+**Sadržaj (strategija B / D37):** `hr` i `sr` dijele BS message katalog i BS marketing slugove (`i18n/catalog.ts`). Engleski je zaseban katalog. **TODO:** pravi `messages/hr.json` + `messages/sr.json` kad bude prevod.
+
+| Ruta (BS / HR / SR) | Ruta (EN) | Stranica |
 |---|---|---|
-| `/` | `/en` | Home |
-| `/funkcije` | `/en/features` | Funkcije |
-| `/cijene` | `/en/pricing` | Cijene |
-| `/zasto-dentord` | `/en/why-dentord` | Zašto DentOrd |
-| `/tour` | `/en/tour` | Product tour (W6/W7) |
-| `/demo` | `/en/demo` | Demo (screenshots + live demo pristup, W8) |
-| `/faq` | `/en/faq` | FAQ |
-| `/kontakt` | `/en/contact` | Kontakt + "Pozovite me" forma |
-| `/blog` | `/en/blog` | Blog (struktura sad, sadržaj kasnije — W11) |
-| `/privacy` | `/en/privacy` | Privacy Policy (PRD §13.1) |
-| `/terms` | `/en/terms` | Terms of Service (PRD §13.2) |
-| `/dpa` | `/en/dpa` | DPA (PRD §13.3) |
-| `/signup` | — | Postojeći auth flow (izvan marketing groupa) |
+| `/bs`, `/hr`, `/sr` | `/en` | Home |
+| `/bs/funkcije`, `/hr/funkcije`, `/sr/funkcije` | `/en/features` | Funkcije |
+| `/bs/cijene`, `/hr/cijene`, `/sr/cijene` | `/en/pricing` | Cijene |
+| `/bs/zasto-dentord`, `/hr/zasto-dentord`, `/sr/zasto-dentord` | `/en/why-dentord` | Zašto DentOrd |
+| `/bs/tour`, … | `/en/tour` | Product tour (W6/W7) |
+| `/bs/demo`, … | `/en/demo` | Demo (screenshots + live demo pristup, W8) |
+| `/bs/faq`, … | `/en/faq` | FAQ |
+| `/bs/kontakt`, `/hr/kontakt`, `/sr/kontakt` | `/en/contact` | Kontakt + "Pozovite me" forma |
+| `/bs/blog`, … | `/en/blog` | Blog (struktura sad, sadržaj kasnije — W11) |
+| `/bs/privacy`, … | `/en/privacy` | Privacy Policy (PRD §13.1) |
+| `/bs/terms`, … | `/en/terms` | Terms of Service (PRD §13.2) |
+| `/bs/dpa`, … | `/en/dpa` | DPA (PRD §13.3) |
+| `/bs/signup`, … | `/en/signup` | Postojeći auth flow (izvan marketing groupa) |
 
 ### 3.2 Navigacija
 
@@ -204,7 +206,7 @@ Public route group u istom projektu: `app/[locale]/(marketing)/`. Default locale
 
 - Lijevo: logo (link na Home).
 - Sredina: Funkcije · Cijene · Tour · Zašto DentOrd · FAQ.
-- Desno: language switcher (BS/EN) · "Prijava" (ghost link → `/login`) · **"Registruj ordinaciju"** (primarni CTA button → `/signup`).
+- Desno: language dropdown (Bosanski / Hrvatski / Srpski / English — `Locale.*`) · "Prijava" (ghost link → `/login`) · **"Registruj ordinaciju"** (primarni CTA button → `/signup`).
 - Mobile: logo + hamburger → drawer sa svim linkovima, CTA na dnu drawera full-width.
 
 **Footer** (`navy` pozadina, svijetli tekst):
@@ -227,7 +229,7 @@ Public route group u istom projektu: `app/[locale]/(marketing)/`. Default locale
 
 ## 4. Stranice — struktura sekcija i copy
 
-> Copy je draft (W20): BS je primarni, EN prevod. Realizacija smješta stringove u `messages/bs.json` / `messages/en.json` pod namespace `marketing.*`.
+> Copy je draft (W20): BS je primarni katalog; HR/SR trenutno dijele BS (strategija B); EN prevod. Realizacija smješta stringove u `messages/bs.json` / `messages/en.json` pod namespace `Marketing.*`. **TODO:** zasebni HR/SR katalozi.
 
 ### 4.1 Home (`/`)
 
@@ -236,11 +238,11 @@ Redoslijed sekcija:
 1. **Hero** (bijela pozadina + gradijent mrlje)
    - Eyebrow badge (pill, `mist` pozadina, `Sparkles` ikonica) — BS: **"Besplatno za sve ordinacije do 31.12.2026"** / EN: "Free for all clinics until Dec 31, 2026"
    - H1 (Fraunces) — BS: **"Vaša ordinacija, konačno organizovana."** / EN: "Your clinic, finally organized."
-   - Subtitle — BS: *"DentOrd objedinjuje kartone pacijenata, odontogram, termine, fakture i zalihe — u jednoj jednostavnoj aplikaciji, na bosanskom jeziku."* / EN: *"DentOrd brings patient charts, odontogram, appointments, invoices and inventory together — in one simple app."*
+   - Subtitle — BS: *"DentOrd objedinjuje kartone pacijenata, odontogram, termine, fakture i zalihe — u jednoj jednostavnoj aplikaciji, na jeziku našeg regiona."* / EN: *"DentOrd brings patient charts, odontogram, appointments, invoices and inventory together — in one simple app."*
    - CTA red: [Registruj ordinaciju besplatno] [Pogledajte kako radi →] + microcopy.
    - Hero screenshot: **dashboard** u browser okviru (najbogatiji ekran: KPI kartice + današnji termini).
 
-2. **Trust bar** (jedna linija, muted): BS: *"Podaci na EU serverima · GDPR usklađeno · Dnevni backup · Podrška na bosanskom"* — 4 stavke sa Lucide ikonicama (`Server`, `ShieldCheck`, `DatabaseBackup`, `LifeBuoy`).
+2. **Trust bar** (jedna linija, muted): BS: *"Podaci na EU serverima · GDPR usklađeno · Dnevni backup · Podrška na našem jeziku"* — 4 stavke sa Lucide ikonicama (`Server`, `ShieldCheck`, `DatabaseBackup`, `LifeBuoy`). EN trust: *"Support in your language"* (ne *"Support in Bosnian"*).
 
 3. **Problem → rješenje** (`wash` pozadina, 2 kolone)
    - H2 — BS: **"Papirni kartoni i Excel tabele koštaju vas vremena svaki dan."**
@@ -312,7 +314,7 @@ Redoslijed sekcija:
 
 1. Page hero: H1 — BS: **"Zašto ordinacije biraju DentOrd?"**
 2. **Poređenje "prije / poslije"** (2 kolone ili tabela): papir+Excel vs DentOrd — 6 redova (kartoni, termini, fakture, podsjetnici, izvještaji, tim).
-3. **"Napravljen za region"** sekcija: bosanski jezik prvi (D37), EUR + PDV, +387 default (D46), Europe/Sarajevo (D47), podrška na našem jeziku.
+3. **"Napravljen za region"** sekcija: jezik našeg regiona / za BiH, Hrvatsku i Srbiju (D37 — locale `bs` ostaje default, bez claima „samo bosanski“), EUR + PDV, +387 default (D46), Europe/Sarajevo (D47), podrška na našem jeziku.
 4. **Sigurnost i povjerenje** (ista dark sekcija kao Home §6, prošireno: backup D34/§8.3, audit log).
 5. **Roadmap/vizija** (kratko, bez obećanja datuma): AI asistent, SMS/WhatsApp podsjetnici, portal za pacijente — "raste s vama".
 6. Placeholder blok za **case studies** (komponenta postoji, sakrivena kao recenzije — W10 pattern).
@@ -390,36 +392,37 @@ Jedna duga scroll stranica sa **sticky screenshot panelom**: na desktopu lijeva 
 
 ### 5.2 Poglavlja i koraci (usklađeno sa PRD §6.1–6.16)
 
-**Poglavlje 1 — Registracija (2 min)**
+**Poglavlje 1 — Registracija (3 min)**
 1. Klik na "Registruj ordinaciju" — email, lozinka, ime ordinacije, ime vlasnika. Bez kartice.
-2. Potvrda emaila i prva prijava. Napomena: vlasnički nalog koristi MFA radi sigurnosti (D11).
+2. Potvrda emaila i prva prijava.
+3. Owner MFA (authenticator / TOTP, D11): zašto (zaštita vlasničkog naloga i podataka pacijenata; kod u app-u ~30 s, nije SMS; obavezno samo za vlasnika). Šta pripremiti: telefon + besplatna authenticator app. Nakon logina: skeniranje QR → 6-cifreni kod → tek onda onboarding.
 
 **Poglavlje 2 — Postavka ordinacije (5 min, onboarding 3 koraka — D43)**
-3. Korak 1: osnovni podaci + radno vrijeme (screenshot onboarding step 1).
-4. Korak 2: cjenovnik usluga — ručno ili CSV import (D30).
-5. Korak 3: pozivnica timu — doktor/recepcija dobiju email, svako sa svojom ulogom (RBAC).
+4. Korak 1: osnovni podaci + radno vrijeme (screenshot onboarding step 1).
+5. Korak 2: cjenovnik usluga — ručno ili CSV import (D30).
+6. Korak 3: pozivnica timu — doktor/recepcija dobiju email, svako sa svojom ulogom (RBAC).
 
 **Poglavlje 3 — Prvi pacijent (3 min)**
-6. Novi pacijent: kontakt, medicinska historija, alergije.
-7. Karton: dokumenti i RTG slike na jednom mjestu.
-8. Odontogram: klik na zub → status; historija po zubu.
-9. Plan terapije: stavke sa cijenama; pacijent zna šta slijedi.
+7. Novi pacijent: kontakt, medicinska historija, alergije.
+8. Karton: dokumenti i RTG slike na jednom mjestu.
+9. Odontogram: klik na zub → status; historija po zubu.
+10. Plan terapije: stavke sa cijenama; pacijent zna šta slijedi.
 
 **Poglavlje 4 — Termini (2 min)**
-10. Kalendar: dan/sedmica po doktoru; novi termin u 3 klika.
-11. Automatski email podsjetnik pacijentu prije termina.
-12. Otkazan termin → waitlist automatski predlaže zamjenu.
+11. Kalendar: dan/sedmica po doktoru; novi termin u 3 klika.
+12. Automatski email podsjetnik pacijentu prije termina.
+13. Otkazan termin → waitlist automatski predlaže zamjenu.
 
 **Poglavlje 5 — Naplata (3 min)**
-13. Iz završenog tretmana → faktura (EUR, PDV, brend ordinacije).
-14. Uplate i rate (kalkulator rata).
-15. Troškovi + mjesečni izvještaji, izvoz u Excel.
+14. Iz završenog tretmana → faktura (EUR, PDV, brend ordinacije).
+15. Uplate i rate (kalkulator rata).
+16. Troškovi + mjesečni izvještaji, izvoz u Excel.
 
 **Poglavlje 6 — Svakodnevni rad (2 min)**
-16. Dashboard: današnji termini, novi pacijenti, promet.
-17. CRM recall: pacijenti koji dugo nisu dolazili → email u par klikova.
-18. Inventar: stanje zaliha i upozorenja na minimum.
-19. Postavke, uloge i audit: ko šta vidi i ko je šta mijenjao.
+17. Dashboard: današnji termini, novi pacijenti, promet.
+18. CRM recall: pacijenti koji dugo nisu dolazili → email u par klikova.
+19. Inventar: stanje zaliha i upozorenja na minimum.
+20. Postavke, uloge i audit: ko šta vidi i ko je šta mijenjao.
 
 **Završetak**: FinalCta varijanta — BS: **"To je sve. Ozbiljno."** *"Registrujte ordinaciju i prođite ove korake uživo — besplatno do kraja 2026."* + sekundarni link na `/demo`.
 
@@ -439,7 +442,7 @@ Svi 2× WebP, browser okvir (`BrowserFrame`), light tema, brand paleta (§2.1):
 
 - Ključne fraze (BS): *program za stomatološku ordinaciju, softver za zubare, vođenje stomatološke ordinacije, stomatološki karton digitalno, zakazivanje termina stomatolog, dental software Bosna*. EN sekundarno: *dental practice management software*.
 - Meta title šablon: `<Stranica> — DentOrd | Softver za stomatološke ordinacije` (≤ 60 znakova). Home: `DentOrd — Softver za vođenje stomatološke ordinacije`.
-- `hreflang` bs/en parovi; canonical bez query stringova; sitemap.xml + robots.txt; OG slike 1200×630 (template: navy pozadina, logo, naslov stranice u Fraunces).
+- `hreflang` za `bs` / `hr` / `sr` / `en` (+ `x-default` → BS); canonical bez query stringova; sitemap.xml + robots.txt; OG slike 1200×630 (template: navy pozadina, logo, naslov stranice u Fraunces).
 - JSON-LD: `SoftwareApplication` (Home, sa pricing offers), `FAQPage` (FAQ), `Article` (blog).
 - Blog je dugoročni SEO kanal (W11) — prve teme ciljati na fraze iznad.
 
@@ -469,7 +472,7 @@ Svi 2× WebP, browser okvir (`BrowserFrame`), light tema, brand paleta (§2.1):
 
 ### 7.2 Acceptance checklist
 
-- [x] Sve rute iz §3.1 postoje na BS i EN; language switcher čuva trenutnu stranicu
+- [x] Sve rute iz §3.1 postoje na BS/HR/SR/EN; language dropdown čuva trenutnu stranicu
 - [x] Primarni CTA na svakoj stranici vodi direktno na `/signup` (ne na demo/kontakt)
 - [x] Pricing prikazuje 4 paketa sa PDV-om + "Besplatno do 31.12.2026" badge; podaci se slažu sa PRD §4.1–4.3
 - [x] Kontakt forma: zapis u `leads` + email na support@ + rate limit + honeypot; čitanje leads samo super-admin
