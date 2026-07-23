@@ -21,7 +21,19 @@ max_rows = 1000
 # without explicit GRANTs. When unset, new entities are NOT auto-exposed, matching the new cloud
 # default. Set to `true` to keep the legacy behaviour of auto-exposing new entities; this is
 # deprecated and the field is removed on 2026-10-30 once the always-revoked behaviour is permanent.
-# auto_expose_new_tables = true
+#
+# Explicitly `true` here (not left commented/unset): every table in supabase/migrations/*.sql
+# relies on RLS policies as the actual authorization boundary (see
+# .cursor/rules/multi-tenant-security.mdc — "Never bypass RLS for convenience") and none of them
+# carry explicit per-table `grant ... to anon, authenticated, service_role` statements. On a fresh
+# local stack (`supabase start` + `db reset`, e.g. the Security CI job, which always runs against
+# a brand-new Docker Postgres) leaving this unset makes every table — starting with `plans`, the
+# first one any test touches — throw "permission denied for table X" for every role including
+# service_role, since service_role's RLS bypass doesn't help with a missing base GRANT. The
+# already-provisioned remote/staging project predates this CLI default change (or has the
+# Dashboard's "Default privileges for new entities" toggle on), which is why this only ever
+# surfaced against a from-scratch local stack.
+auto_expose_new_tables = true
 
 [api.tls]
 # Enable HTTPS endpoints locally using a self-signed certificate.

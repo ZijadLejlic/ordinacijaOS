@@ -1,7 +1,6 @@
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { CookieConsentBanner } from "@/components/analytics/cookie-consent-banner";
 import { PosthogProvider } from "@/components/analytics/posthog-provider";
 import { routing } from "@/i18n/routing";
 import { marketingMessages } from "@/lib/i18n/client-messages";
@@ -27,11 +26,20 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   // Default client catalog is Marketing-only (cookie banner + marketing pages).
   // App / auth / platform layouts nest a fuller NextIntlClientProvider.
+  //
+  // The cookie-consent banner itself is NOT rendered here (even though this
+  // provider carries its translations): it's `position: fixed` at the
+  // viewport bottom, and this root layout wraps every route group —
+  // (marketing), (auth), (dashboard), (onboarding), (platform). Rendering it
+  // here means it overlays authenticated app pages too, where it can sit on
+  // top of primary action buttons anchored near the bottom of the viewport
+  // (onboarding step 1's "Nastavi", appointment/invoice dialogs, ...) and
+  // block clicks until the user notices and dismisses it. See
+  // (marketing)/layout.tsx, which renders it for marketing pages only.
   return (
     <NextIntlClientProvider messages={marketingMessages(messages)}>
       <PosthogProvider>
         <div className="flex min-h-full flex-1 flex-col">{children}</div>
-        <CookieConsentBanner />
       </PosthogProvider>
     </NextIntlClientProvider>
   );

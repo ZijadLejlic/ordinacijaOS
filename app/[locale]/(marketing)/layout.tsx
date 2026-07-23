@@ -1,6 +1,7 @@
 import { setRequestLocale } from "next-intl/server";
 import { MarketingHeader } from "@/components/marketing/marketing-header";
 import { MarketingFooter } from "@/components/marketing/marketing-footer";
+import { CookieConsentBanner } from "@/components/analytics/cookie-consent-banner";
 import { shouldShowBlogInNav } from "@/lib/blog/posts";
 import type { AppLocale } from "@/i18n/routing";
 
@@ -19,6 +20,7 @@ export default async function MarketingLayout({ children, params }: Props) {
       <MarketingHeader showBlogNav={showBlogNav} />
       <div className="flex flex-1 flex-col">{children}</div>
       <MarketingFooter />
+      <CookieConsentBanner />
     </div>
   );
 }
