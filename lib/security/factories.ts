@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import ws from "ws";
 import type { Database } from "../supabase/database.types";
 
 /**
@@ -49,14 +50,20 @@ export type ClinicWithRoles = {
   byRole: Partial<Record<AppRole, TestUser>>;
 };
 
-// No `realtime: { transport: ws }` option: none of the callers (security suite,
-// e2e helpers) ever open a realtime channel — matches lib/supabase/service.ts, which
-// doesn't pass a realtime option either. Dropping it also avoids a real type mismatch
-// between Node's global `WebSocket` and supabase-js's `WebSocketLikeConstructor` in
-// this dependency version.
+// Node 20 (used by this repo's GitHub Actions runners — see node-version: "20" in
+// .github/workflows/*.yml) has no native WebSocket global, and
+// @supabase/supabase-js's RealtimeClient throws SYNCHRONOUSLY at client construction
+// time (not lazily on first `.channel()` call — see
+// node_modules/@supabase/realtime-js/.../websocket-factory.ts `getWebSocketConstructor`)
+// if it can't find one. `ws` is supabase's own documented fix for this exact Node
+// version. The `as any` cast is needed because `ws`'s type declarations don't
+// structurally match `WebSocketLikeConstructor` (a known `ws`-vs-`realtime-js` typing
+// mismatch, not a real runtime incompatibility).
 export function createSupabaseClient(url: string, key: string) {
   return createClient<Database>(url, key, {
     auth: { autoRefreshToken: false, persistSession: false },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    realtime: { transport: ws as any },
   });
 }
 
