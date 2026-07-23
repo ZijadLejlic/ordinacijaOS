@@ -37,12 +37,23 @@ jobs:
       # lib/security/test-env.ts reads (NEXT_PUBLIC_SUPABASE_URL,
       # NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY) — no repo
       # secrets required for this job.
+      #
+      # `supabase status -o env` encodes every value with Go's `%q` (i.e. each
+      # line is `KEY="value"`, quotes included — see supabase/cli's shared env
+      # encoder). $GITHUB_ENV is NOT a shell: it takes everything after the
+      # first `=` on a line literally, so piping that output straight into it
+      # makes e.g. NEXT_PUBLIC_SUPABASE_URL literally `"http://127.0.0.1:54321"`
+      # (quotes included) instead of `http://127.0.0.1:54321`. supabase-js's
+      # validateSupabaseUrl() then rejects that string because it doesn't start
+      # with `http(s)://` — it starts with `"`. The sed strips exactly that one
+      # outer pair of quotes per `KEY="value"` line before appending.
       - name: Export local Supabase env vars
         run: |
           supabase status -o env \
             --override-name api.url=NEXT_PUBLIC_SUPABASE_URL \
             --override-name auth.anon_key=NEXT_PUBLIC_SUPABASE_ANON_KEY \
             --override-name auth.service_role_key=SUPABASE_SERVICE_ROLE_KEY \
+            | sed -E 's/^([A-Za-z_][A-Za-z0-9_]*)="(.*)"$/\1=\2/' \
             >> "$GITHUB_ENV"
 
       # P0.8 (docs/QA/Implementation-Plan.md): fail closed, not silently skip.
