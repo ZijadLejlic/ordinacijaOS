@@ -1,5 +1,4 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import ws from "ws";
 import type { Database } from "../supabase/database.types";
 
 /**
@@ -20,7 +19,17 @@ import type { Database } from "../supabase/database.types";
  * Playwright's e2e/helpers, which don't share a module resolution config.
  */
 
-export type DbClient = SupabaseClient<Database, "public">;
+// Single type param (not `SupabaseClient<Database, "public">`), matching every other
+// `type Client = SupabaseClient<Database>` in this codebase (lib/auth/mfa.ts,
+// lib/onboarding/gate.ts, lib/invoices/actions.ts, etc.) — and `createSupabaseClient`
+// below intentionally has no explicit return-type annotation, matching the working
+// lib/supabase/service.ts pattern. This @supabase/supabase-js version's `SupabaseClient`
+// resolves several of its type params via nested conditional defaults; annotating a
+// wrapper function's return type as an independently-written `SupabaseClient<...>`
+// alias makes TS compare two separately-resolved instantiations of those conditional
+// defaults, which it (wrongly) treats as incompatible — a real quirk that only
+// surfaces under `next build`'s production type-check, not a config difference.
+export type DbClient = SupabaseClient<Database>;
 export type AppRole = Database["public"]["Enums"]["app_role"];
 
 export type TestUser = {
@@ -40,10 +49,14 @@ export type ClinicWithRoles = {
   byRole: Partial<Record<AppRole, TestUser>>;
 };
 
-export function createSupabaseClient(url: string, key: string): DbClient {
-  return createClient<Database, "public">(url, key, {
+// No `realtime: { transport: ws }` option: none of the callers (security suite,
+// e2e helpers) ever open a realtime channel — matches lib/supabase/service.ts, which
+// doesn't pass a realtime option either. Dropping it also avoids a real type mismatch
+// between Node's global `WebSocket` and supabase-js's `WebSocketLikeConstructor` in
+// this dependency version.
+export function createSupabaseClient(url: string, key: string) {
+  return createClient<Database>(url, key, {
     auth: { autoRefreshToken: false, persistSession: false },
-    realtime: { transport: ws },
   });
 }
 
