@@ -1,68 +1,22 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import ws from "ws";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import type { Database } from "@/lib/supabase/database.types";
 import { getSecurityTestEnv } from "@/lib/security/test-env";
+import {
+  cleanupClinics,
+  createClinicWithRoles,
+  createSupabaseClient,
+  randomTag,
+  signInAs,
+  type AppRole,
+  type DbClient,
+  type TestUser,
+} from "@/lib/security/factories";
 
-type DbClient = SupabaseClient<Database>;
-type AppRole = Database["public"]["Enums"]["app_role"];
-
-type TestClinic = {
-  clinicId: string;
-  userId: string;
-  email: string;
-  password: string;
-  role: AppRole;
-};
+type TestClinic = TestUser;
 
 const env = getSecurityTestEnv();
 const describeSecurity = env ? describe : describe.skip;
 
-function createSupabaseClient(url: string, key: string): DbClient {
-  return createClient<Database>(url, key, {
-    auth: { autoRefreshToken: false, persistSession: false },
-    realtime: { transport: ws },
-  });
-}
-
-function randomTag() {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-}
-
-async function signInAs(
-  url: string,
-  anonKey: string,
-  email: string,
-  password: string,
-): Promise<DbClient> {
-  const client = createSupabaseClient(url, anonKey);
-
-  const { error } = await client.auth.signInWithPassword({ email, password });
-  if (error) {
-    throw new Error(`signIn failed for ${email}: ${error.message}`);
-  }
-
-  return client;
-}
-
-async function createAuthUser(
-  service: DbClient,
-  email: string,
-  password: string,
-) {
-  const { data, error } = await service.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true,
-  });
-
-  if (error || !data.user) {
-    throw new Error(error?.message ?? "createUser failed");
-  }
-
-  return data.user;
-}
-
+/** P0.9: thin wrapper over the shared factory — keeps call sites below unchanged. */
 async function createTestClinic(
   service: DbClient,
   options: {
@@ -71,92 +25,30 @@ async function createTestClinic(
     planCode?: string;
   },
 ): Promise<TestClinic> {
-  const tag = randomTag();
-  const email = `security-test-${tag}@ordinacijaos.test`;
-  const password = `Test-${tag}!Aa1`;
-
-  const user = await createAuthUser(service, email, password);
-
-  const planCode = options.planCode ?? "professional";
-  const { data: plan, error: planError } = await service
-    .from("plans")
-    .select("id")
-    .eq("code", planCode)
-    .single();
-
-  if (planError || !plan) {
-    throw new Error(planError?.message ?? "plan not found");
-  }
-
-  const { data: clinic, error: clinicError } = await service
-    .from("clinics")
-    .insert({
-      name: options.clinicName,
-      plan_id: plan.id,
-      trial_ends_at: "2026-12-31T23:59:59+00:00",
-    })
-    .select("id")
-    .single();
-
-  if (clinicError || !clinic) {
-    throw new Error(clinicError?.message ?? "clinic insert failed");
-  }
-
-  const { error: profileError } = await service.from("profiles").insert({
-    id: user.id,
-    clinic_id: clinic.id,
-    role: options.role,
-    full_name: `Security Test ${options.role}`,
-    is_active: true,
+  const { users } = await createClinicWithRoles(service, {
+    roles: [options.role],
+    clinicName: options.clinicName,
+    planCode: options.planCode,
+    emailPrefix: "security-test",
   });
-
-  if (profileError) {
-    throw new Error(profileError.message);
-  }
-
-  return {
-    clinicId: clinic.id,
-    userId: user.id,
-    email,
-    password,
-    role: options.role,
-  };
-}
-
-async function cleanupTestData(service: DbClient, clinics: TestClinic[]) {
-  const clinicIds = [...new Set(clinics.map((c) => c.clinicId))];
-
-  for (const clinicId of clinicIds) {
-    await service
-      .from("clinics")
-      .update({ status: "pending_delete" })
-      .eq("id", clinicId);
-    const { error } = await service.rpc("hard_delete_clinic", {
-      p_clinic_id: clinicId,
-    });
-    if (error) {
-      await service.from("clinic_invites").delete().eq("clinic_id", clinicId);
-      await service.from("clinic_locations").delete().eq("clinic_id", clinicId);
-      await service.from("audit_events").delete().eq("clinic_id", clinicId);
-      await service.from("clinic_subscriptions").delete().eq("clinic_id", clinicId);
-      await service.from("profiles").delete().eq("clinic_id", clinicId);
-      await service.from("clinics").delete().eq("id", clinicId);
-    }
-  }
-
-  for (const clinic of clinics) {
-    await service.auth.admin.deleteUser(clinic.userId).catch(() => undefined);
-  }
+  return users[0];
 }
 
 describeSecurity("tenant isolation & RBAC (release blocker)", () => {
-  const { url, anonKey, serviceKey } = env!;
+  // `env` is only non-null when describeSecurity === describe (not describe.skip).
+  // Destructuring lazily inside beforeAll (rather than here in the describe body,
+  // which vitest always executes to discover the suite) keeps the "no DB configured"
+  // path a clean skip instead of a TypeError on `env!`.
+  let url: string;
+  let anonKey: string;
+  let serviceKey: string;
   let service: DbClient;
   let clinicA: TestClinic;
   let clinicB: TestClinic;
   const created: TestClinic[] = [];
 
   beforeAll(async () => {
+    ({ url, anonKey, serviceKey } = env!);
     service = createSupabaseClient(url, serviceKey);
 
     clinicA = await createTestClinic(service, {
@@ -171,7 +63,7 @@ describeSecurity("tenant isolation & RBAC (release blocker)", () => {
   }, 60_000);
 
   afterAll(async () => {
-    await cleanupTestData(service, created);
+    await cleanupClinics(service, created);
   }, 60_000);
 
   it("clinic A doctor cannot read clinic B profiles", async () => {

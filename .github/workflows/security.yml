@@ -7,8 +7,9 @@ on:
 
 jobs:
   tenant-isolation:
-    name: Tenant isolation & RBAC
+    name: Tenant isolation & RBAC (local Supabase)
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
@@ -19,9 +20,37 @@ jobs:
 
       - run: npm ci
 
-      - name: Run security integration tests
+      # P0.7 (docs/QA/Implementation-Plan.md): hermetic local Supabase instead of
+      # remote staging secrets — matches Test-Strategy.md's "Local DB" target and
+      # closes D-01/D-05 residual gap (this job never ran end-to-end before).
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start local Supabase stack
+        run: supabase start
+
+      - name: Reset local DB (applies all migrations + supabase/seed.sql)
+        run: supabase db reset
+
+      # Maps local-stack connection info onto the exact env vars
+      # lib/security/test-env.ts reads (NEXT_PUBLIC_SUPABASE_URL,
+      # NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY) — no repo
+      # secrets required for this job.
+      - name: Export local Supabase env vars
+        run: |
+          supabase status -o env \
+            --override-name api.url=NEXT_PUBLIC_SUPABASE_URL \
+            --override-name auth.anon_key=NEXT_PUBLIC_SUPABASE_ANON_KEY \
+            --override-name auth.service_role_key=SUPABASE_SERVICE_ROLE_KEY \
+            >> "$GITHUB_ENV"
+
+      # P0.8 (docs/QA/Implementation-Plan.md): fail closed, not silently skip.
+      # If the env export step above ever regresses (wrong override name, CLI
+      # output format change, etc.), getSecurityTestEnv() throws instead of
+      # returning null — the job goes red instead of reporting a fake-green
+      # "2 skipped". See D-15 in docs/QA/Discrepancies.md.
+      - name: Run security integration tests (fail closed if it would skip)
         env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          SECURITY_TESTS_REQUIRED: "1"
         run: npm run test:security

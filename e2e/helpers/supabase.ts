@@ -1,25 +1,23 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import ws from "ws";
-import type { Database } from "../../lib/supabase/database.types";
+import {
+  createSupabaseClient,
+  randomTag as sharedRandomTag,
+  type AppRole,
+  type DbClient,
+} from "../../lib/security/factories";
 import { requireE2EEnv } from "./env";
 
-export type DbClient = SupabaseClient<Database, "public">;
-export type AppRole = Database["public"]["Enums"]["app_role"];
+// Re-exported for existing e2e imports; the actual client/type live in the
+// shared P0.9 factory module (lib/security/factories.ts).
+export type { AppRole, DbClient };
 
 export function createServiceClient(): DbClient {
   const { url, serviceKey } = requireE2EEnv();
-  return createClient<Database, "public">(url, serviceKey, {
-    auth: { autoRefreshToken: false, persistSession: false },
-    realtime: { transport: ws },
-  });
+  return createSupabaseClient(url, serviceKey);
 }
 
 export function createAnonClient(): DbClient {
   const { url, anonKey } = requireE2EEnv();
-  return createClient<Database, "public">(url, anonKey, {
-    auth: { autoRefreshToken: false, persistSession: false },
-    realtime: { transport: ws },
-  });
+  return createSupabaseClient(url, anonKey);
 }
 
 export async function signInAs(
@@ -34,6 +32,6 @@ export async function signInAs(
   return client;
 }
 
-export function randomTag() {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+export function randomTag(): string {
+  return sharedRandomTag();
 }

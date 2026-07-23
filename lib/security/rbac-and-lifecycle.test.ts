@@ -1,77 +1,20 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import ws from "ws";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import type { Database } from "@/lib/supabase/database.types";
 import { getSecurityTestEnv } from "@/lib/security/test-env";
-
-type DbClient = SupabaseClient<Database>;
-type AppRole = Database["public"]["Enums"]["app_role"];
-
-type TestUser = {
-  clinicId: string;
-  userId: string;
-  email: string;
-  password: string;
-  role: AppRole;
-};
+import {
+  cleanupClinics,
+  createClinicWithRoles,
+  createSupabaseClient,
+  randomTag,
+  signInAs,
+  type AppRole,
+  type DbClient,
+  type TestUser,
+} from "@/lib/security/factories";
 
 const env = getSecurityTestEnv();
 const describeSecurity = env ? describe : describe.skip;
 
-function createSupabaseClient(url: string, key: string): DbClient {
-  return createClient<Database>(url, key, {
-    auth: { autoRefreshToken: false, persistSession: false },
-    realtime: { transport: ws },
-  });
-}
-
-function randomTag() {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-}
-
-async function signInAs(
-  url: string,
-  anonKey: string,
-  email: string,
-  password: string,
-): Promise<DbClient> {
-  const client = createSupabaseClient(url, anonKey);
-  const { error } = await client.auth.signInWithPassword({ email, password });
-  if (error) {
-    throw new Error(`signIn failed for ${email}: ${error.message}`);
-  }
-  return client;
-}
-
-async function createAuthUser(
-  service: DbClient,
-  email: string,
-  password: string,
-) {
-  const { data, error } = await service.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true,
-  });
-  if (error || !data.user) {
-    throw new Error(error?.message ?? "createUser failed");
-  }
-  return data.user;
-}
-
-async function resolvePlanId(service: DbClient, planCode = "professional") {
-  const { data: plan, error } = await service
-    .from("plans")
-    .select("id")
-    .eq("code", planCode)
-    .single();
-  if (error || !plan) {
-    throw new Error(error?.message ?? `plan ${planCode} not found`);
-  }
-  return plan.id;
-}
-
-/** Direct clinic+profile insert (no onboarding gate, no MFA enrollment). */
+/** P0.9: thin wrapper over the shared factory — keeps call sites below unchanged. */
 async function createClinicUser(
   service: DbClient,
   options: {
@@ -81,79 +24,26 @@ async function createClinicUser(
     clinicId?: string;
   },
 ): Promise<TestUser> {
-  const tag = randomTag();
-  const email = `rbac-${options.role}-${tag}@ordinacijaos.test`;
-  const password = `Test-${tag}!Aa1`;
-
-  const user = await createAuthUser(service, email, password);
-  let clinicId = options.clinicId;
-
-  if (!clinicId) {
-    const planId = await resolvePlanId(service, options.planCode);
-    const { data: clinic, error: clinicError } = await service
-      .from("clinics")
-      .insert({
-        name: options.clinicName,
-        plan_id: planId,
-        trial_ends_at: "2026-12-31T23:59:59+00:00",
-      })
-      .select("id")
-      .single();
-
-    if (clinicError || !clinic) {
-      throw new Error(clinicError?.message ?? "clinic insert failed");
-    }
-    clinicId = clinic.id;
-  }
-
-  const { error: profileError } = await service.from("profiles").insert({
-    id: user.id,
-    clinic_id: clinicId,
-    role: options.role,
-    full_name: `RBAC ${options.role} ${tag}`,
-    is_active: true,
+  const { users } = await createClinicWithRoles(service, {
+    roles: [options.role],
+    clinicName: options.clinicName,
+    planCode: options.planCode,
+    clinicId: options.clinicId,
+    emailPrefix: "rbac",
   });
-
-  if (profileError) {
-    throw new Error(profileError.message);
-  }
-
-  return { clinicId, userId: user.id, email, password, role: options.role };
-}
-
-async function cleanupUsers(service: DbClient, users: TestUser[]) {
-  const clinicIds = [...new Set(users.map((u) => u.clinicId))];
-
-  for (const clinicId of clinicIds) {
-    await service
-      .from("clinics")
-      .update({ status: "pending_delete" })
-      .eq("id", clinicId);
-
-    const { error } = await service.rpc("hard_delete_clinic", {
-      p_clinic_id: clinicId,
-    });
-    if (error) {
-      await service.from("gdpr_erasure_requests").delete().eq("clinic_id", clinicId);
-      await service.from("clinic_operators").delete().eq("clinic_id", clinicId);
-      await service.from("clinic_locations").delete().eq("clinic_id", clinicId);
-      await service.from("patients").delete().eq("clinic_id", clinicId);
-      await service.from("audit_events").delete().eq("clinic_id", clinicId);
-      await service.from("clinic_subscriptions").delete().eq("clinic_id", clinicId);
-      await service.from("profiles").delete().eq("clinic_id", clinicId);
-      await service.from("clinics").delete().eq("id", clinicId);
-    }
-  }
-
-  for (const user of users) {
-    await service.auth.admin.deleteUser(user.userId).catch(() => undefined);
-  }
+  return users[0];
 }
 
 describeSecurity(
   "RBAC matrix, PIN operators, GDPR & clinic lifecycle (release blocker)",
   () => {
-    const { url, anonKey, serviceKey } = env!;
+    // `env` is only non-null when describeSecurity === describe (not describe.skip).
+    // Destructuring lazily inside beforeAll (rather than here in the describe body,
+    // which vitest always executes to discover the suite) keeps the "no DB configured"
+    // path a clean skip instead of a TypeError on `env!`.
+    let url: string;
+    let anonKey: string;
+    let serviceKey: string;
     let service: DbClient;
     let owner: TestUser;
     let doctor: TestUser;
@@ -162,6 +52,7 @@ describeSecurity(
     const created: TestUser[] = [];
 
     beforeAll(async () => {
+      ({ url, anonKey, serviceKey } = env!);
       service = createSupabaseClient(url, serviceKey);
 
       owner = await createClinicUser(service, {
@@ -187,7 +78,7 @@ describeSecurity(
     }, 60_000);
 
     afterAll(async () => {
-      await cleanupUsers(service, created);
+      await cleanupClinics(service, created);
     }, 60_000);
 
     describe("RBAC matrix (PRD §3.2)", () => {

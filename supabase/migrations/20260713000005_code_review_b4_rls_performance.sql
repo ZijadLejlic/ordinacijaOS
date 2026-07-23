@@ -28,7 +28,7 @@ create policy audit_events_insert_member
 on public.audit_events
 for insert
 to authenticated
-with_check (
+with check (
   clinic_id = (select current_clinic_id())
   and actor_user_id = (select auth.uid())
 );
@@ -47,7 +47,7 @@ as restrictive
 for all
 to authenticated
 using ((select owner_mfa_ok()))
-with_check ((select owner_mfa_ok()));
+with check ((select owner_mfa_ok()));
 
 -- ---------------------------------------------------------------------------
 -- clinic_invites — owner write split (INSERT/UPDATE/DELETE only)
@@ -59,7 +59,7 @@ create policy clinic_invites_insert_owner
 on public.clinic_invites
 for insert
 to authenticated
-with_check (
+with check (
   clinic_id = (select current_clinic_id())
   and (select is_clinic_owner())
 );
@@ -72,7 +72,7 @@ using (
   clinic_id = (select current_clinic_id())
   and (select is_clinic_owner())
 )
-with_check (
+with check (
   clinic_id = (select current_clinic_id())
   and (select is_clinic_owner())
 );
@@ -103,7 +103,7 @@ as restrictive
 for all
 to authenticated
 using ((select owner_mfa_ok()))
-with_check ((select owner_mfa_ok()));
+with check ((select owner_mfa_ok()));
 
 -- ---------------------------------------------------------------------------
 -- clinic_locations
@@ -115,7 +115,7 @@ create policy clinic_locations_insert_owner
 on public.clinic_locations
 for insert
 to authenticated
-with_check (
+with check (
   clinic_id = (select current_clinic_id())
   and (select is_clinic_owner())
 );
@@ -128,7 +128,7 @@ using (
   clinic_id = (select current_clinic_id())
   and (select is_clinic_owner())
 )
-with_check (
+with check (
   clinic_id = (select current_clinic_id())
   and (select is_clinic_owner())
 );
@@ -156,7 +156,7 @@ as restrictive
 for all
 to authenticated
 using ((select owner_mfa_ok()))
-with_check ((select owner_mfa_ok()));
+with check ((select owner_mfa_ok()));
 
 -- ---------------------------------------------------------------------------
 -- clinic_operators
@@ -168,7 +168,7 @@ create policy clinic_operators_insert_owner
 on public.clinic_operators
 for insert
 to authenticated
-with_check (
+with check (
   clinic_id = (select current_clinic_id())
   and (select is_clinic_owner())
 );
@@ -181,7 +181,7 @@ using (
   clinic_id = (select current_clinic_id())
   and (select is_clinic_owner())
 )
-with_check (
+with check (
   clinic_id = (select current_clinic_id())
   and (select is_clinic_owner())
 );
@@ -209,7 +209,7 @@ as restrictive
 for all
 to authenticated
 using ((select owner_mfa_ok()))
-with_check ((select owner_mfa_ok()));
+with check ((select owner_mfa_ok()));
 
 -- ---------------------------------------------------------------------------
 -- clinic_subscriptions
@@ -234,7 +234,7 @@ using (
   clinic_id = (select current_clinic_id())
   and (select is_clinic_owner())
 )
-with_check (
+with check (
   clinic_id = (select current_clinic_id())
   and (select is_clinic_owner())
 );
@@ -246,7 +246,7 @@ as restrictive
 for all
 to authenticated
 using ((select owner_mfa_ok()))
-with_check ((select owner_mfa_ok()));
+with check ((select owner_mfa_ok()));
 
 -- ---------------------------------------------------------------------------
 -- clinics
@@ -268,7 +268,7 @@ using (
   id = (select current_clinic_id())
   and (select is_clinic_owner())
 )
-with_check (
+with check (
   id = (select current_clinic_id())
   and (select is_clinic_owner())
 );
@@ -280,7 +280,7 @@ as restrictive
 for all
 to authenticated
 using ((select owner_mfa_ok()))
-with_check ((select owner_mfa_ok()));
+with check ((select owner_mfa_ok()));
 
 -- ---------------------------------------------------------------------------
 -- profiles — keep separate UPDATE policies (merged policy caused RLS recursion)
@@ -295,7 +295,7 @@ on public.profiles
 for update
 to authenticated
 using (id = (select auth.uid()))
-with_check (
+with check (
   id = (select auth.uid())
   and clinic_id = (select current_clinic_id())
 );
@@ -308,7 +308,7 @@ using (
   clinic_id = (select current_clinic_id())
   and (select is_clinic_owner())
 )
-with_check (
+with check (
   clinic_id = (select current_clinic_id())
   and (select is_clinic_owner())
 );
@@ -327,4 +327,4 @@ as restrictive
 for all
 to authenticated
 using ((select owner_mfa_ok()))
-with_check ((select owner_mfa_ok()));
+with check ((select owner_mfa_ok()));
