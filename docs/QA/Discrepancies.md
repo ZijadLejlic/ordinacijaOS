@@ -20,7 +20,7 @@ Related: [Traceability-Matrix.md](./Traceability-Matrix.md) §10, [Threat-Model.
 
 ## 2. Findings
 
-### D-01 — Schema not reproducible from local migrations (S0) — **RESOLVED (partial: E2E reset pending Docker)**
+### D-01 — Schema not reproducible from local migrations (S0) — **RESOLVED 2026-07-23**
 
 **Evidence (original)**
 
@@ -44,10 +44,11 @@ Related: [Traceability-Matrix.md](./Traceability-Matrix.md) §10, [Threat-Model.
 - Replaced stub content in `phase2a_clinical_core.sql`, `phase2b_treatment_plans.sql`, `phase2c_appointments.sql`, `phase2d_invoices.sql`, `phase2e_expenses.sql` with full executable SQL (tables/enums/functions/triggers/RLS/storage), matching the remote schema.
 - **Bug fix found and fixed in the same pass**: `20260713000005_code_review_b4_rls_performance.sql` had a syntax error — `with_check (` instead of valid Postgres `with check (` — 18 occurrences, would have blocked `supabase db reset` outright regardless of the stub issue above.
 - **Verified read-only via Supabase MCP `execute_sql`** against the remote project (zero DDL sent to remote): 67/67 function names, 35/35 tables, 14/14 enums match exactly; `pg_policies.permissive` cross-checked for all `owner_mfa_aal2` policies (PERMISSIVE on treatment_plans/treatment_plan_items/invoices/invoice_lines/payments/payment_plans/payment_plan_installments, RESTRICTIVE on appointments/appointment_waitlist/expenses/patients — matches implementation); 11 storage.objects policy names match; `invoice_lines.vat_rate numeric(5,4)` vs `services.vat_rate numeric(5,2)` confirmed and correctly implemented as different scales.
-- **Residual gap**: `supabase db reset` full E2E run is **blocked** in this sandbox/CI environment — no Docker/Colima/Podman/psql/postgres available (`npx supabase start` fails with "Cannot connect to the Docker daemon"). Syntax review + remote cross-check (function/table/enum/policy counts and flags) give high confidence, but an actual `supabase db reset` has not been executed end-to-end. **Action for a Docker-enabled environment/CI**: run the Verification command below once and report pass/fail; no further schema authoring expected unless it fails.
-- **P0.7 update (2026-07-23)**: [`.github/workflows/security.yml`](../../.github/workflows/security.yml) now runs exactly this `supabase start` / `supabase db reset` sequence (plus `test:security`) on every PR — that workflow's first live run **is** the Docker-enabled verification this residual gap has been waiting on. Report its pass/fail here once it has run.
+- **Residual gap (now closed)**: local dev sandbox still has no Docker/Colima/Podman (`docker not found`), so `supabase db reset` cannot be run from *this* environment. That is expected/permanent for this sandbox, not a product gap.
+- **P0.7 update (2026-07-23)**: [`.github/workflows/security.yml`](../../.github/workflows/security.yml) runs exactly this `supabase start` / `supabase db reset` sequence (plus `test:security`) on every PR/push on a real GitHub Actions runner (which has Docker).
+- **Live verification (2026-07-23, closes the residual)**: confirmed via `gh run view <run-id> --log` on the latest green run on `main` (commit `37a4927`, run [`30048179856`](https://github.com/ZijadLejlic/ordinacijaOS/actions/runs/30048179856)) — job **"Tenant isolation & RBAC (local Supabase)"** log shows, in order: `Run supabase start` → `Seeding data from supabase/seed.sql...` → `Started supabase local development setup.` → `Run supabase db reset` → `Seeding data from supabase/seed.sql...` → `Finished supabase db reset on branch main.` → `Run npm run test:security` with `SECURITY_TESTS_REQUIRED: 1` → `Test Files 2 passed (2)` / `Tests 21 passed (21)`. Workflow conclusion: `success`. This is the actual Docker-enabled `supabase db reset` E2E run the plan required — no longer just syntax-reviewed.
 
-**Verification command (run once Docker is available)**
+**Verification command (proven green in CI; requires Docker locally to reproduce outside CI)**
 
 ```bash
 supabase start
@@ -126,7 +127,7 @@ supabase db reset
 
 ---
 
-### D-05 — Pure unit tests not in CI (S1) — **PARTIAL: P0.2/P0.4/P0.6/P0.7 written, live CI run + P0.8 gate open**
+### D-05 — Pure unit tests not in CI (S1) — **RESOLVED 2026-07-23**
 
 **Evidence**
 
@@ -148,9 +149,9 @@ supabase db reset
 - P0.2 (done 2026-07-23): [`supabase/config.toml`](../../supabase/config.toml) committed so a local Supabase stack (Auth hooks/MFA/JWT expiry) is reproducible for `test:security` in CI — prerequisite for P0.6/P0.7.
 - P0.4 (done 2026-07-23): [`package.json`](../../package.json) scripts split — `test:unit` = `vitest run --exclude "lib/security/**"` (14 files, verified green, zero Supabase env needed), `test:security` = the 2 existing security files (unchanged allowlist), `test` = `npm run test:unit && npm run test:security` composed so both run when local DB is up. Verified `test:unit` passes standalone with no `.env.local`/env vars present.
 - P0.6 (done 2026-07-23): added [`.github/workflows/unit.yml`](../../.github/workflows/unit.yml) — runs `npm run test:unit` on every `pull_request` and on `push` to `main`, no secrets/`env:` block (confirmed the 14-file/59-test suite is fully DB-free). This closes the "14 pure unit files never run on PR" evidence above.
-- P0.7 (written 2026-07-23, execution unverified — see D-01): rewrote [`.github/workflows/security.yml`](../../.github/workflows/security.yml) to run `test:security` against a **local** Supabase CLI stack (`supabase start` + `db reset`, env vars sourced from `supabase status -o env`) instead of remote-project secrets. This is the "documented staging fallback" alternative resolved in favor of local, per the plan's stated preference. **Not yet proven green**: no Docker in this sandbox, so the first real signal will be this workflow's first run on an actual PR/GitHub Actions runner.
+- P0.7 (done 2026-07-23): rewrote [`.github/workflows/security.yml`](../../.github/workflows/security.yml) to run `test:security` against a **local** Supabase CLI stack (`supabase start` + `db reset`, env vars sourced from `supabase status -o env`) instead of remote-project secrets. This is the "documented staging fallback" alternative resolved in favor of local, per the plan's stated preference. **Proven green 2026-07-23**: latest run on `main` (commit `37a4927`, run [`30048179856`](https://github.com/ZijadLejlic/ordinacijaOS/actions/runs/30048179856)) — `supabase start` → `supabase db reset` → `npm run test:security` (`SECURITY_TESTS_REQUIRED=1`) → `2 passed (2)` files / `21 passed (21)` tests, workflow conclusion `success`. Same push's `Unit tests` job: `15 passed (15)` files / `65 passed (65)` tests (also `success`), confirming `.github/workflows/unit.yml` runs on every push/PR with no secrets.
 - P0.8 (done 2026-07-23): [`security.yml`](../../.github/workflows/security.yml) now sets `SECURITY_TESTS_REQUIRED: "1"` on the `test:security` step, and [`getSecurityTestEnv()`](../../lib/security/test-env.ts) throws (module-load time, so the file reports **failed**, not skipped) if that flag is set and any DB env var is still missing — closing the "still possible if `supabase start` were ever skipped/misconfigured" gap. Verified live both ways (flag+missing env → `2 failed`, real `exit 1`; no flag+missing env → clean `2 skipped`, `exit 0`) and unit-tested in [`test-env.test.ts`](../../lib/security/test-env.test.ts).
-- **Still open**: confirming P0.7's live `supabase start`/`db reset`/`test:security` run is green on an actual Docker-enabled runner (same residual as D-01).
+- **Closed 2026-07-23**: confirmed via `gh run list`/`gh run view --log` that P0.7's live `supabase start`/`db reset`/`test:security` run is green on the actual GitHub Actions runner (Docker available there) — see D-01 for the full log excerpt. No further action open for D-05.
 
 ---
 
@@ -438,11 +439,11 @@ Stripe, AI, SMS/WhatsApp, portal, online booking, mini-site, lab — correctly o
 
 | ID | Sev | Topic | Test IDs |
 |---|---|---|---|
-| D-01 | S0 | Migrations stubs / non-reproducible DB | P0 harness — **RESOLVED** (2026-07-23), E2E `db reset` pending Docker env |
+| D-01 | S0 | Migrations stubs / non-reproducible DB | P0 harness — **RESOLVED** (2026-07-23), `supabase start`/`db reset` proven green in CI run `30048179856` |
 | D-02 | S0 | Image limit app-only | `FILE-DB-001` |
 | D-03 | S0 | Feature entitlements app-only | `PLAN-SEC-001` |
 | D-04 | S1 | JWT hook manual | `TEN-SEC-004` |
-| D-05 | S1 | Unit tests not in CI | P0 CI — **PARTIAL**, config.toml/npm scripts/CI unit+security workflows + fail-closed gate written (P0.2/P0.4/P0.6/P0.7/P0.8); only P0.7's live Docker-enabled CI run is open |
+| D-05 | S1 | Unit tests not in CI | P0 CI — **RESOLVED** (2026-07-23): unit.yml + security.yml (local Supabase) + fail-closed gate all green in CI run `30048179856` |
 | D-06 | S1 | Lockout owner notify | `AUTH-INT-002` |
 | D-07 | S2 | Force logout scope | `AUTH-INT-020` |
 | D-08 | S2 | Invoice legal settings gates | `FIN-INT-015` |

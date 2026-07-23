@@ -139,16 +139,16 @@ Format per row: **ID** · Requirement · Risk · Level · Preconditions · Expec
 | TEN-RLS-008 | D7 §6.5 | Appointment leak | RLS | A/B appts | A cannot read B appts | Critical | COVERED |
 | TEN-RLS-009 | D21 | Storage cross-clinic | RLS | file in B path | A cannot list/download B `patient-files` | Critical | COVERED |
 | TEN-E2E-001 | §12.2 | UI IDOR | E2E | A/B patients | B patient 404 / hidden in list | Critical | COVERED |
-| TEN-RLS-010 | D7 | Cross-clinic invoices | RLS | invoice in B | A cannot read/write | Critical | GAP |
-| TEN-RLS-011 | D7 | Cross-clinic expenses | RLS | expense in B | denied | Critical | GAP |
-| TEN-RLS-012 | D7 | Cross-clinic treatment plans | RLS | plan in B | denied | Critical | GAP |
-| TEN-RLS-013 | D7 | Cross-clinic CRM/email | RLS | rows in B | denied | Critical | GAP |
-| TEN-RLS-014 | D7 | Cross-clinic inventory/consent | RLS | rows in B | denied | Critical | GAP |
-| TEN-RLS-015 | D7 | Cross-clinic locations/invites | RLS | rows in B | denied | Critical | GAP |
-| TEN-SEC-002 | D7 | INSERT with forged clinic_id | SEC | A JWT | WITH CHECK rejects | Critical | GAP |
-| FILE-RLS-002 | D21 | Upload to other clinic folder | RLS | A JWT | storage policy denies | Critical | GAP |
-| FILE-SEC-001 | D21 | Public list buckets | SEC | anon | empty / denied | Critical | PARTIAL |
-| FILE-SEC-003 | D21 FIN | Invoice PDF path IDOR | API | A session, B invoice id | 403/404 | Critical | GAP |
+| TEN-RLS-010 | D7 | Cross-clinic invoices | RLS | invoice in B | A cannot read/write | Critical | COVERED |
+| TEN-RLS-011 | D7 | Cross-clinic expenses | RLS | expense in B | denied | Critical | COVERED |
+| TEN-RLS-012 | D7 | Cross-clinic treatment plans | RLS | plan in B | denied | Critical | COVERED |
+| TEN-RLS-013 | D7 | Cross-clinic CRM/email | RLS | rows in B | denied | Critical | COVERED |
+| TEN-RLS-014 | D7 | Cross-clinic inventory/consent | RLS | rows in B | denied | Critical | COVERED |
+| TEN-RLS-015 | D7 | Cross-clinic locations/invites | RLS | rows in B | denied | Critical | COVERED |
+| TEN-SEC-002 | D7 | INSERT with forged clinic_id | SEC | A JWT | WITH CHECK rejects | Critical | COVERED |
+| FILE-RLS-002 | D21 | Upload to other clinic folder | RLS | A JWT | storage policy denies | Critical | COVERED |
+| FILE-SEC-001 | D21 | Public list buckets | SEC | anon | empty / denied | Critical | COVERED |
+| FILE-SEC-003 | D21 FIN | Invoice PDF path IDOR | API | A session, B invoice id | 403/404 | Critical | COVERED |
 
 #### Auth / MFA / privilege
 
