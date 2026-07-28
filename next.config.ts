@@ -8,6 +8,13 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: process.cwd(),
   },
+  // Patient PDFs allow 20 MB; Server Actions default to 1 MB and reject larger
+  // image/document uploads with 413 before the action runs (prod smoke finding).
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "21mb",
+    },
+  },
 };
 
 const withIntl = withNextIntl(nextConfig);

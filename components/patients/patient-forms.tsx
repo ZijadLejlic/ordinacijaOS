@@ -47,6 +47,7 @@ const KNOWN_ERRORS = [
   "documentTooLarge",
   "documentNotFound",
   "imageMustBeImage",
+  "imageTooLarge",
   "imageLimit",
   "imageConvertFailed",
   "imageNotFound",

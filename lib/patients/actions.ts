@@ -16,6 +16,7 @@ import {
   PATIENT_FILES_BUCKET,
   SIGNED_URL_TTL_SECONDS,
   convertImageToWebp,
+  MAX_IMAGE_SIZE_BYTES,
   documentPath,
   imagePath,
 } from "@/lib/patients/storage";
@@ -519,6 +520,9 @@ export async function uploadImageAction(
   }
   if (!file.type.startsWith("image/")) {
     return { error: "imageMustBeImage" };
+  }
+  if (file.size > MAX_IMAGE_SIZE_BYTES) {
+    return { error: "imageTooLarge" };
   }
 
   const auth = await requireClinicalProfile(WRITE_ROLES);

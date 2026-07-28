@@ -5,6 +5,8 @@ export const PATIENT_FILES_BUCKET = "patient-files";
 export const SIGNED_URL_TTL_SECONDS = 120;
 
 export const MAX_DOCUMENT_SIZE_BYTES = 20 * 1024 * 1024;
+/** Same ceiling as documents — raw upload before WebP convert. */
+export const MAX_IMAGE_SIZE_BYTES = 20 * 1024 * 1024;
 const WEBP_QUALITY = 82;
 const WEBP_MAX_WIDTH = 2400;
 

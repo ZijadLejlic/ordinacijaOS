@@ -2080,6 +2080,7 @@
       "uploadFailed": "Upload failed.",
       "documentNotFound": "Document not found.",
       "imageMustBeImage": "File must be an image.",
+      "imageTooLarge": "Image is too large (max 20 MB).",
       "imageLimit": "Image limit per patient reached. Upgrade your plan.",
       "imageConvertFailed": "Could not convert the image to WebP.",
       "imageNotFound": "Image not found.",

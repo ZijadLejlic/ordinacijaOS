@@ -2080,6 +2080,7 @@
       "uploadFailed": "Upload nije uspio.",
       "documentNotFound": "Dokument nije pronađen.",
       "imageMustBeImage": "Fajl mora biti slika.",
+      "imageTooLarge": "Slika je prevelika (max 20 MB).",
       "imageLimit": "Dostignut je limit slika po pacijentu. Nadogradite paket.",
       "imageConvertFailed": "Slika se nije mogla konvertovati u WebP.",
       "imageNotFound": "Slika nije pronađena.",
