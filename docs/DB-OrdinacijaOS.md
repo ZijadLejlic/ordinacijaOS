@@ -285,7 +285,7 @@ Migracija `phase2a_clinical_core` (+ `is_valid_fdi` search_path fix). RLS + `cli
 | `patients` | Karton: kontakt, anamneza, napomene, soft `is_active` |
 | `patient_allergies` | `allergy_severity`: mild/moderate/severe/unknown |
 | `patient_documents` | PDF meta; `storage_path` unique; path `{clinic}/{patient}/documents/{id}.pdf` |
-| `patient_images` | WebP meta; plan limit enforce u app (D22) |
+| `patient_images` | WebP meta; plan limit `images_per_patient` hard-block via `enforce_patient_image_limits` BEFORE INSERT + SA (D8/D22) |
 | `odontogram_teeth` | FDI via `is_valid_fdi()`; `tooth_status` enum |
 | `odontogram_events` | Historija izmjena statusa |
 
@@ -319,11 +319,11 @@ Migracija `phase2d_invoices` (+ revoke anon EXECUTE follow-up).
 |---|---|
 | `invoice_number_counters` | `(clinic_id, year)` → `last_number`; samo preko `allocate_invoice_number` RPC (row lock) |
 | `invoices` | `YYYY-####` unique per clinic; status `unpaid\|partial\|paid\|void`; void umjesto DELETE; `pdf_storage_path` |
-| `invoice_lines` | Denormalized `clinic_id`; snapshot description/price/`vat_rate` (0–1); INSERT-only |
-| `payments` | Append-only; method `cash\|card\|bank_transfer\|other`; trigger recompute invoice status |
+| `invoice_lines` | Denormalized `clinic_id`; snapshot description/price/`vat_rate` (0–1); INSERT-only (RESTRICTIVE MFA + `REVOKE UPDATE, DELETE` — D-20) |
+| `payments` | Append-only; method `cash\|card\|bank_transfer\|other`; trigger recompute invoice status; RESTRICTIVE MFA + `REVOKE UPDATE, DELETE` (D-20) |
 | `payment_plans` + `payment_plan_installments` | Rate kalkulator; app gate `installments_calculator` |
 
-**RLS helpers:** `can_access/write_invoices` (owner/accountant only — PRD §3.2).
+**RLS helpers:** `can_access/write_invoices` (owner/accountant only — PRD §3.2). Finance `*_owner_mfa_aal2` policies are **RESTRICTIVE** (D-20 / `fix_finance_mfa_restrictive_append_only`).
 
 **Storage:** `{clinic_id}/{patient_id}/invoices/{invoice_id}.pdf` u `patient-files` (+ finance storage policies).
 
@@ -526,7 +526,9 @@ Location create must call `assertCanCreateLocation`; image upload must call `ass
 | `phase2c_appointments` | appointments + waitlist + EXCLUDE overlap + RLS |
 | `phase2c_appointments_revoke_anon` | revoke anon EXECUTE on appointment/waitlist helpers |
 | `phase2d_invoices` | invoices/lines/payments/plans + counters + allocate RPC + finance RLS + invoice storage policies |
-| `fix_allocate_invoice_number` | fix Postgres 42702 ambiguous `series_year` in `allocate_invoice_number` (ON CONFLICT vs RETURNS TABLE) |
+| `fix_allocate_invoice_number` | fix Postgres 42702 ambiguous `series_year` in `allocate_invoice_number` (ON CONFLICT vs RETURNS TABLE) — incomplete: conflict *target* still used column name |
+| `fix_allocate_invoice_number_on_conflict` | P2.1/D-14: `ON CONFLICT ON CONSTRAINT invoice_number_counters_pkey` (RPC happy path; app service-role fallback removed in P2.9) |
+| `fix_finance_mfa_restrictive_append_only` | P2.2/D-20: finance MFA → RESTRICTIVE; REVOKE UPDATE/DELETE on payments + invoice_lines |
 | `phase2d_invoices_revoke_anon` | revoke anon EXECUTE on invoice helpers; trigger fn not callable via API |
 | `phase2d_invoice_patient_directory` | limited patient id/name RPCs for accountant invoice UX |
 | `phase2d_invoice_patient_names` | batch patient name resolver for invoice list/detail |

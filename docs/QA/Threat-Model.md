@@ -101,7 +101,7 @@ Each row: **Threat ID**, category, description, likelihood×impact → **Risk**,
 | T-RBAC-04 | Elevation | Non-owner reads audit_events | High | Owner-only SELECT RLS | `RBAC-RLS-005` (COVERED) |
 | T-RBAC-05 | Elevation | Non-owner approves GDPR erasure | Critical | RPC owner+MFA | `PII-RLS-001` (COVERED) |
 | T-RBAC-06 | Elevation | Feature used without entitlement (Starter on CRM/inventory) | High | SA `assertFeature` only — **DB gap** | `PLAN-INT-011`, `PLAN-SEC-001` |
-| T-RBAC-07 | Elevation | Server Action forgotten RBAC (defense gap) | High | Mirror checks + RLS backstop | `RBAC-INT-001..030` |
+| T-RBAC-07 | Elevation | Server Action forgotten RBAC (defense gap) | High | Mirror checks + RLS backstop | `RBAC-INT-001..004/006..010/012..017/021` (COVERED P3.1); `005` → P3.2 |
 
 ### 4.3 Multi-tenancy
 

@@ -57,51 +57,51 @@ supabase db reset
 
 ---
 
-### D-02 — Image limit (D22) enforced only in app (S0 residual)
+### D-02 — Image limit (D22) enforced only in app (S0) — **RESOLVED 2026-07-28**
 
-**Evidence**
+**Evidence (pre-fix)**
 
 - Helper: [`lib/entitlements/limits.ts`](../../lib/entitlements/limits.ts) `assertCanAddPatientImage`.
 - Called from [`lib/patients/actions.ts`](../../lib/patients/actions.ts) (~line 557) before upload.
 - Unit coverage: [`lib/entitlements/entitlements.test.ts`](../../lib/entitlements/entitlements.test.ts).
-- No DB trigger / CHECK counting `patient_images` per patient vs `plans.limits_json`.
+- P1.6 probe (`FILE-DB-001`) confirmed direct PostgREST INSERT past cap succeeded (DB had no gate).
 
-**Impact**
+**Impact (pre-fix)**
 
-- Authenticated user who can INSERT `patient_images` (or upload via storage if policy allows) can exceed plan cap by bypassing the Server Action.
-- PRD D8/D22 “hard block” is soft at the database boundary.
+- Authenticated user who can INSERT `patient_images` could exceed plan cap by bypassing the Server Action.
+- PRD D8/D22 “hard block” was soft at the database boundary.
 
 **Catching tests**
 
-- `FILE-DB-001`, `PLAN-INT-002`, `PLAN-SEC-001` (document bypass until trigger exists).
+- `FILE-DB-001` (now asserts DB deny via `plan_limit_images`), `PLAN-INT-002`.
 
 **Resolution**
 
-- Prefer BEFORE INSERT trigger mirroring invite/location limits; or accept residual with monitoring + Critical SEC test that fails open until fixed.
+- **RESOLVED 2026-07-28 (P1.11 Option A):** BEFORE INSERT trigger `patient_images_enforce_limits` → `public.enforce_patient_image_limits()` in [`supabase/migrations/20260728000000_plan_limit_patient_images.sql`](../../supabase/migrations/20260728000000_plan_limit_patient_images.sql). Mirrors invite/location limit pattern; raises `plan_limit_images` (`check_violation`) when `count(patient_images) >= plans.limits_json.images_per_patient`. SA gate retained as defense-in-depth.
 
 ---
 
-### D-03 — Feature entitlements (D42) enforced only in Server Actions (S0 residual)
+### D-03 — Feature entitlements (D42) enforced only in Server Actions (S0 residual) — **WAIVED for MVP 2026-07-28**
 
 **Evidence**
 
 - `assertFeature` in [`lib/entitlements/features.ts`](../../lib/entitlements/features.ts); used across `lib/*/actions.ts` (inventory, CRM, consent, expenses, branding, …).
 - Free-period overrides also app-layer (`FREE_PERIOD_DISABLED_FEATURES`).
 - RLS allows clinic members to write feature tables when role permits — **no** plan_entitlements check in policies.
+- P1.7 probe (`PLAN-SEC-001`) confirmed live: starter doctor can INSERT `inventory_items` via PostgREST; real `createInventoryItemAction` denies with `featureDisabled`.
 
 **Impact**
 
 - Starter (or mis-set plan) client can INSERT into `crm_notifications`, `inventory_items`, `consent_forms`, etc. via PostgREST if RBAC helpers allow the role.
-- UI/SA gates are not sufficient for “hard” entitlement claims.
+- UI/SA gates are not sufficient for “hard” entitlement claims at the DB boundary.
 
 **Catching tests**
 
-- `PLAN-INT-011`, `PLAN-SEC-001`.
+- `PLAN-INT-011` (still GAP / P3.5), `PLAN-SEC-001` (COVERED — documents residual + SA deny).
 
 **Resolution**
 
-- Option A: DB helpers `clinic_has_feature(key)` used in RLS WITH CHECK for Pro+ tables.
-- Option B: document app-only entitlements as accepted residual for MVP; still ship SEC tests.
+- **WAIVED for MVP 2026-07-28 (P1.11 Option B):** accepted app-only entitlements residual. Option A (`clinic_has_feature(key)` in RLS WITH CHECK for Pro+ tables) deferred — wider blast radius (many tables + free-period dual-path) vs D-02’s single cheap trigger. Revisit post-MVP if PostgREST abuse becomes a real threat; SEC probe stays green documenting the gap.
 
 ---
 
@@ -314,7 +314,7 @@ supabase db reset
 | `clinic_subscriptions` no INSERT policy | DB doc §3.2 | **No** → `PLAN-RLS-001` |
 | `audit_events` SELECT owner-only | migration `phase3c_audit_log_ui` | **Yes** (`RBAC-RLS-005`) |
 | Storage buckets non-public list | Tech §6 | **Partial** (`TEN-RLS-009` patient-files only) |
-| Payments / invoice_lines append-only | Tech finance | **No** → `FIN-RLS-001` |
+| Payments / invoice_lines append-only | Tech finance | **RESOLVED** (2026-07-28) — RESTRICTIVE MFA + REVOKE UPDATE/DELETE; `FIN-RLS-001` COVERED |
 | `pin_hash` not selectable | DB doc D10 | Covered indirectly via RPC tests |
 
 **Impact**
@@ -327,24 +327,77 @@ supabase db reset
 
 ---
 
-### D-14 — Allocate invoice number temporary service-role fallback (S2 → verify)
+### D-14 — Allocate invoice number temporary service-role fallback (S2) — RESOLVED 2026-07-28
 
 **Evidence**
 
 - Tech changelog / invoices note: temporary service-role fallback for Postgres 42702 until fix migration `20260714040000_fix_allocate_invoice_number`.
-- Fix migration exists in repo.
+- Fix migration exists in repo **but was incomplete**: `ON CONFLICT (clinic_id, series_year)` remained ambiguous under `RETURNS TABLE (series_year, …)` — same Postgres 42702.
+- **P2.1 live probe (2026-07-28):** every same-clinic `allocate_invoice_number` RPC call hit `42702` / `column reference "series_year" is ambiguous`; cross-clinic still correctly raised `forbidden_clinic` (checks run before INSERT). App path in `lib/invoices/allocate-number.ts` therefore always fell through to the service-role optimistic upsert for successful allocates. Caller today passes `profile.clinic_id` only (`lib/invoices/actions.ts`), so AC4 was not currently exploitable via the SA — but the JWT clinic gate on the happy path was dead.
 
 **Impact**
 
-- If fallback still in app path, finance allocation might bypass user JWT checks under error conditions.
+- Happy-path allocate bypassed the SECURITY DEFINER JWT/`current_clinic_id` checks and used service-role instead.
+- Concurrent uniqueness depended on the app-level optimistic loop, not the DB row lock.
 
 **Catching tests**
 
-- `FIN-SEC-001`, `FIN-INT-001`; code review that fallback is removed.
+- `FIN-SEC-001`, `FIN-DB-001`, `FIN-INT-001` (`lib/security/allocate-invoice-number.test.ts`).
 
 **Resolution**
 
-- Grep `allocate-number` / service client usage; delete dead fallback if migration applied everywhere.
+- **Done (RPC, 2026-07-28, P2.1):** migration [`20260728010000_fix_allocate_invoice_number_on_conflict.sql`](../../supabase/migrations/20260728010000_fix_allocate_invoice_number_on_conflict.sql) — `ON CONFLICT ON CONSTRAINT invoice_number_counters_pkey`. Applied live via Supabase MCP; FIN-SEC/DB/INT-001 green against the RPC (no fallback).
+- **Done (app, 2026-07-28, P2.9):** deleted `allocateInvoiceNumberFallback` / `createServiceClient` from `lib/invoices/allocate-number.ts`. Allocate is RPC-only; any RPC failure returns `{ error: "createFailed" }` (no service-role bypass). Confirmed FIN-SEC/DB/INT-001 still green after removal.
+
+---
+
+### D-20 — Payments / invoice_lines append-only broken by PERMISSIVE MFA FOR ALL (S1) — RESOLVED 2026-07-28
+
+**Evidence**
+
+- Phase2d migration comments claim `payments` / `invoice_lines` are “fully append-only: no UPDATE/DELETE policy at all” (only SELECT + INSERT named policies).
+- Same migration also creates `payments_owner_mfa_aal2` / `invoice_lines_owner_mfa_aal2` as **PERMISSIVE `FOR ALL`** `using (owner_mfa_ok())` (explicit warning in SQL: “⚠️ PERMISSIVE, not RESTRICTIVE … finance group”).
+- Postgres RLS: one matching PERMISSIVE policy is enough. For accountant (`owner_mfa_ok()` → true for non-owners), that FOR ALL policy alone grants DELETE and UPDATE.
+- **P2.2 live probe (2026-07-28):** authenticated accountant DELETE/UPDATE on both `payments` and `invoice_lines` succeeded (rows removed / rewritten). Test: [`lib/security/payments-append-only-void.test.ts`](../../lib/security/payments-append-only-void.test.ts) (`FIN-RLS-001`).
+
+**Related residual (same phase, lower blast):** `recompute_invoice_payment_status` on void invoices returns without raising — PostgREST can still INSERT a payment after void; SA `recordPaymentAction` correctly returns `invoiceVoid` (`FIN-INT-004` COVERED at INT; DB harden optional).
+
+**Impact**
+
+- BR-F03 / BR-F04 / Threat-Model `T-FIN-03` (tamper DELETE payment / rewrite line) not enforced at DB for any role that passes `owner_mfa_ok()`.
+- Missing named DELETE policy is insufficient defense when a PERMISSIVE FOR ALL MFA policy exists.
+
+**Catching tests**
+
+- `FIN-RLS-001` (`lib/security/payments-append-only-void.test.ts`).
+
+**Resolution**
+
+- **Done (2026-07-28):** migration [`20260728020000_fix_finance_mfa_restrictive_append_only.sql`](../../supabase/migrations/20260728020000_fix_finance_mfa_restrictive_append_only.sql) — (1) flip all five finance `*_owner_mfa_aal2` policies to **RESTRICTIVE** (invoices, invoice_lines, payments, payment_plans, payment_plan_installments — match expenses/patients); (2) `REVOKE UPDATE, DELETE` on `payments` / `invoice_lines` from `anon`/`authenticated`. Applied live via Supabase MCP. FIN-RLS-001 flipped to expect deny; live `3 passed (3)`.
+
+---
+
+### D-21 — `FILE-INT-020` ID-drift + GDPR storage cleanup split (S2) — documented P2.5
+
+**Evidence**
+
+- Threat-Model `T-PII-02` and Business-Rules cite test id `FILE-INT-020`, but Test-Strategy.md §4 has **no** such catalog row (only `FILE-INT-001` / `FILE-INT-011`).
+- `approve_gdpr_patient_erasure` hard-deletes the DB subtree only; Storage cleanup is in `approvePatientErasureAction` (`listPatientStoragePaths` → RPC → `deletePatientStorageObjects`), with a best-effort `catch` that can hide remove failures.
+- P2.5 covers storage-empty under `PII-INT-001` (`lib/security/gdpr-erasure-subtree.test.ts`); live owner `storage.remove` works (assert via Storage **list**, not download).
+
+**Impact**
+
+- Docs cross-refs to `FILE-INT-020` are dangling; searchers may think storage erase is untested.
+- Silent SA catch is observability-only while remove succeeds; if Storage RLS ever regresses, UI still shows success with orphaned blobs.
+
+**Catching tests**
+
+- `PII-INT-001` COVERED (includes storage path family that Threat-Model labeled `FILE-INT-020`).
+
+**Resolution**
+
+- Docs-consistency: either add a Test-Strategy `FILE-INT-020` row aliasing `PII-INT-001`, or retarget Threat-Model/Business-Rules to `PII-INT-001` only.
+- Optional hardening: fail the SA (or audit) when `deletePatientStorageObjects` throws / remove returns empty; or use service-role client for post-approve storage delete only.
 
 ---
 
@@ -371,7 +424,7 @@ supabase db reset
 
 ---
 
-### D-16 — Demo clinic lifecycle exemptions (S3 / intentional)
+### D-16 — Demo clinic lifecycle exemptions (S3 / intentional) — **TESTED 2026-07-28**
 
 **Evidence**
 
@@ -384,28 +437,29 @@ supabase db reset
 
 **Catching tests**
 
-- `LIFE-SEC-002`.
+- `LIFE-SEC-002` COVERED (`lifecycle-transitions.test.ts`): transitions skip `is_demo` past-grace; `hard_delete_clinic` raises `demo_clinic`.
 
 ---
 
-### D-17 — Peer amounts default not in PRD (S2)
+### D-17 — Peer amounts default not in PRD (S2) — **PINNED for tests 2026-07-28**
 
 **Evidence**
 
 - DB doc lists `doctors_see_peer_amounts` (D17); default not in Decision Log.
 - Behavior in `dashboard_payment_stats` RPC.
+- **Pinned (P2.3):** `clinics.settings_json` column default in `20260712900001_phase1_foundation.sql` is `doctors_see_peer_amounts: false`; RPC `coalesce(..., false)` matches. `FIN-INT-020` asserts this on a fresh clinic insert. Demo seed (`scripts/seed-demo-clinic.ts`) sets `true` for UX demo only — not the product default.
 
 **Impact**
 
-- Ambiguous expected default for tests.
+- Ambiguous expected default for tests — **resolved for catalog** (false). PRD Decision Log still silent.
 
 **Catching tests**
 
-- `FIN-INT-020` must pin expected default from DB seed/docs.
+- `FIN-INT-020` COVERED — pins DB default false + setting-off leak probe.
 
 **Resolution**
 
-- Add default to PRD Decision Log or DB §5.
+- Tests use DB default **false**. Optional: add the same default to PRD Decision Log D17 for product clarity (docs-only; not blocking).
 
 ---
 
@@ -440,8 +494,8 @@ Stripe, AI, SMS/WhatsApp, portal, online booking, mini-site, lab — correctly o
 | ID | Sev | Topic | Test IDs |
 |---|---|---|---|
 | D-01 | S0 | Migrations stubs / non-reproducible DB | P0 harness — **RESOLVED** (2026-07-23), `supabase start`/`db reset` proven green in CI run `30048179856` |
-| D-02 | S0 | Image limit app-only | `FILE-DB-001` |
-| D-03 | S0 | Feature entitlements app-only | `PLAN-SEC-001` |
+| D-02 | S0 | Image limit app-only | `FILE-DB-001` — **RESOLVED** (2026-07-28), DB trigger `plan_limit_images` |
+| D-03 | S0 | Feature entitlements app-only | `PLAN-SEC-001` — **WAIVED MVP** (2026-07-28), Option B accepted residual |
 | D-04 | S1 | JWT hook manual | `TEN-SEC-004` |
 | D-05 | S1 | Unit tests not in CI | P0 CI — **RESOLVED** (2026-07-23): unit.yml + security.yml (local Supabase) + fail-closed gate all green in CI run `30048179856` |
 | D-06 | S1 | Lockout owner notify | `AUTH-INT-002` |
@@ -452,11 +506,14 @@ Stripe, AI, SMS/WhatsApp, portal, online booking, mini-site, lab — correctly o
 | D-11 | S2 | Visit closes plan item | `PII-INT-011` |
 | D-12 | S2 | Session TTL unasserted | `AUTH-INT-021` |
 | D-13 | S1 | RLS spot-check gaps | `MKT-SEC-001`, `FIN-RLS-001`, … |
-| D-14 | S2 | Invoice allocate fallback | `FIN-SEC-001` |
+| D-14 | S2 | Invoice allocate fallback | `FIN-SEC-001` — **RESOLVED** (2026-07-28): RPC P2.1 + app fallback removed P2.9 |
 | D-15 | S1 | Security suite skip-open | P0 — **RESOLVED** (P0.4 skip-crash fix + P0.8 `SECURITY_TESTS_REQUIRED` fail-closed gate, both live in CI) |
-| D-16 | S3 | Demo exemption | `LIFE-SEC-002` |
-| D-17 | S2 | Peer amounts default | `FIN-INT-020` |
+| D-16 | S3 | Demo exemption (tested) | `LIFE-SEC-002` COVERED |
+| D-17 | S2 (pinned) | Peer amounts default | `FIN-INT-020` — **PINNED false** (P2.3; PRD Decision Log optional) |
 | D-18 | S3 | Faza 4 N/A | `PLAN-INT-010` |
+| D-19 | S2 | Coverage threshold baseline | P0.5 — **RESOLVED** |
+| D-20 | S1 | Payments/lines append-only broken (PERMISSIVE MFA FOR ALL) | `FIN-RLS-001` — **RESOLVED** (2026-07-28): RESTRICTIVE MFA + REVOKE UPDATE/DELETE |
+| D-21 | S2 | `FILE-INT-020` ID-drift; GDPR storage is SA not RPC | `PII-INT-001` — documented P2.5 |
 
 ---
 

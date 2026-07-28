@@ -32,6 +32,16 @@ jobs:
           NEXT_TELEMETRY_DISABLED: "1"
         run: npm run build
 
+      # P1.9 (docs/QA/Implementation-Plan.md): PLAT-SEC-003 / D41 real
+      # "build/bundle grep" check — reuses this job's own build output above
+      # instead of paying for a second `next build`. Complements the
+      # fast/DB-free static import-graph test that already runs on every PR
+      # via test:unit (lib/security/no-service-role-in-client.test.ts).
+      - name: Verify no service role key in client bundle (PLAT-SEC-003)
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: npm run check:no-service-role-in-bundle
+
       - name: Run Playwright E2E
         env:
           CI: "true"

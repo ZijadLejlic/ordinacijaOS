@@ -53,7 +53,7 @@ Zaključati **kako** gradimo DentOrd (stack, patterni, granice), da agent/develo
 | Services UI (Faza 2A) | `/services` — lista + search/status; owner CRUD (create/edit/activate); D16 `shared_pricelist_across_locations` → optional `location_id`; staff read-only |
 | Treatment plans (Faza 2B) | Na `/patients/[id]` — plan + stavke (usluga, opcionalni FDI, status planned/in_progress/done/cancelled, procjena EUR); RBAC kao odontogram; feature `treatment_plan` |
 | Calendar (Faza 2C) | `/calendar` — day/week/month; CRUD termina; hard overlap (DB EXCLUDE); DnD uz `calendar_advanced`; waitlist + auto-predlog na cancel uz `waitlist_auto`; `date-fns` + `date-fns-tz` (Europe/Sarajevo); custom grid (bez FullCalendar) |
-| Invoices (Faza 2D) | `/invoices` + `/invoices/[id]` — create/void, payments (cash/card/transfer/other), debts filter, installment plans (`installments_calculator`); PDF via `@react-pdf/renderer` stored on issue; download `GET /api/invoices/[id]/pdf`; RBAC owner/accountant; feature `invoices`. Number allocate: RPC + temporary service-role fallback for Postgres 42702 until `20260714040000_fix_allocate_invoice_number` applied |
+| Invoices (Faza 2D) | `/invoices` + `/invoices/[id]` — create/void, payments (cash/card/transfer/other), debts filter, installment plans (`installments_calculator`); PDF via `@react-pdf/renderer` stored on issue; download `GET /api/invoices/[id]/pdf`; RBAC owner/accountant; feature `invoices`. Number allocate: `allocate_invoice_number` RPC only (Sarajevo year, row lock; ON CONFLICT ON CONSTRAINT after `20260728010000_fix_allocate_invoice_number_on_conflict`) |
 | Expenses + KPI + Excel (Faza 2E) | `/expenses` CRUD/void + profit; Excel `GET /api/reports/excel` (`exceljs`); dashboard KPI (today appts/revenue/patients, revenue by doctor, monthly trend); RBAC §3.2; feature `expenses_reports_excel` (Pro+); doctor payment aggregates via `dashboard_payment_stats` RPC (D17) |
 | Locations (Faza 2F) | `/settings/locations` — owner CRUD (soft deactivate); D8 hard-block via `assertCanCreateLocation` + DB trigger (active-only count); D16 `settings_json.shared_pricelist_across_locations` toggle (enabling clears `services.location_id`) |
 | Branding (Faza 2G) | `/settings/branding` — owner logo + colors (`branding_json`); feature `branding_custom` (Pro+); private bucket `clinic-branding`; applied in AppShell + invoice PDF |
@@ -250,6 +250,9 @@ Prati PRD §11. Tech doc se širi po fazama; ne specifikovati Enterprise module 
 | 2026-07-14 | Faza 3C: clinic lifecycle trial→readonly→hard delete (D6/D45); cron `/api/cron/clinic-lifecycle` |
 | 2026-07-14 | Item 23: Playwright E2E (signup/termin/faktura/isolation) + Vitest tenant isolation patients/appts/storage CI |
 | 2026-07-14 | Fix allocate_invoice_number ambiguity (migration + app fallback); nest AuditLog.events keys for next-intl |
+| 2026-07-28 | P2.1/D-14: complete allocate ON CONFLICT fix (`invoice_number_counters_pkey`); FIN-SEC/DB/INT-001 covered; app fallback removal deferred to P2.9 |
+| 2026-07-28 | P2.9/D-14: remove dead allocate service-role fallback; allocate is RPC-only |
+| 2026-07-28 | P2.2/D-20: finance MFA → RESTRICTIVE; REVOKE UPDATE/DELETE on payments + invoice_lines; FIN-RLS-001 COVERED |
 | 2026-07-14 | Faza 3D / D20: consent templates + draw-sign PDF (`consent_forms` / `consent_signatures`) |
 | 2026-07-14 | Faza 3E / §6.12: inventar basic `/inventory` + `inventory_items` + low-stock nav badge |
 | 2026-07-14 | Marketing 1c: SEO helper (metadata/OG/JSON-LD) + cookie consent banner + PostHog consent gate |

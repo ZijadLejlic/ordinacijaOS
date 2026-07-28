@@ -14,7 +14,7 @@
 | D3 | Van MVP free | No AI / SMS / WhatsApp / patient portal | `PLAN-UNIT-002`, `PLAN-INT-010` | PARTIAL | Free-period override unit COVERED; assertFeature INT GAP |
 | D4 | Free trial | Self-signup; trial_ends_at ≤ 2026-12-31 | `AUTH-E2E-001`, `AUTH-INT-001` | PARTIAL | Signup E2E COVERED; trial date assert PARTIAL |
 | D5 | Billing start | Stripe from 2027-01-01 | `PLAN-UNIT-002` | PARTIAL | Date constant unit only; Stripe N/A until Faza 4 |
-| D6 | After free | 7d read-only → export → delete | `LIFE-RLS-001`, `LIFE-INT-001`, `LIFE-API-001` | PARTIAL | Writable guard + closure COVERED in rbac-and-lifecycle; cron API GAP |
+| D6 | After free | 7d read-only → export → delete | `LIFE-RLS-001`, `LIFE-INT-001`, `LIFE-INT-002`, `LIFE-API-001` | COVERED | Writable + closure + grace→pending_delete + cron gate COVERED |
 | D7 | Tenant model | 1 user = 1 clinic; owner sees all locations | `TEN-RLS-001..009`, `TEN-E2E-001` | PARTIAL | Patients/appts/storage COVERED; not all tables |
 | D8 | Pro limits | ≤5 doctors, ≤10 users, ≤2 locations; hard block | `PLAN-DB-001`, `PLAN-DB-002`, `PLAN-INT-001` | PARTIAL | Invite + location triggers COVERED; doctor seat edge GAP |
 | D9 | Staff invites | Magic link → set password → role | `AUTH-E2E-002`, `AUTH-INT-010`, `AUTH-SEC-001` | GAP | No dedicated invite E2E; actions exist |
@@ -25,7 +25,7 @@
 | D14 | Calendar | Doctor-bound; hard block overlap | `CAL-DB-001`, `CAL-E2E-001` | COVERED | EXCLUDE + E2E overlap |
 | D15 | Duration | Default from service + manual | `CAL-INT-001` | GAP | Covered indirectly in create flow |
 | D16 | Pricelist | Shared vs per-location toggle | `PLAN-INT-020`, `CAL-INT-002` | GAP | Action exists; no automated test |
-| D17 | Peer amounts | Clinic setting doctors_see_peer_amounts | `FIN-INT-020`, `FIN-DB-001` | GAP | RPC `dashboard_payment_stats`; no test |
+| D17 | Peer amounts | Clinic setting doctors_see_peer_amounts | `FIN-INT-020`, `FIN-DB-001` | COVERED | RPC `dashboard_payment_stats`; default false |
 | D18 | Odontogram | FDI; tied to visits/treatments | `PII-INT-010`, `PII-UNIT-001` | GAP | `is_valid_fdi` untested in suite |
 | D19 | Treatment plan | planned/in_progress/done/cancelled | `PII-INT-011` | GAP | UI exists; no dedicated test |
 | D20 | Consent sign | Draw signature on device | `PII-INT-012`, `FILE-INT-010` | GAP | Feature implemented; no automated test |
@@ -49,11 +49,11 @@
 | D38 | Marketing site | Full SEO/blog/pricing/signup | `MKT-E2E-002`, `MKT-UNIT-001` | PARTIAL | Plans matrix unit COVERED |
 | D39 | Deploy model | Module → prod when ready | — | N/A | Process |
 | D40 | Responsive | Full responsive required | `MKT-E2E-003`, `CAL-E2E-002` | GAP | Manual UAT today |
-| D41 | Super-admin | Impersonation + audit; entitlements | `PLAT-UNIT-001`, `PLAT-INT-001`, `PLAT-SEC-001` | PARTIAL | isPlatformAdmin unit COVERED; impersonation audit INT GAP |
+| D41 | Super-admin | Impersonation + audit; entitlements | `PLAT-UNIT-001`, `PLAT-INT-001`, `PLAT-SEC-001` | COVERED | isPlatformAdmin unit + impersonation audit INT COVERED; sticky cookie SEC still GAP |
 | D42 | Entitlements | plans → features[] not UI-only | `PLAN-UNIT-001`, `PLAN-INT-011` | PARTIAL | Features from DB + free override; feature INT gates GAP |
 | D43 | Onboarding | In-app 3 steps | `AUTH-E2E-001` | PARTIAL | Step 1 COVERED; steps 2–3 GAP |
 | D44 | Support | support@ Resend | `CRM-INT-003` | GAP | Ops / smoke |
-| D45 | Clinic close | Export → 7d grace → hard delete | `LIFE-INT-001`, `LIFE-INT-002`, `PII-API-002` | PARTIAL | Closure COVERED; full hard_delete clinic GAP |
+| D45 | Clinic close | Export → 7d grace → hard delete | `LIFE-INT-001`, `LIFE-INT-002`, `PII-API-002`, `LIFE-SEC-002` | COVERED | Closure + grace→pending_delete + demo skip COVERED (P2.6/P2.7) |
 | D46 | Phone default | +387; owner changeable | `AUTH-INT-001` | PARTIAL | Signup sets default; change GAP |
 | D47 | TZ default | Europe/Sarajevo | `CAL-UNIT-002`, `AUTH-E2E-001` | PARTIAL | Calendar ranges unit COVERED |
 | D48 | Annual sub | 2 months free (2027+) | — | N/A | Faza 4 |
@@ -74,14 +74,14 @@
 | 6.5 | Calendar day/week/month, overlap, DnD | `CAL-E2E-001`, `CAL-INT-001..005`, `CAL-DB-001` | PARTIAL |
 | 6.6 | Waitlist | `CAL-UNIT-001`, `CAL-INT-003` | PARTIAL |
 | 6.7 | Finance (invoice/payment/plans/expenses/Excel) | `FIN-E2E-001`, `FIN-INT-*`, `FIN-API-001`, `FIN-UNIT-001` | PARTIAL |
-| 6.8 | Dashboard KPI | `FIN-INT-020`, `RBAC-INT-010` | GAP |
+| 6.8 | Dashboard KPI | `FIN-INT-020`, `RBAC-INT-010` | COVERED |
 | 6.9 | Email system | `CRM-UNIT-001`, `CRM-INT-001`, `CRM-API-001` | PARTIAL |
 | 6.10 | CRM light | `CRM-UNIT-002`, `CRM-INT-002` | PARTIAL |
 | 6.11 | Consent draw-sign | `PII-INT-012`, `FILE-INT-010` | GAP |
-| 6.12 | Inventory basic | `CRM-INT-020` → use `INV-*` as `CRM` sibling: `PLAN-INT-021` | GAP |
+| 6.12 | Inventory basic | `PLAN-INT-021`, `RBAC-INT-021` | PARTIAL |
 | 6.13 | Branding | `PLAN-INT-022`, `FILE-INT-011` | GAP |
 | 6.14 | CSV import | `IMP-UNIT-001`, `IMP-INT-001` | PARTIAL |
-| 6.15 | Audit log UI | `RBAC-RLS-001`, `RBAC-INT-001` | PARTIAL |
+| 6.15 | Audit log UI | `RBAC-RLS-005` (owner SELECT); patients SA matrix starts at `RBAC-INT-001` (P3.1) | COVERED |
 | 6.16 | In-app notifications | `CRM-INT-004` | GAP |
 
 Inventory tests use IDs `PLAN-INT-021` / `RBAC-INT-021` in the strategy catalog (inventory is Pro feature under PLAN/RBAC areas).
@@ -99,13 +99,13 @@ Inventory tests use IDs `PLAN-INT-021` / `RBAC-INT-021` in the strategy catalog 
 | 8.1 | Force logout | `AUTH-INT-020` | GAP |
 | 8.1 | Secrets server-only | `PLAT-SEC-002`, `FILE-SEC-002` | GAP |
 | 8.1 | Tenant isolation = release blocker | `TEN-*` suite | PARTIAL |
-| 8.1 | Impersonation audited | `PLAT-INT-001` | GAP |
-| 8.2 | Patient export | `PII-API-001` | GAP |
-| 8.2 | Erasure owner approve → hard delete | `PII-RLS-001`, `PII-INT-001` | PARTIAL |
+| 8.1 | Impersonation audited | `PLAT-INT-001` | COVERED |
+| 8.2 | Patient export | `PII-API-001` | COVERED |
+| 8.2 | Erasure owner approve → hard delete | `PII-RLS-001`, `PII-INT-001` | COVERED |
 | 8.2 | PostHog no patient names | `PII-SEC-001` | GAP |
 | 8.2 | Cookie banner | `MKT-E2E-004`, `PII-UNIT-002` | PARTIAL |
-| 8.3 | Clinic ZIP backup | `PII-API-002` | GAP |
-| 8.3 | Close: export → grace → delete | `LIFE-INT-002` | PARTIAL |
+| 8.3 | Clinic ZIP backup | `PII-API-002` | COVERED |
+| 8.3 | Close: export → grace → delete | `LIFE-INT-002`, `LIFE-SEC-002` | COVERED |
 | 8.4 | Sentry / PostHog | `MKT-UNIT-002` | GAP |
 | 8.5 | Incident ≤72h | — | N/A | Process |
 
@@ -140,8 +140,8 @@ Inventory tests use IDs `PLAN-INT-021` / `RBAC-INT-021` in the strategy catalog 
 | Email reminder edit + send | `CRM-INT-001` | GAP |
 | Branding in app shell | `PLAN-INT-022` | GAP |
 | CSV import patients + services | `IMP-INT-001` | GAP |
-| GDPR export; delete waits owner approve | `PII-API-001`, `PII-INT-001` | PARTIAL |
-| Clinic ZIP backup | `PII-API-002` | GAP |
+| GDPR export; delete waits owner approve | `PII-API-001`, `PII-INT-001` | COVERED |
+| Clinic ZIP backup | `PII-API-002` | COVERED |
 | Trial → readonly → delete | `LIFE-RLS-001`, `LIFE-INT-001` | PARTIAL |
 | Clinic A cannot read Clinic B | `TEN-RLS-*`, `TEN-E2E-001` | PARTIAL |
 | Storage not publicly listable; signed URL only | `FILE-RLS-001` | PARTIAL |
@@ -165,13 +165,13 @@ Inventory tests use IDs `PLAN-INT-021` / `RBAC-INT-021` in the strategy catalog 
 
 | Item | Test IDs | Status |
 |---|---|---|
-| Role set owner/doctor/assistant/reception/accountant | `RBAC-INT-001..020` | PARTIAL |
-| §3.2 module matrix | `RBAC-RLS-*` (can_* RPCs COVERED subset) | PARTIAL |
-| Peer amounts asterisk for doctors | `FIN-INT-020` | GAP |
+| Role set owner/doctor/assistant/reception/accountant | `RBAC-INT-001..004`, `006..010`, `012..017`, `021` (P3.1 SA matrix); `005` → P3.2 | COVERED |
+| §3.2 module matrix | `RBAC-RLS-*` + `RBAC-INT-*` SA runner (`lib/security/rbac-int-matrix.test.ts`) | PARTIAL |
+| Peer amounts asterisk for doctors | `FIN-INT-020` | COVERED |
 | Invite flow + plan limit before invite | `AUTH-INT-010`, `PLAN-DB-001` | PARTIAL |
 | Auth rules (owner MFA, 7d session, lockout, force logout) | See D11–D13 | PARTIAL |
 
-Existing Vitest coverage for RBAC matrix (finances, clinical, front desk, owner-only, audit) is in `lib/security/rbac-and-lifecycle.test.ts` — mapped as `RBAC-RLS-001..004`, `AUTH-RLS-010`, `PII-RLS-001`, `LIFE-RLS-001`.
+Existing Vitest coverage for RBAC matrix (finances, clinical, front desk, owner-only, audit) is in `lib/security/rbac-and-lifecycle.test.ts` — mapped as `RBAC-RLS-001..004`, `AUTH-RLS-010`, `PII-RLS-001`, `LIFE-RLS-001`. P3.1 Server Action matrix: `lib/security/rbac-int-matrix.test.ts` (`RBAC-INT-001..004/006..010/012..017/021`; `005` reserved for doctor peer calendar / P3.2).
 
 ---
 

@@ -103,8 +103,8 @@ A rule is **hard** only if DB-C/DB-T/DB-F/RLS enforce it. SA/API alone are bypas
 |---|---|---|---|
 | BR-F01 | Invoice number `YYYY-####` per clinic; Sarajevo year | DB-F `allocate_invoice_number` | Yes |
 | BR-F02 | Invoice statuses unpaid/partial/paid/void | Enum + trigger on payments | Yes |
-| BR-F03 | Payments append-only (no delete) | RLS / grants | Yes* |
-| BR-F04 | Invoice lines insert-only snapshot | RLS | Yes* |
+| BR-F03 | Payments append-only (no delete) | RLS RESTRICTIVE MFA + REVOKE UPDATE/DELETE | Yes |
+| BR-F04 | Invoice lines insert-only snapshot | RLS RESTRICTIVE MFA + REVOKE UPDATE/DELETE | Yes |
 | BR-F05 | Void invoice instead of delete | SA | Soft + no DELETE policy |
 | BR-F06 | Payment methods: cash/card/transfer/other (record only) | Enum | Yes |
 | BR-F07 | Installment plans gated by `installments_calculator` | SA feature | Soft |
