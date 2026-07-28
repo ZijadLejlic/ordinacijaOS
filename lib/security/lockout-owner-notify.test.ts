@@ -47,7 +47,7 @@ describeSecurity("AUTH-INT-002 lockout owner notify (audit)", () => {
   }, 60_000);
 
   afterAll(async () => {
-    if (clinic) await cleanupClinics(service, [clinic.clinicId]);
+    if (clinic) await cleanupClinics(service, clinic.users);
   }, 60_000);
 
   it("5 failed logins → auth.login_lockout audit readable by owner JWT", async () => {

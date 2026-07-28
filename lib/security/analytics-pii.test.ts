@@ -84,7 +84,8 @@ describe("analytics PII sanitize (D33 / PII-SEC-001)", () => {
       const src = readFileSync(resolve(process.cwd(), relative), "utf8");
       expect(src, relative).toMatch(/trackEvent\s*\(/);
       // Strip string literals so names inside UI copy don't false-positive.
-      const withoutStrings = src.replace(/(["'`])(?:\\.|(?!\1).)*\1/gs, '""');
+      // Avoid the `s` (dotAll) flag — tsconfig target is ES2017 (TS1501 in CI).
+      const withoutStrings = src.replace(/(["'`])(?:\\.|(?!\1)[\s\S])*\1/g, '""');
       expect(withoutStrings, relative).not.toMatch(
         /trackEvent\s*\(\s*[^,]+,\s*\{[^}]*(?:first_name|last_name|full_name|patient_name|email|phone|jmbg|oib|iban)\s*:/i,
       );

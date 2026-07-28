@@ -252,20 +252,22 @@ describeSecurity("invite token reuse / expiry (release blocker)", () => {
     expect(result.error?.message).toMatch(/expired/i);
     expect(result.clinicId).toBeNull();
 
+    // `accept_clinic_invite` UPDATEs status→expired then RAISE EXCEPTION.
+    // Postgres rolls that UPDATE back with the error, so status stays
+    // `pending` after a failed accept. The durable flip is on
+    // `peek_clinic_invite` (no raise) / `expire_stale_clinic_invites`.
+    const peekAfter = await service.rpc("peek_clinic_invite", {
+      p_token_hash: invite.tokenHash,
+    });
+    expect(peekAfter.error).toBeNull();
+    expect(peekAfter.data?.[0]?.status).toBe("expired");
+
     const { data: expiredInvite } = await service
       .from("clinic_invites")
       .select("status")
       .eq("id", invite.inviteId)
       .single();
     expect(expiredInvite?.status).toBe("expired");
-
-    // Confirm expiry is enforced identically on the read-side `peek` RPC
-    // (used by the public /invite/[token] page before password entry).
-    const peekAfter = await service.rpc("peek_clinic_invite", {
-      p_token_hash: invite.tokenHash,
-    });
-    expect(peekAfter.error).toBeNull();
-    expect(peekAfter.data?.[0]?.status).toBe("expired");
   });
 
   it("AUTH-SEC-001 bonus: a nonexistent token is rejected the same way as a real one, not with a distinguishing error", async () => {

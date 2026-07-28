@@ -567,6 +567,7 @@ Stripe, AI, SMS/WhatsApp, portal, online booking, mini-site, lab — correctly o
 | D-21 | S2 | `FILE-INT-020` ID-drift; GDPR storage is SA not RPC | `PII-INT-001` — documented P2.5 |
 | D-22 | S1 | `admin.signOut(profileId)` wrong API (needs JWT) | `AUTH-INT-020` — **RESOLVED** (2026-07-28): `revoke_user_sessions` RPC |
 | D-23 | S1 | deactivate UPDATE `updated_at` without column GRANT | `AUTH-INT-020` — **RESOLVED** (2026-07-28): update `is_active` only |
+| D-24 | S1 | Treatment plans MFA PERMISSIVE FOR ALL (cross-clinic) | `TEN-RLS-012` / `TEN-SEC-002` — **RESOLVED** (2026-07-28): RESTRICTIVE MFA |
 
 ---
 
