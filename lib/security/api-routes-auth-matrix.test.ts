@@ -6,9 +6,8 @@ import {
 } from "@/lib/security/factories";
 
 /**
- * P3.3 (docs/QA/Implementation-Plan.md): all 8 app/api route auth
- * matrix — unauthenticated + wrong-role (where product has role) + happy
- * path positive control.
+ * P3.3 (docs/QA/Implementation-Plan.md): app/api route auth matrix —
+ * unauthenticated + wrong-role (where product has role) + happy path.
  *
  * Inventory (grepped app/api route handlers, not assumed):
  *   1. GET /api/health — public liveness { ok: true }; detailed
@@ -20,8 +19,9 @@ import {
  *      canExportPatientData
  *   6. GET /api/privacy/clinic/export — session + canExportClinicBackup
  *   7. GET /api/og — intentionally public marketing OG image (no auth)
- *   8. GET /api/sentry-test — production without SENTRY_ENABLE_TEST_ENDPOINTS
- *      → 404; otherwise DSN-gated (TEMPORARY probe; remove after verification)
+ *
+ * Temporary `/api/sentry-test` probe (PLAT-API-002) removed after live
+ * Sentry verification (2026-07-29).
  *
  * Already COVERED — do not re-implement (matrix cites them):
  *   - cron secret → LIFE-API-001 / cron-secret-guard.test.ts (unit)
@@ -34,15 +34,13 @@ import {
  * This file's job (gaps + public/env truth):
  *   - Session routes: unauthenticated → 401 (excel + privacy x2;
  *     PDF unauth already FILE-SEC-003 — thin matrix assert only)
- *   - health / og / sentry-test: assert code truth (public / env-gated),
- *     not invented RBAC
+ *   - health / og: assert code truth (public / env-gated), not invented RBAC
  *   - cron: thin re-assert of the unauth 401 path (source of truth remains
  *     LIFE-API-001; job mocked so this stays DB-free)
  *
- * Catalog IDs closed here: PLAT-API-001 (health), PLAT-API-002
- * (sentry-test), MKT-API-001 (og); extends unauth half of
- * FIN-API-002 / PII-API-001 / PII-API-002 (PDF unauth stays
- * FILE-SEC-003). Pattern: P1.2 / P2.4 / P2.6.
+ * Catalog IDs closed here: PLAT-API-001 (health), MKT-API-001 (og);
+ * extends unauth half of FIN-API-002 / PII-API-001 / PII-API-002
+ * (PDF unauth stays FILE-SEC-003). Pattern: P1.2 / P2.4 / P2.6.
  */
 
 const env = getSecurityTestEnv();
@@ -74,26 +72,6 @@ vi.mock("@/lib/clinic/lifecycle-job", () => ({
   runClinicLifecycleJob,
 }));
 
-const { sentryCaptureMessage, sentryFlush, sentryCaptureException, sentryWithScope } =
-  vi.hoisted(() => ({
-    sentryCaptureMessage: vi.fn(() => "test-event-id"),
-    sentryFlush: vi.fn(async () => true),
-    sentryCaptureException: vi.fn(() => "test-exc-id"),
-    sentryWithScope: vi.fn((fn: (scope: { setTag: () => void }) => unknown) =>
-      fn({ setTag: vi.fn() }),
-    ),
-  }));
-
-vi.mock("@sentry/nextjs", () => ({
-  captureMessage: sentryCaptureMessage,
-  captureException: sentryCaptureException,
-  flush: sentryFlush,
-  withScope: sentryWithScope,
-  setUser: vi.fn(),
-  setTag: vi.fn(),
-  addBreadcrumb: vi.fn(),
-}));
-
 /** Auth matrix only: prove no session gate before ImageResponse. */
 vi.mock("next/og", () => ({
   ImageResponse: class extends Response {
@@ -114,12 +92,11 @@ import { GET as getOgRoute } from "@/app/api/og/route";
 import { GET as getClinicExportRoute } from "@/app/api/privacy/clinic/export/route";
 import { GET as getPatientExportRoute } from "@/app/api/privacy/patients/[patientId]/export/route";
 import { GET as getExcelReportRoute } from "@/app/api/reports/excel/route";
-import { GET as getSentryTestRoute } from "@/app/api/sentry-test/route";
 
 const FAKE_UUID = "00000000-0000-4000-8000-000000000001";
 
 // =============================================================================
-// DB-free: health / og / sentry-test / cron thin reference
+// DB-free: health / og / cron thin reference
 // =============================================================================
 
 describe("API routes auth matrix — public / env-gated (DB-free)", () => {
@@ -192,91 +169,6 @@ describe("API routes auth matrix — public / env-gated (DB-free)", () => {
 
       expect(res.status).toBe(200);
       expect(res.headers.get("content-type")).toMatch(/image\/png/);
-    });
-  });
-
-  describe("PLAT-API-002: GET /api/sentry-test (env-gated, no session RBAC)", () => {
-    const previousNodeEnv = process.env.NODE_ENV;
-    const previousDsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
-    const previousTestFlag = process.env.SENTRY_ENABLE_TEST_ENDPOINTS;
-
-    afterEach(() => {
-      vi.stubEnv("NODE_ENV", previousNodeEnv ?? "test");
-      if (previousDsn === undefined) {
-        delete process.env.NEXT_PUBLIC_SENTRY_DSN;
-      } else {
-        process.env.NEXT_PUBLIC_SENTRY_DSN = previousDsn;
-      }
-      if (previousTestFlag === undefined) {
-        delete process.env.SENTRY_ENABLE_TEST_ENDPOINTS;
-      } else {
-        process.env.SENTRY_ENABLE_TEST_ENDPOINTS = previousTestFlag;
-      }
-      sentryCaptureMessage.mockClear();
-      sentryCaptureException.mockClear();
-      sentryFlush.mockClear();
-    });
-
-    it("production without test flag → 404 (probe denied)", async () => {
-      vi.stubEnv("NODE_ENV", "production");
-      delete process.env.SENTRY_ENABLE_TEST_ENDPOINTS;
-      process.env.NEXT_PUBLIC_SENTRY_DSN = "https://example.ingest.sentry.io/1";
-
-      const res = await getSentryTestRoute(
-        new Request("http://localhost/api/sentry-test"),
-      );
-      const body = await res.json();
-
-      expect(res.status).toBe(404);
-      expect(body).toEqual({ ok: false });
-      expect(sentryCaptureMessage).not.toHaveBeenCalled();
-    });
-
-    it("production with SENTRY_ENABLE_TEST_ENDPOINTS=1 + DSN → 200", async () => {
-      vi.stubEnv("NODE_ENV", "production");
-      process.env.SENTRY_ENABLE_TEST_ENDPOINTS = "1";
-      process.env.NEXT_PUBLIC_SENTRY_DSN = "https://example.ingest.sentry.io/1";
-
-      const res = await getSentryTestRoute(
-        new Request("http://localhost/api/sentry-test"),
-      );
-      const body = await res.json();
-
-      expect(res.status).toBe(200);
-      expect(body.ok).toBe(true);
-      expect(sentryCaptureMessage).toHaveBeenCalledTimes(1);
-      expect(sentryFlush).toHaveBeenCalledTimes(1);
-    });
-
-    it("non-production without DSN → 500 (fail closed on missing config)", async () => {
-      vi.stubEnv("NODE_ENV", "development");
-      delete process.env.NEXT_PUBLIC_SENTRY_DSN;
-
-      const res = await getSentryTestRoute(
-        new Request("http://localhost/api/sentry-test"),
-      );
-      const body = await res.json();
-
-      expect(res.status).toBe(500);
-      expect(body.ok).toBe(false);
-      expect(body.error).toMatch(/NEXT_PUBLIC_SENTRY_DSN/);
-      expect(sentryCaptureMessage).not.toHaveBeenCalled();
-    });
-
-    it("non-production with DSN → 200 and captures once (positive control)", async () => {
-      vi.stubEnv("NODE_ENV", "development");
-      process.env.NEXT_PUBLIC_SENTRY_DSN = "https://example.ingest.sentry.io/1";
-
-      const res = await getSentryTestRoute(
-        new Request("http://localhost/api/sentry-test"),
-      );
-      const body = await res.json();
-
-      expect(res.status).toBe(200);
-      expect(body.ok).toBe(true);
-      expect(body.eventId).toBeTruthy();
-      expect(sentryCaptureMessage).toHaveBeenCalledTimes(1);
-      expect(sentryFlush).toHaveBeenCalledTimes(1);
     });
   });
 

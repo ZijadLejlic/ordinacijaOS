@@ -59,15 +59,6 @@ export function getSentryTracesSampleRate(): number {
   return 0.1;
 }
 
-/**
- * Temporary verification endpoints (API + page).
- * REMOVE after Sentry verification — see docs/Sentry.md.
- */
-export function areSentryTestEndpointsEnabled(): boolean {
-  if (process.env.SENTRY_ENABLE_TEST_ENDPOINTS === "1") return true;
-  return process.env.NODE_ENV !== "production";
-}
-
 /** Vercel / CI commit SHA for release correlation (also used by withSentryConfig). */
 export function getSentryRelease(): string | undefined {
   return (

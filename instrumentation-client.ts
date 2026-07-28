@@ -57,7 +57,6 @@ function isClinicAppPath(pathname: string) {
     "/login",
     "/signup",
     "/invite",
-    "/sentry-test",
   ];
   return prefixes.some((p) => stripped === p || stripped.startsWith(`${p}/`));
 }
