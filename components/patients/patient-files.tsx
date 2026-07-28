@@ -60,6 +60,8 @@ export type FileRow = {
   storagePath: string;
   sizeBytes: number;
   createdAt: string;
+  /** Short-lived signed URL for inline thumbnail (images only). */
+  previewUrl?: string | null;
 };
 
 function useSignedView() {
@@ -69,13 +71,21 @@ function useSignedView() {
 
   function view(path: string) {
     setError(null);
+    // Open synchronously on the click gesture — Safari blocks async window.open
+    // after await (blank tab / no navigation).
+    const popup = window.open("about:blank", "_blank");
     startTransition(async () => {
       const result = await createSignedFileUrlAction(path);
       if (result.error || !result.url) {
+        popup?.close();
         setError(mapError(t, result.error ?? "signedUrlFailed"));
         return;
       }
-      window.open(result.url, "_blank", "noopener,noreferrer");
+      if (popup) {
+        popup.location.href = result.url;
+      } else {
+        window.location.assign(result.url);
+      }
     });
   }
 
@@ -256,7 +266,16 @@ export function ImagesList({
             key={image.id}
             className="flex items-center justify-between gap-3 p-3"
           >
-            <span className="truncate text-sm font-medium">{image.title}</span>
+            <div className="flex min-w-0 items-center gap-3">
+              {image.previewUrl ? (
+                <img
+                  src={image.previewUrl}
+                  alt={image.title}
+                  className="bg-muted h-12 w-12 shrink-0 rounded object-cover"
+                />
+              ) : null}
+              <span className="truncate text-sm font-medium">{image.title}</span>
+            </div>
             <div className="flex shrink-0 gap-2">
               <Button
                 type="button"

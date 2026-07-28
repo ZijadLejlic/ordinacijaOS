@@ -47,6 +47,10 @@ import {
   canRequestPatientErasure,
 } from "@/lib/privacy/rbac";
 import { createClient } from "@/lib/supabase/server";
+import {
+  PATIENT_FILES_BUCKET,
+  SIGNED_URL_TTL_SECONDS,
+} from "@/lib/patients/storage";
 import { formatInTimeZone } from "date-fns-tz";
 import { CLINIC_TIMEZONE } from "@/lib/calendar/time";
 
@@ -200,6 +204,22 @@ export default async function PatientDetailPage({ params }: Props) {
     ordinacija: clinicName,
   };
 
+  const imageRows = await Promise.all(
+    (images ?? []).map(async (image) => {
+      const { data } = await supabase.storage
+        .from(PATIENT_FILES_BUCKET)
+        .createSignedUrl(image.storage_path, SIGNED_URL_TTL_SECONDS);
+      return {
+        id: image.id,
+        title: image.title,
+        storagePath: image.storage_path,
+        sizeBytes: image.size_bytes,
+        createdAt: image.created_at,
+        previewUrl: data?.signedUrl ?? null,
+      };
+    }),
+  );
+
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-4 py-6 sm:py-10">
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
@@ -313,13 +333,7 @@ export default async function PatientDetailPage({ params }: Props) {
           <ImagesList
             patientId={patient.id}
             canWrite={canWrite}
-            images={(images ?? []).map((image) => ({
-              id: image.id,
-              title: image.title,
-              storagePath: image.storage_path,
-              sizeBytes: image.size_bytes,
-              createdAt: image.created_at,
-            }))}
+            images={imageRows}
           />
           {canWrite ? <ImageUploadForm patientId={patient.id} /> : null}
         </CardContent>

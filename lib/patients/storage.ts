@@ -42,9 +42,11 @@ export function consentSignaturePath(
 
 /** Compress and re-encode any raster image to WebP (D21 — quality-preserving). */
 export async function convertImageToWebp(buffer: Buffer): Promise<Buffer> {
+  // Flatten alpha → lossy VP8 (not VP8X) for broader Safari/iOS inline display.
   return sharp(buffer)
     .rotate()
     .resize({ width: WEBP_MAX_WIDTH, withoutEnlargement: true })
+    .flatten({ background: { r: 255, g: 255, b: 255 } })
     .webp({ quality: WEBP_QUALITY })
     .toBuffer();
 }
