@@ -112,7 +112,7 @@ Each row: **Threat ID**, category, description, likelihood×impact → **Risk**,
 | T-TEN-03 | Info disclosure | Cross-clinic IDOR via known UUID in URL | Critical | RLS + RSC not-found | `TEN-E2E-001` (COVERED) |
 | T-TEN-04 | Info disclosure | Cross-clinic storage list/download | Critical | Storage folder RLS | `FILE-RLS-001` (PARTIAL) |
 | T-TEN-05 | Elevation | Move profile to another clinic | Critical | Trigger blocks clinic_id change | `AUTH-RLS-002` |
-| T-TEN-06 | Spoofing | Stale JWT `app_metadata.clinic_id` after profile change | High | Fallback to profiles; re-login on role change | `TEN-SEC-003` |
+| T-TEN-06 | Spoofing | Stale JWT `app_metadata.app_role` after role change | High | Role helpers profiles-first (`TEN-SEC-003`); re-login refreshes claims | `TEN-SEC-003` |
 | T-TEN-07 | Tampering | JWT hook disabled → rely on fallback only | Medium | Ops enable hook; both paths tested | `TEN-SEC-004` |
 | T-TEN-08 | Elevation | Cross-clinic membership (future D51) accidentally shipped | Medium | Negative test no switcher | `TEN-SEC-001` |
 
@@ -219,7 +219,7 @@ Starter clinic (or forged plan) inserts `crm_notifications` / `inventory_items` 
 | JWT hook manually enabled | Ops | Production-Ops + `TEN-SEC-004` |
 | Stripe / metered / portal (2027) | Out of MVP | Threat model addendum in Faza 4 |
 | External pen-test | Recommended before mass billing | Open item PRD §14 |
-| Email notification on lockout | May be incomplete | Confirm Resend path; `AUTH-INT-002` |
+| Email notification on lockout | Deferred §6.16 | MVP notify = audit (`AUTH-INT-002` COVERED); push email/bell when notification center ships |
 
 ---
 

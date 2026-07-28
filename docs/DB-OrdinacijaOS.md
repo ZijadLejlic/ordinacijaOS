@@ -30,9 +30,9 @@
 
 Helpers (SECURITY DEFINER, `search_path = public`, execute samo `authenticated`):
 
-- `current_clinic_id()` — JWT `app_metadata.clinic_id` pa fallback na `profiles`
-- `current_app_role()` — JWT `app_metadata.app_role` pa fallback na `profiles`
-- `is_clinic_owner()`
+- `current_clinic_id()` — JWT `app_metadata.clinic_id` pa fallback na `profiles` (JWT-first; D7 clinic_id ne mijenja tenant)
+- `current_app_role()` — live `profiles.role` first, then JWT `app_metadata.app_role` (TEN-SEC-003 / P6b.8)
+- `is_clinic_owner()` — live profiles owner check first, then JWT claim
 - `owner_mfa_ok()` — D11: owner s verified MFA mora `aal2` (RLS restrictive)
 - `create_clinic_for_owner(name, full_name, trial_ends_at?)` — signup: clinic + owner + default location + trial subscription (Professional); seeds `settings_json.onboarding` incomplete (Faza 2I). Idempotent: if profile already exists, returns existing `clinic_id` (needed because owners at aal1 cannot SELECT `profiles` under restrictive `owner_mfa_ok` RLS)
 

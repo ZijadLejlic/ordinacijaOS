@@ -16,7 +16,8 @@
 | Resend send (SPF + DKIM) | ✅ DNS | `send.dentord.com` SPF; `resend._domainkey` DKIM |
 | MX / inbox `support@` | ✅ | ImprovMX `mx1`/`mx2` + root SPF; aliases `support` + `hello` → Gmail |
 | Leaked Password Protection | ⏭️ Free | Pro+; skip za UAT |
-| JWT Custom Access Token hook | ⏭️ Free | Pro+; `profiles` fallback OK za UAT |
+| JWT Custom Access Token hook | ⏭️ Free / ✅ local CI | Pro+ enable in dashboard; `profiles` fallback OK za UAT (D-04 ACCEPTED). Local `config.toml` hook **on** for security suite. |
+| Auth session TTL (D12) | ✅ local / ⚠️ hosted mirror | Local `config.toml`: `jwt_expiry = 604800`, `[auth.sessions] timebox = "168h"`. Hosted: Authentication → Settings → JWT expiry **604800**, Sessions timebox **168h**. Asserted by `AUTH-INT-021`. |
 | `NEXT_PUBLIC_APP_URL` na Vercel | ⚠️ ručno | Mora biti `https://www.dentord.com` — invite linkovi |
 | Mobile responsive (D40) | ✅ u kodu | Deploy potreban na produkciju |
 
@@ -41,6 +42,8 @@ Redeploy da uđu: `/api/health`, mobile fixovi, ostale lokalne izmjene.
 ### 1.2 Supabase Free — skip
 
 Leaked password + Auth Hooks = Pro+. Nije UAT blocker.
+
+**Hosted Auth session TTL (D12):** mirror local `supabase/config.toml` — JWT expiry **604800** s (7d) and Sessions timebox **168h**. Automated assert: `AUTH-INT-021` (`lib/security/session-ttl-config.test.ts`).
 
 ### 1.3 MX (gotovo)
 

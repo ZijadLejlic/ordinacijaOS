@@ -12,7 +12,7 @@ const hasEnv = Boolean(getE2EEnv());
 /**
  * Prefer full UI signup. If Supabase Auth rate-limits email (common after
  * many local runs), bootstrap owner via admin + create_clinic_for_owner so
- * MFA enroll + onboarding step 1 still get exercised (PRD §12.2).
+ * MFA enroll + onboarding steps 1–3 still get exercised (PRD §12.2 / J1).
  */
 async function ensureOwnerOnMfaEnroll(
   page: import("@playwright/test").Page,
@@ -93,10 +93,10 @@ async function ensureOwnerOnMfaEnroll(
   return "admin-bootstrap" as const;
 }
 
-test.describe("Signup → MFA → onboarding step 1", () => {
+test.describe("Signup → MFA → onboarding steps 1–3", { tag: "@blocker" }, () => {
   test.skip(!hasEnv, "Supabase E2E env not configured");
 
-  test("owner can create clinic and complete onboarding step 1", async ({
+  test("owner completes onboarding steps 1–3 (skip invite) → dashboard", async ({
     page,
   }) => {
     const tag = randomTag();
@@ -116,6 +116,27 @@ test.describe("Signup → MFA → onboarding step 1", () => {
 
       await completeMfaEnroll(page);
 
+      // Resolve ids ASAP so finally cleanup runs even if a later step fails
+      {
+        const service = createServiceClient();
+        const listed = await service.auth.admin.listUsers({
+          page: 1,
+          perPage: 1000,
+        });
+        const user = listed.data.users.find((u) => u.email === email);
+        expect(user).toBeTruthy();
+        userId = user!.id;
+        const { data: owned } = await service
+          .from("profiles")
+          .select("clinic_id, role")
+          .eq("id", userId)
+          .single();
+        expect(owned?.role).toBe("owner");
+        clinicId = owned?.clinic_id ?? null;
+        expect(clinicId).toBeTruthy();
+      }
+
+      // —— Step 1: clinic basics (D43 / D46 / D47) ——
       await expect(page).toHaveURL(/\/onboarding/);
       await expect(page.getByText("Osnovni podaci")).toBeVisible();
 
@@ -124,28 +145,77 @@ test.describe("Signup → MFA → onboarding step 1", () => {
       await page.locator("#phoneCountryDefault").selectOption("+387");
       await page.getByRole("button", { name: "Nastavi" }).click();
 
+      // —— Step 2: add ≥1 service, advance ——
       await expect(page.getByText("Prve usluge")).toBeVisible({
         timeout: 30_000,
       });
 
-      const service = createServiceClient();
-      const listed = await service.auth.admin.listUsers({
-        page: 1,
-        perPage: 1000,
+      await page.locator("#name").fill(`Kontrola ${tag.slice(-6)}`);
+      await page.locator("#code").fill(`E2E-${tag.slice(-4)}`);
+      await page.locator("#durationMinutes").fill("30");
+      await page.locator("#priceEur").fill("50");
+      await page.locator("#vatRate").fill("0.17");
+      await page.getByRole("button", { name: "Dodaj uslugu" }).click();
+      await expect(page.getByText("Usluga dodana.")).toBeVisible({
+        timeout: 30_000,
       });
-      const user = listed.data.users.find((u) => u.email === email);
-      expect(user).toBeTruthy();
-      userId = user!.id;
+      await expect(page.getByText(/Aktivnih usluga:\s*[1-9]/)).toBeVisible();
 
-      const { data: owned } = await service
-        .from("profiles")
-        .select("clinic_id, role")
-        .eq("id", userId)
+      await page.getByRole("button", { name: "Nastavi" }).click();
+
+      // —— Step 3: skip invite (J1 allows skip; no real Resend send) ——
+      await expect(page.getByText("Pozovi kolegu")).toBeVisible({
+        timeout: 30_000,
+      });
+      await page.getByRole("button", { name: "Preskoči i završi" }).click();
+
+      await expect(page).toHaveURL(/\/dashboard/, { timeout: 60_000 });
+      await expect(
+        page.getByRole("heading", { name: "Kontrolna tabla" }),
+      ).toBeVisible({ timeout: 30_000 });
+
+      // —— DB assertions (AUTH-E2E-001) ——
+      const service = createServiceClient();
+      const { data: clinic } = await service
+        .from("clinics")
+        .select("name, timezone, phone_country_default, settings_json")
+        .eq("id", clinicId!)
         .single();
 
-      expect(owned?.role).toBe("owner");
-      clinicId = owned?.clinic_id ?? null;
-      expect(clinicId).toBeTruthy();
+      expect(clinic?.name).toBe(`${clinicName} Updated`);
+      expect(clinic?.timezone).toBe("Europe/Sarajevo");
+      expect(clinic?.phone_country_default).toBe("+387");
+
+      const settings =
+        clinic?.settings_json &&
+        typeof clinic.settings_json === "object" &&
+        !Array.isArray(clinic.settings_json)
+          ? (clinic.settings_json as Record<string, unknown>)
+          : {};
+      const onboarding =
+        settings.onboarding &&
+        typeof settings.onboarding === "object" &&
+        !Array.isArray(settings.onboarding)
+          ? (settings.onboarding as Record<string, unknown>)
+          : {};
+      expect(onboarding.completed).toBe(true);
+      expect(onboarding.skipped_invite).toBe(true);
+      const steps =
+        onboarding.steps &&
+        typeof onboarding.steps === "object" &&
+        !Array.isArray(onboarding.steps)
+          ? (onboarding.steps as Record<string, unknown>)
+          : {};
+      expect(steps.clinic).toBe(true);
+      expect(steps.services).toBe(true);
+      expect(steps.invite).toBe(true);
+
+      const { count: serviceCount } = await service
+        .from("services")
+        .select("id", { count: "exact", head: true })
+        .eq("clinic_id", clinicId!)
+        .eq("is_active", true);
+      expect(serviceCount).toBeGreaterThanOrEqual(1);
     } finally {
       if (clinicId) {
         const service = createServiceClient();

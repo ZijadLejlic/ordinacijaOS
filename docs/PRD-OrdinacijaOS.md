@@ -43,7 +43,7 @@ Odluke su finalne za v1 planiranje. Agent/developer **ne nagađa** mimo ovog log
 | D10 | Shared desk | Reception/assistant: shared nalog + **PIN quick switch** operatora |
 | D11 | 2FA | Obavezno samo za **owner**; ostali ne |
 | D12 | Session | TTL **7 dana**; owner može force logout **jednog** korisnika (per-user; ne clinic-wide) |
-| D13 | Lockout | 5 failed logins → notifikacija owneru |
+| D13 | Lockout | 5 failed logins → **15 min** lock + `auth.login_lockout` audit (owner Audit UI). Email / in-app bell deferred until §6.16 notification center. |
 | D14 | Kalendar | Termin vezan za **doktora**; stolice nisu u MVP; hard block overlap |
 | D15 | Trajanje termina | Default po usluzi + ručna korekcija |
 | D16 | Cjenovnik / lokacije | Owner checkbox: isti cjenovnik na svim lokacijama ili odvojen |
@@ -198,7 +198,7 @@ Owner_signup → Clinic_created → Invite_staff_email
 - Owner: username/email + password + **TOTP 2FA obavezno**.
 - Ostali: email + password (iz invite flow-a); 2FA nije obavezna.
 - Session refresh TTL: **7 dana**.
-- 5 uzastopnih failed login pokušaja na nalog → email/in-app notifikacija owneru; privremeni lock (npr. 15 min) na taj nalog.
+- 5 uzastopnih failed login pokušaja na nalog → privremeni lock (**15 min**) + `audit_events` `auth.login_lockout` vidljiv owneru u Audit UI. Push email / in-app bell (§6.16) nije MVP.
 - Owner: **Force logout** jednog staff korisnika (sve sesije tog naloga; ne cijele klinike).
 
 ---
@@ -498,7 +498,7 @@ Sekundarni: Pozovi me / kontakt.
 - Supabase Auth + RLS na svim clinic tabelama
 - Private storage; **signed URLs** (kratki TTL); nikad public medical files
 - Owner 2FA (TOTP)
-- Lockout + owner alert nakon 5 failova
+- Lockout + owner alert (audit `auth.login_lockout`) nakon 5 failova
 - Force logout
 - Secrets samo server-side; odvojen staging/prod
 - AI (kad postoji): draft-only; disclaimer “alat za evidenciju, odluku donosi doktor”

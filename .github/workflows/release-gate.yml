@@ -1,0 +1,57 @@
+# P5 exit — single release gate for PR / main.
+# Leaf workflows (lint-typecheck, unit, security, e2e) are reusable only;
+# this file is the sole push/pull_request entry so CI does not double-run.
+name: Release gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: release-gate-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-typecheck:
+    name: Lint & typecheck
+    uses: ./.github/workflows/lint-typecheck.yml
+
+  unit:
+    name: Unit + coverage
+    uses: ./.github/workflows/unit.yml
+
+  security:
+    name: Security (local Supabase)
+    uses: ./.github/workflows/security.yml
+
+  e2e:
+    name: E2E blockers
+    uses: ./.github/workflows/e2e.yml
+    secrets: inherit
+
+  release-gate:
+    name: All gates green
+    needs: [lint-typecheck, unit, security, e2e]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Require every leaf workflow success
+        env:
+          LINT: ${{ needs.lint-typecheck.result }}
+          UNIT: ${{ needs.unit.result }}
+          SECURITY: ${{ needs.security.result }}
+          E2E: ${{ needs.e2e.result }}
+        run: |
+          echo "lint-typecheck=$LINT"
+          echo "unit=$UNIT"
+          echo "security=$SECURITY"
+          echo "e2e=$E2E"
+          fail=0
+          for r in "$LINT" "$UNIT" "$SECURITY" "$E2E"; do
+            if [ "$r" != "success" ]; then
+              echo "::error::Release gate failed — required job result was '$r' (want success)"
+              fail=1
+            fi
+          done
+          exit "$fail"

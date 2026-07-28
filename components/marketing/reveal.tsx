@@ -32,10 +32,8 @@ export function Reveal({ children, className, delayMs = 0 }: RevealProps) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (reduceMotion) {
-      setReady(true);
-      return;
-    }
+    // reduceMotion → show without mount animation (derived via `show` below).
+    if (reduceMotion) return;
     const node = ref.current;
     if (!node) return;
 

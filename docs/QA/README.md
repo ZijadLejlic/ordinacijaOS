@@ -7,7 +7,7 @@
 
 | Field | Value |
 |---|---|
-| Status | Analysis complete (2026-07-23) |
+| Status | Analysis + P0–P5 implementation (Traceability COVERED sweep + UAT cross-link 2026-07-28) |
 | Scope | Professional MVP (Faze 1–3); Faza 4 noted only as residual risk |
 | Emphasis | Security → multi-tenant isolation → RLS → financial/PII → functional |
 | Target test runtime | Hermetic local Supabase (CLI) — see [Implementation-Plan.md](./Implementation-Plan.md) P0 |
@@ -136,14 +136,19 @@ npm run test:e2e:dev
 
 Loaded from `.env.local` / `.env` via `lib/security/test-env.ts` and `e2e/helpers/env.ts`.
 
-**CI today:**
+### Flaky quarantine
 
-| Workflow | Runs | Trigger |
+See root [`README.md`](../../README.md) (P5.6) and [Test-Strategy.md](./Test-Strategy.md) § Regression: issue link → `fix`/`@flaky` → un-quarantine in fix PR; max 1 CI retry; do not delete coverage.
+
+**CI today (P5 release gate):**
+
+| Workflow | Role | Trigger |
 |---|---|---|
-| `.github/workflows/security.yml` | `npm run test:security` | push `main`, PRs |
-| `.github/workflows/e2e.yml` | Playwright (signup, appointment, invoice, isolation) | push `main`, PRs |
-
-**Known gap:** the 14 pure unit test files are **not** executed in CI (only the two security files via `test:security`). Tracked in [Discrepancies.md](./Discrepancies.md) and fixed in Implementation-Plan **P0**.
+| `.github/workflows/release-gate.yml` | Calls lint + unit + security + e2e; aggregator fails unless all green | push `main`, PRs |
+| `.github/workflows/lint-typecheck.yml` | ESLint + `tsc --noEmit` | `workflow_call` only |
+| `.github/workflows/unit.yml` | `npm run test:coverage` | `workflow_call` only |
+| `.github/workflows/security.yml` | Local Supabase + `test:security` (fail-closed) | `workflow_call` only |
+| `.github/workflows/e2e.yml` | Playwright blockers + service-role bundle check | `workflow_call` only |
 
 ---
 
@@ -151,19 +156,19 @@ Loaded from `.env.local` / `.env` via `lib/security/test-env.ts` and `e2e/helper
 
 | Layer | Files | Supabase | CI |
 |---|---|---|---|
-| Pure unit (Vitest) | 14 under `lib/**/*.test.ts` | No | **Not in CI** |
-| Security integration (Vitest) | `tenant-isolation.test.ts`, `rbac-and-lifecycle.test.ts` | Yes (live) | `security.yml` |
-| E2E (Playwright) | 5 specs under `e2e/` | Yes + running app | `e2e.yml` |
+| Pure unit (Vitest) | `lib/**/*.test.ts` (excl. security INT) | No | release gate → `unit.yml` |
+| Security integration (Vitest) | `lib/security/*.test.ts` | Local in CI | release gate → `security.yml` |
+| E2E (Playwright) | 7 specs under `e2e/` (incl. marketing + invite) | Yes + running app | release gate → `e2e.yml` |
 | Demo seed | `scripts/seed-demo-clinic.ts` | Yes | Manual |
 
 ---
 
 ## 8. Related product docs
 
-- Partner UAT checklist: [`docs/UAT-Partner.md`](../UAT-Partner.md)
+- Partner UAT checklist (Auto vs Ručno): [`docs/UAT-Partner.md`](../UAT-Partner.md)
 - Production ops: [`docs/Production-Ops.md`](../Production-Ops.md)
 - Prior code review: [`docs/CODE-REVIEW-2026-07.md`](../CODE-REVIEW-2026-07.md)
 
 ---
 
-*DentOrd QA index — 2026-07-23.*
+*DentOrd QA index — updated 2026-07-28.*

@@ -253,7 +253,7 @@ Accountant/owner → Create invoice (allocate number) → PDF stored
 ```
 
 **Risks:** number collision; cross-clinic allocate; DELETE payment; PDF IDOR.  
-**Tests:** `FIN-E2E-001`, `FIN-INT-001..010`, `FIN-API-001`, `FIN-SEC-001`.
+**Tests:** `FIN-E2E-001`, `FIN-INT-001..010`, `FIN-API-001`, `FIN-SEC-001`. Partial/paid + void SA covered by `FIN-INT-003/004` (INT); installments feature gate COVERED (`FIN-INT-010`).
 
 ### J5 — GDPR erasure
 

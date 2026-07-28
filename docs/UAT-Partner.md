@@ -3,7 +3,8 @@
 > Free period do **31.12.2026** (Professional entitlements, bez naplate).  
 > Live: [https://www.dentord.com](https://www.dentord.com)  
 > Bugovi / pitanja: **support@dentord.com**  
-> Ops: `docs/Production-Ops.md` · PRD UAT: §12.3–12.5
+> Ops: `docs/Production-Ops.md` · PRD UAT: §12.3–12.5  
+> QA: [Traceability-Matrix.md](./QA/Traceability-Matrix.md) · [Test-Strategy.md](./QA/Test-Strategy.md)
 
 ---
 
@@ -24,21 +25,38 @@ npm run check:production-ops
 
 Radi redom; označi. Cilj: &lt; 30 min (KPI time-to-first-appointment).
 
-| # | Korak | OK? |
-|---|---|---|
-| 1 | Signup / login owner + MFA | ☐ |
-| 2 | Onboarding (klinika, usluge, invite korak) | ☐ |
-| 3 | Invite **doktor** + **recepcija** → postave lozinku, uđu s ispravnom rolom | ☐ |
-| 4 | (Opcionalno) PIN operator na reception | ☐ |
-| 5 | Novi pacijent + alergija | ☐ |
-| 6 | Karton: dokument/slika upload, odontogram klik, plan terapije stavka | ☐ |
-| 7 | Kalendar: termin (default trajanje), overlap blokiran, email podsjetnik test | ☐ |
-| 8 | Faktura: linije + izdavanje + PDF download + partial uplata | ☐ |
-| 9 | Dashboard KPI danas vidljiv | ☐ |
-| 10 | Mobile (~375px): login, kalendar dan, karton, lista faktura | ☐ |
-| 11 | Kontakt forma / mail na `support@` stiže | ☐ |
+**Autom. vs ručno:** `Auto` = CI/Playwright/Vitest već pokriva happy-path (ne zamjenjuje produkcijski smoke). `Ručno` = nema E2E ili samo INT/parcijalno — fokus UAT-a.
 
-Moduli bez punog E2E (ručno ako treba): CRM, inventar, consent sign, CSV import, ZIP backup, GDPR erasure (samo na test pacijentu).
+| # | Korak | Auto? | Test IDs / napomena | OK? |
+|---|---|---|---|---|
+| 1 | Signup / login owner + MFA | Auto | `AUTH-E2E-001`, `AUTH-E2E-003` — na prod ipak uradi jednom | ☐ |
+| 2 | Onboarding (klinika, usluge, invite korak) | Auto | `AUTH-E2E-001` (steps 1–3; invite skip u E2E) | ☐ |
+| 3 | Invite **doktor** + **recepcija** → lozinka + uloga | Auto | `AUTH-E2E-002` — na prod provjeri invite URL ≠ localhost | ☐ |
+| 4 | (Opcionalno) PIN operator na reception | Ručno | `AUTH-INT-011` PARTIAL; cross-clinic PIN = `AUTH-SEC-002` | ☐ |
+| 5 | Novi pacijent + alergija | Ručno | Tenant isolation Auto (`TEN-E2E-001` / TEN-RLS); alergija UI nema E2E | ☐ |
+| 6 | Karton: dokument/slika, odontogram, plan terapije | Djelomično | FDI/plan/consent INT: `PII-INT-010..012`; upload UI + alergije = ručno | ☐ |
+| 7 | Kalendar: termin, overlap, email podsjetnik | Djelomično | Overlap Auto `CAL-E2E-001`; waitlist INT `CAL-INT-003`; reminder INT `CRM-INT-001`; default trajanje GAP | ☐ |
+| 8 | Faktura: izdavanje + PDF + partial uplata | Djelomično | PDF Auto `FIN-E2E-001`; partial/void INT `FIN-INT-003/004`; installments GAP | ☐ |
+| 9 | Dashboard KPI danas vidljiv | Auto (INT) | `FIN-INT-020`, `RBAC-INT-010` — prod smoke i dalje | ☐ |
+| 10 | Mobile (~375px): login, kalendar, karton, fakture | Ručno | `CAL-E2E-002` / `MKT-E2E-003` GAP — prioritet partner UAT | ☐ |
+| 11 | Kontakt forma / mail na `support@` stiže | Ručno | `CRM-INT-003` GAP; lead honeypot/rate Auto `MKT-INT-001`/`MKT-SEC-002` | ☐ |
+
+### 1.3 Moduli — Auto INT vs ručni UAT
+
+Ovi moduli imaju **INT/unit** pokrivenost, ali **nema** Playwright journey na produkciji. Ručno smoke (test podaci only):
+
+| Modul | Auto (INT/unit) | Ručni UAT fokus |
+|---|---|---|
+| CRM light (birthday/recall) | `CRM-INT-002`, `CRM-UNIT-002` | Generate lista + human send iz UI |
+| Inventar | `PLAN-INT-021`, `RBAC-INT-021` | Low-stock badge; create/adjust |
+| Consent draw-sign | `PII-INT-012` | Potpis na uređaju → PDF u kartonu |
+| CSV import | `IMP-INT-001`, `IMP-UNIT-001` | Preview greške → commit patients/services |
+| Branding boje | `PLAN-INT-022` | Shell boje; logo upload ACL COVERED (`FILE-INT-011`) |
+| ZIP backup / GDPR erasure | `PII-API-002`, `PII-INT-001` | Owner-only; **samo test pacijent / demo klinika** |
+| Shared pricelist / lokacije | — (`PLAN-INT-020` GAP) | Toggle shared pricelist ručno |
+| Installments | — (`FIN-INT-010` GAP) | Ako Pro: payment plan UI |
+
+Marketing public smoke (bez logina) je Auto: `e2e/marketing-smoke.spec.ts` → `MKT-E2E-001/002/004`.
 
 ---
 
@@ -78,11 +96,15 @@ Demo klinika (read-only marketing): `/bs/demo` — odvojena od pravih tenanata.
 
 Za svaku partner ordinaciju:
 
-- [ ] Owner završio onboarding  
-- [ ] Doktor ulogovan, kreirao bar 1 termin  
-- [ ] Recepcija ulogovana, bar 1 pacijent + 1 termin  
-- [ ] Bar 1 faktura PDF (owner/accountant)  
-- [ ] Feedback mail na support@ (ili “sve OK”)  
+| # | Korak | Vezano na interni # / Auto | OK? |
+|---|---|---|---|
+| 1 | Owner završio onboarding | #1–2 · Auto `AUTH-E2E-001` | ☐ |
+| 2 | Doktor ulogovan, kreirao bar 1 termin | #3 + #7 · Auto overlap `CAL-E2E-001` | ☐ |
+| 3 | Recepcija ulogovana, bar 1 pacijent + 1 termin | #3 + #5 · tenant Auto `TEN-E2E-001` | ☐ |
+| 4 | Bar 1 faktura PDF (owner/accountant) | #8 · Auto `FIN-E2E-001` | ☐ |
+| 5 | Feedback mail na support@ (ili “sve OK”) | #11 · ručno | ☐ |
+
+Prioritet partner feedbacka koji Auto **ne** hvata: **mobile (#10)**, PIN desk, alergije/upload UI, installments, shared pricelist, logo branding.
 
 ---
 
@@ -107,3 +129,7 @@ U bodyju:
 1. Triage: blocker / UX / kasnije  
 2. Fix → deploy → kratki reply partneru  
 3. Poslije ~10 dana: traži dozvolu za recenziju (Website W10 — testimonials trenutno sakrivene)
+
+---
+
+*UAT partner checklist — cross-linked to QA Traceability/Test-Strategy 2026-07-28 (P5.9).*

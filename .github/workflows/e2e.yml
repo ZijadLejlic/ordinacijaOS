@@ -1,9 +1,7 @@
 name: E2E (release blocker)
 
 on:
-  push:
-    branches: [main]
-  pull_request:
+  workflow_call:
 
 jobs:
   playwright:

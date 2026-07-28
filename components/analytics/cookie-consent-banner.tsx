@@ -1,14 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import {
+  CONSENT_STORAGE_KEY,
   readCookieConsent,
   writeCookieConsent,
 } from "@/lib/analytics/consent";
 import { cn } from "@/lib/utils";
+
+function subscribeConsent(onStoreChange: () => void) {
+  if (typeof window === "undefined") return () => undefined;
+  const onStorage = (e: StorageEvent) => {
+    if (e.key === null || e.key === CONSENT_STORAGE_KEY) onStoreChange();
+  };
+  window.addEventListener("storage", onStorage);
+  return () => window.removeEventListener("storage", onStorage);
+}
+
+function getConsentNeeded() {
+  return readCookieConsent() === null;
+}
 
 /**
  * Minimal cookie banner (PRD §13.4 / W18): essential vs analytics.
@@ -16,17 +30,19 @@ import { cn } from "@/lib/utils";
  */
 export function CookieConsentBanner() {
   const t = useTranslations("Marketing.cookieConsent");
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    setVisible(readCookieConsent() === null);
-  }, []);
+  const needsConsent = useSyncExternalStore(
+    subscribeConsent,
+    getConsentNeeded,
+    () => false,
+  );
+  const [dismissed, setDismissed] = useState(false);
+  const visible = needsConsent && !dismissed;
 
   if (!visible) return null;
 
   function decide(analytics: boolean) {
     writeCookieConsent(analytics);
-    setVisible(false);
+    setDismissed(true);
   }
 
   return (

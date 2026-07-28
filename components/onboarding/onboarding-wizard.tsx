@@ -306,11 +306,13 @@ function StepServices({
   const createError = mapError(t, createState?.error);
   const advanceError = mapError(t, advanceState?.error);
 
-  useEffect(() => {
+  const [seenCreateState, setSeenCreateState] = useState(createState);
+  if (createState !== seenCreateState) {
+    setSeenCreateState(createState);
     if (createState?.message === "serviceCreated") {
       setLocalCount((c) => c + 1);
     }
-  }, [createState]);
+  }
 
   useEffect(() => {
     if (advanceState?.message === "servicesDone") onAdvanced();

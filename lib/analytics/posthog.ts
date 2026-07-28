@@ -14,7 +14,8 @@ let initialized = false;
 let client: PosthogClient | null = null;
 let loadPromise: Promise<PosthogClient> | null = null;
 
-function sanitizeProps(
+/** Strip PII-ish prop keys before PostHog capture (D33). Exported for PII-SEC-001. */
+export function sanitizeAnalyticsProps(
   props?: AnalyticsProps,
 ): Record<string, string | number | boolean> {
   if (!props) return {};
@@ -84,7 +85,7 @@ export function optOutPosthog() {
 export function trackEvent(event: string, props?: AnalyticsProps) {
   if (!canUsePosthog() || typeof window === "undefined" || !initialized || !client)
     return;
-  client.capture(event, sanitizeProps(props));
+  client.capture(event, sanitizeAnalyticsProps(props));
 }
 
 export function identifyClinicUser(input: {
