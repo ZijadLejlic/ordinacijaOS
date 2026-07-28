@@ -6,16 +6,30 @@ let sentryPromise: Promise<SentryMod> | null = null;
 
 function loadSentry() {
   if (!sentryPromise) {
-    sentryPromise = import("@sentry/nextjs").then((Sentry) => {
+    sentryPromise = import("@sentry/nextjs").then(async (Sentry) => {
+      const { getSharedSentryOptions } = await import(
+        "@/lib/observability/sentry-options"
+      );
+      const { isSentryEnabled } = await import(
+        "@/lib/observability/sentry-env"
+      );
+      const shared = getSharedSentryOptions();
       Sentry.init({
-        dsn,
-        enabled: Boolean(dsn),
-        environment: process.env.NODE_ENV,
-        debug: process.env.NODE_ENV === "development" && Boolean(dsn),
-        tracesSampleRate: 0.1,
-        sendDefaultPii: false,
-        replaysSessionSampleRate: 0,
-        replaysOnErrorSampleRate: dsn ? 0.1 : 0,
+        ...shared,
+        integrations: shared.enabled
+          ? [
+              Sentry.replayIntegration({
+                maskAllText: true,
+                blockAllMedia: true,
+              }),
+            ]
+          : [],
+        replaysSessionSampleRate: shared.enabled ? 0.01 : 0,
+        replaysOnErrorSampleRate: shared.enabled ? 1.0 : 0,
+        debug:
+          process.env.NODE_ENV === "development" &&
+          isSentryEnabled() &&
+          process.env.NEXT_PUBLIC_SENTRY_DEBUG === "1",
       });
       return Sentry;
     });
@@ -43,6 +57,7 @@ function isClinicAppPath(pathname: string) {
     "/login",
     "/signup",
     "/invite",
+    "/sentry-test",
   ];
   return prefixes.some((p) => stripped === p || stripped.startsWith(`${p}/`));
 }
@@ -50,31 +65,36 @@ function isClinicAppPath(pathname: string) {
 /**
  * Defer client SDK. Marketing pages wait long enough that Lighthouse does not
  * download ~170KB of mostly-unused Sentry during the audit window.
+ * Clinic + verification paths init promptly.
  */
 function scheduleSentryInit() {
   if (!dsn || typeof window === "undefined") return;
+
   const run = () => {
-    void loadSentry();
+    void import("@/lib/observability/sentry-env").then(({ isSentryEnabled }) => {
+      if (!isSentryEnabled()) return;
+      void loadSentry();
+    });
   };
 
-  if (!isClinicAppPath(window.location.pathname)) {
-    window.setTimeout(run, 20_000);
+  if (isClinicAppPath(window.location.pathname)) {
+    const ric = (
+      window as Window & {
+        requestIdleCallback?: (
+          cb: () => void,
+          opts?: { timeout: number },
+        ) => number;
+      }
+    ).requestIdleCallback;
+    if (typeof ric === "function") {
+      ric(run, { timeout: 1500 });
+    } else {
+      setTimeout(run, 500);
+    }
     return;
   }
 
-  const ric = (
-    window as Window & {
-      requestIdleCallback?: (
-        cb: () => void,
-        opts?: { timeout: number },
-      ) => number;
-    }
-  ).requestIdleCallback;
-  if (typeof ric === "function") {
-    ric(run, { timeout: 4000 });
-  } else {
-    setTimeout(run, 3000);
-  }
+  window.setTimeout(run, 20_000);
 }
 
 scheduleSentryInit();
@@ -82,7 +102,10 @@ scheduleSentryInit();
 export const onRouterTransitionStart = (
   ...args: Parameters<SentryMod["captureRouterTransitionStart"]>
 ) => {
-  void loadSentry().then((Sentry) => {
-    Sentry.captureRouterTransitionStart(...args);
+  void import("@/lib/observability/sentry-env").then(({ isSentryEnabled }) => {
+    if (!isSentryEnabled()) return;
+    void loadSentry().then((Sentry) => {
+      Sentry.captureRouterTransitionStart(...args);
+    });
   });
 };

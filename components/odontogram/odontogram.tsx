@@ -113,7 +113,7 @@ export function Odontogram({
 
   return (
     <div className="space-y-6">
-      <div className="w-full max-w-full overflow-x-auto pb-1">
+      <div className="w-full max-w-full overflow-x-auto p-2">
         <div className="mx-auto flex w-max flex-col items-center gap-2">
           <div className="flex gap-0.5 sm:gap-1">
             {FDI_LAYOUT.upperRow.map((fdi) => (

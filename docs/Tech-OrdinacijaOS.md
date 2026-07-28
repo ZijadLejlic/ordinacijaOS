@@ -201,7 +201,7 @@ Iz PRD §10 / Decision Log — posebno u 2026 free MVP:
 
 ## 9. Observability
 
-- Sentry: greške; tag `clinic_id` / `role` via `setClinicErrorContext` (bez patient PII)
+- Sentry: greške; `setSentryAuthContext` (user.id + `clinic_id`/`role` tags, bez patient PII) — vidi `docs/Sentry.md`
 - PostHog: `clinic_id`, `role`, event names — **bez** patient PII (D33); EU host default; disabled bez `NEXT_PUBLIC_POSTHOG_KEY`; **učitava se tek nakon analytics cookie consent** (W18 / PRD §13.4)
 - Support: email `support@dentord.com` (D44)
 

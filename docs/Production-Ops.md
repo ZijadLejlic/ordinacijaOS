@@ -34,6 +34,7 @@ Potvrdi Production env:
 | `NEXT_PUBLIC_APP_URL` | `https://www.dentord.com` |
 | `EMAIL_FROM` | `DentOrd <noreply@dentord.com>` |
 | `RESEND_API_KEY` / `CRON_SECRET` / Supabase keys | set |
+| Sentry (`NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_AUTH_TOKEN` Build-only, org/project) | vidi `docs/Sentry.md` |
 
 Redeploy da uđu: `/api/health`, mobile fixovi, ostale lokalne izmjene.
 

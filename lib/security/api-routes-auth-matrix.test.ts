@@ -20,8 +20,8 @@ import {
  *      canExportPatientData
  *   6. GET /api/privacy/clinic/export — session + canExportClinicBackup
  *   7. GET /api/og — intentionally public marketing OG image (no auth)
- *   8. GET /api/sentry-test — NODE_ENV === production → 404;
- *      otherwise DSN-gated (no session RBAC)
+ *   8. GET /api/sentry-test — production without SENTRY_ENABLE_TEST_ENDPOINTS
+ *      → 404; otherwise DSN-gated (TEMPORARY probe; remove after verification)
  *
  * Already COVERED — do not re-implement (matrix cites them):
  *   - cron secret → LIFE-API-001 / cron-secret-guard.test.ts (unit)
@@ -74,14 +74,24 @@ vi.mock("@/lib/clinic/lifecycle-job", () => ({
   runClinicLifecycleJob,
 }));
 
-const { sentryCaptureMessage, sentryFlush } = vi.hoisted(() => ({
-  sentryCaptureMessage: vi.fn(() => "test-event-id"),
-  sentryFlush: vi.fn(async () => true),
-}));
+const { sentryCaptureMessage, sentryFlush, sentryCaptureException, sentryWithScope } =
+  vi.hoisted(() => ({
+    sentryCaptureMessage: vi.fn(() => "test-event-id"),
+    sentryFlush: vi.fn(async () => true),
+    sentryCaptureException: vi.fn(() => "test-exc-id"),
+    sentryWithScope: vi.fn((fn: (scope: { setTag: () => void }) => unknown) =>
+      fn({ setTag: vi.fn() }),
+    ),
+  }));
 
 vi.mock("@sentry/nextjs", () => ({
   captureMessage: sentryCaptureMessage,
+  captureException: sentryCaptureException,
   flush: sentryFlush,
+  withScope: sentryWithScope,
+  setUser: vi.fn(),
+  setTag: vi.fn(),
+  addBreadcrumb: vi.fn(),
 }));
 
 /** Auth matrix only: prove no session gate before ImageResponse. */
@@ -188,6 +198,7 @@ describe("API routes auth matrix — public / env-gated (DB-free)", () => {
   describe("PLAT-API-002: GET /api/sentry-test (env-gated, no session RBAC)", () => {
     const previousNodeEnv = process.env.NODE_ENV;
     const previousDsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
+    const previousTestFlag = process.env.SENTRY_ENABLE_TEST_ENDPOINTS;
 
     afterEach(() => {
       vi.stubEnv("NODE_ENV", previousNodeEnv ?? "test");
@@ -196,15 +207,24 @@ describe("API routes auth matrix — public / env-gated (DB-free)", () => {
       } else {
         process.env.NEXT_PUBLIC_SENTRY_DSN = previousDsn;
       }
+      if (previousTestFlag === undefined) {
+        delete process.env.SENTRY_ENABLE_TEST_ENDPOINTS;
+      } else {
+        process.env.SENTRY_ENABLE_TEST_ENDPOINTS = previousTestFlag;
+      }
       sentryCaptureMessage.mockClear();
+      sentryCaptureException.mockClear();
       sentryFlush.mockClear();
     });
 
-    it("production → 404 (dev-only probe denied)", async () => {
+    it("production without test flag → 404 (probe denied)", async () => {
       vi.stubEnv("NODE_ENV", "production");
+      delete process.env.SENTRY_ENABLE_TEST_ENDPOINTS;
       process.env.NEXT_PUBLIC_SENTRY_DSN = "https://example.ingest.sentry.io/1";
 
-      const res = await getSentryTestRoute();
+      const res = await getSentryTestRoute(
+        new Request("http://localhost/api/sentry-test"),
+      );
       const body = await res.json();
 
       expect(res.status).toBe(404);
@@ -212,11 +232,29 @@ describe("API routes auth matrix — public / env-gated (DB-free)", () => {
       expect(sentryCaptureMessage).not.toHaveBeenCalled();
     });
 
+    it("production with SENTRY_ENABLE_TEST_ENDPOINTS=1 + DSN → 200", async () => {
+      vi.stubEnv("NODE_ENV", "production");
+      process.env.SENTRY_ENABLE_TEST_ENDPOINTS = "1";
+      process.env.NEXT_PUBLIC_SENTRY_DSN = "https://example.ingest.sentry.io/1";
+
+      const res = await getSentryTestRoute(
+        new Request("http://localhost/api/sentry-test"),
+      );
+      const body = await res.json();
+
+      expect(res.status).toBe(200);
+      expect(body.ok).toBe(true);
+      expect(sentryCaptureMessage).toHaveBeenCalledTimes(1);
+      expect(sentryFlush).toHaveBeenCalledTimes(1);
+    });
+
     it("non-production without DSN → 500 (fail closed on missing config)", async () => {
       vi.stubEnv("NODE_ENV", "development");
       delete process.env.NEXT_PUBLIC_SENTRY_DSN;
 
-      const res = await getSentryTestRoute();
+      const res = await getSentryTestRoute(
+        new Request("http://localhost/api/sentry-test"),
+      );
       const body = await res.json();
 
       expect(res.status).toBe(500);
@@ -229,12 +267,14 @@ describe("API routes auth matrix — public / env-gated (DB-free)", () => {
       vi.stubEnv("NODE_ENV", "development");
       process.env.NEXT_PUBLIC_SENTRY_DSN = "https://example.ingest.sentry.io/1";
 
-      const res = await getSentryTestRoute();
+      const res = await getSentryTestRoute(
+        new Request("http://localhost/api/sentry-test"),
+      );
       const body = await res.json();
 
       expect(res.status).toBe(200);
       expect(body.ok).toBe(true);
-      expect(body.eventId).toBe("test-event-id");
+      expect(body.eventId).toBeTruthy();
       expect(sentryCaptureMessage).toHaveBeenCalledTimes(1);
       expect(sentryFlush).toHaveBeenCalledTimes(1);
     });

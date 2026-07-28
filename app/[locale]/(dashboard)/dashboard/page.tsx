@@ -9,7 +9,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
-import { ClinicTelemetry } from "@/components/analytics/clinic-telemetry";
 import { clinicHasFeature, getClinicEntitlements } from "@/lib/entitlements";
 import { canAccessCalendar } from "@/lib/calendar/rbac";
 import {
@@ -105,15 +104,6 @@ export default async function DashboardPage({ params }: Props) {
 
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-10">
-      {profile?.clinic_id && profile.role ? (
-        <ClinicTelemetry
-          userId={user!.id}
-          clinicId={profile.clinic_id}
-          role={profile.role}
-          isDemo={clinic?.is_demo === true}
-        />
-      ) : null}
-
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
         <p className="text-muted-foreground text-sm">{t("subtitle")}</p>

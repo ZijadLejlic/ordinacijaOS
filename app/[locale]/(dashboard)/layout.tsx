@@ -1,9 +1,11 @@
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
+import { ClinicTelemetry } from "@/components/analytics/clinic-telemetry";
 import { AppShell } from "@/components/dashboard/app-shell";
 import { ClinicReadonlyBanner } from "@/components/clinic/readonly-banner";
 import { ImpersonationBanner } from "@/components/platform/impersonation-banner";
+import { setSentryAuthContext } from "@/lib/observability/sentry";
 import {
   hasCustomColors,
   parseBrandingJson,
@@ -56,6 +58,13 @@ export default async function DashboardLayout({ children, params }: Props) {
   if (!profile) {
     redirect({ href: "/login", locale });
   }
+
+  // Server-side Sentry scope for this request (user.id + tags only — D33).
+  setSentryAuthContext({
+    userId: user!.id,
+    clinicId: profile!.clinic_id,
+    role: profile!.role,
+  });
 
   const clinic = profile!.clinics as {
     name: string;
@@ -160,6 +169,14 @@ export default async function DashboardLayout({ children, params }: Props) {
           showConsent={showConsent}
           branding={shellBranding}
         >
+          {profile!.clinic_id && profile!.role ? (
+            <ClinicTelemetry
+              userId={user!.id}
+              clinicId={profile!.clinic_id}
+              role={profile!.role}
+              isDemo={clinic?.is_demo === true}
+            />
+          ) : null}
           {children}
         </AppShell>
       </div>

@@ -9,6 +9,7 @@ import { resolveOnboardingGate } from "@/lib/onboarding/gate";
 import { clearOperatorCookie } from "@/lib/operators/session";
 import { isPlatformAdmin } from "@/lib/platform/admin";
 import { clearImpersonationCookie } from "@/lib/platform/session";
+import { clearSentryAuthContext } from "@/lib/observability/sentry";
 import { loginSchema, signupSchema } from "@/lib/validations/auth";
 
 async function redirectAfterAuth(locale: string) {
@@ -173,6 +174,7 @@ export async function loginAction(
 export async function logoutAction() {
   const supabase = await createClient();
   const locale = await getLocale();
+  clearSentryAuthContext();
   await clearOperatorCookie();
   await clearImpersonationCookie();
   await supabase.auth.signOut();
