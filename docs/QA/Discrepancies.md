@@ -540,6 +540,28 @@ Stripe, AI, SMS/WhatsApp, portal, online booking, mini-site, lab — correctly o
 
 ---
 
+### D-24 — Treatment plans MFA PERMISSIVE FOR ALL leaks cross-clinic (S1) — **RESOLVED 2026-07-28**
+
+**Evidence (release-gate Security CI + local `db reset`)**
+
+- `phase2b_treatment_plans.sql` created `treatment_plans_owner_mfa_aal2` / `treatment_plan_items_owner_mfa_aal2` as **PERMISSIVE FOR ALL** (P0.1 matched remote dump; comment said do not flip to RESTRICTIVE).
+- Postgres OR-semantics: non-owner `owner_mfa_ok() → true` alone grants SELECT/INSERT on **every** clinic’s plans — bypassing `clinic_id = current_clinic_id()`.
+- Caught live by `TEN-RLS-012` / `TEN-SEC-002` in `tenant-isolation-expanded.test.ts` (same class as D-20 finance).
+
+**Impact**
+
+- Cross-tenant treatment-plan read/write for any authenticated non-owner.
+
+**Catching tests**
+
+- `TEN-RLS-012`, `TEN-SEC-002` (`lib/security/tenant-isolation-expanded.test.ts`).
+
+**Resolution**
+
+- **Done (2026-07-28):** migration `20260728050000_fix_treatment_plans_mfa_restrictive.sql` flips both MFA policies to **RESTRICTIVE**. Applied via Supabase MCP; `pg_policies.permissive = RESTRICTIVE` verified.
+
+---
+
 ## 3. Summary table
 
 | ID | Sev | Topic | Test IDs |
