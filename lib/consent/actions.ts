@@ -20,6 +20,7 @@ import {
 } from "@/lib/consent/templates";
 import { assertFeature } from "@/lib/entitlements";
 import {
+  asUploadBlob,
   consentPdfPath,
   consentSignaturePath,
   PATIENT_FILES_BUCKET,
@@ -322,7 +323,7 @@ export async function signConsentAction(
 
   const { error: sigUploadError } = await supabase.storage
     .from(PATIENT_FILES_BUCKET)
-    .upload(sigPath, signatureBuffer, {
+    .upload(sigPath, asUploadBlob(signatureBuffer, "image/png"), {
       contentType: "image/png",
       upsert: false,
     });
@@ -334,7 +335,7 @@ export async function signConsentAction(
 
   const { error: pdfUploadError } = await supabase.storage
     .from(PATIENT_FILES_BUCKET)
-    .upload(pdfPath, pdfBuffer, {
+    .upload(pdfPath, asUploadBlob(pdfBuffer, "application/pdf"), {
       contentType: "application/pdf",
       upsert: false,
     });

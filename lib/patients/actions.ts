@@ -17,6 +17,7 @@ import {
   SIGNED_URL_TTL_SECONDS,
   convertImageToWebp,
   MAX_IMAGE_SIZE_BYTES,
+  asUploadBlob,
   documentPath,
   imagePath,
 } from "@/lib/patients/storage";
@@ -439,7 +440,10 @@ export async function uploadDocumentAction(
 
   const { error: uploadError } = await supabase.storage
     .from(PATIENT_FILES_BUCKET)
-    .upload(path, buffer, { contentType: "application/pdf", upsert: false });
+    .upload(path, asUploadBlob(buffer, "application/pdf"), {
+      contentType: "application/pdf",
+      upsert: false,
+    });
 
   if (uploadError) {
     await supabase.from("patient_documents").delete().eq("id", docRow.id);
@@ -594,7 +598,10 @@ export async function uploadImageAction(
 
   const { error: uploadError } = await supabase.storage
     .from(PATIENT_FILES_BUCKET)
-    .upload(path, webpBuffer, { contentType: "image/webp", upsert: false });
+    .upload(path, asUploadBlob(webpBuffer, "image/webp"), {
+      contentType: "image/webp",
+      upsert: false,
+    });
 
   if (uploadError) {
     await supabase.from("patient_images").delete().eq("id", imgRow.id);

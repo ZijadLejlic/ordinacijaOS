@@ -21,7 +21,7 @@ import {
   roundMoney,
 } from "@/lib/invoices/money";
 import { renderInvoicePdf } from "@/lib/invoices/pdf";
-import { PATIENT_FILES_BUCKET } from "@/lib/patients/storage";
+import { asUploadBlob, PATIENT_FILES_BUCKET } from "@/lib/patients/storage";
 import { createClient } from "@/lib/supabase/server";
 import type { Database, Json } from "@/lib/supabase/database.types";
 import {
@@ -310,7 +310,7 @@ export async function createInvoiceAction(
     );
     const { error: uploadError } = await supabase.storage
       .from(PATIENT_FILES_BUCKET)
-      .upload(path, pdfBuffer, {
+      .upload(path, asUploadBlob(pdfBuffer, "application/pdf"), {
         contentType: "application/pdf",
         upsert: false,
       });

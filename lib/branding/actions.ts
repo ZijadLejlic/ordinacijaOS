@@ -15,6 +15,7 @@ import {
   logoPath,
   MAX_LOGO_SIZE_BYTES,
 } from "@/lib/branding/storage";
+import { asUploadBlob } from "@/lib/patients/storage";
 import { assertFeature } from "@/lib/entitlements";
 import { createClient } from "@/lib/supabase/server";
 import { updateBrandingColorsSchema } from "@/lib/validations/branding";
@@ -174,7 +175,7 @@ export async function uploadBrandingLogoAction(
   const path = logoPath(profile.clinic_id);
   const { error: uploadError } = await supabase.storage
     .from(CLINIC_BRANDING_BUCKET)
-    .upload(path, webp, {
+    .upload(path, asUploadBlob(webp, "image/webp"), {
       contentType: "image/webp",
       upsert: true,
     });

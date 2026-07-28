@@ -43,10 +43,29 @@ export function consentSignaturePath(
 /** Compress and re-encode any raster image to WebP (D21 — quality-preserving). */
 export async function convertImageToWebp(buffer: Buffer): Promise<Buffer> {
   // Flatten alpha → lossy VP8 (not VP8X) for broader Safari/iOS inline display.
-  return sharp(buffer)
+  const out = await sharp(buffer)
     .rotate()
     .resize({ width: WEBP_MAX_WIDTH, withoutEnlargement: true })
     .flatten({ background: { r: 255, g: 255, b: 255 } })
     .webp({ quality: WEBP_QUALITY })
     .toBuffer();
+  if (
+    out.byteLength < 12 ||
+    out.subarray(0, 4).toString("ascii") !== "RIFF" ||
+    out.subarray(8, 12).toString("ascii") !== "WEBP"
+  ) {
+    throw new Error("webp_magic_invalid");
+  }
+  return out;
+}
+
+/**
+ * Supabase Storage upload body. Passing a Node `Buffer` through `fetch` in
+ * Server Actions has UTF-8-mangled patient WebPs on prod (U+FFFD / ef bf bd).
+ * `Blob` uses multipart FormData and keeps bytes intact.
+ */
+export function asUploadBlob(bytes: Buffer, contentType: string): Blob {
+  const copy = new Uint8Array(bytes.byteLength);
+  copy.set(bytes);
+  return new Blob([copy], { type: contentType });
 }
