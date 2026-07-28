@@ -97,7 +97,7 @@ export async function middleware(request: NextRequest) {
   const supabase = session.supabase;
   // Keep next-intl rewrite as-is. Pair with `HOSTNAME=localhost` on `npm start`
   // so pathname rewrites stay internal (Next.js #94342).
-  let response = session.response;
+  const response = session.response;
 
   const isAuthPage = path === "/login" || path === "/signup";
   const isInvitePage = path === "/invite" || path.startsWith("/invite/");

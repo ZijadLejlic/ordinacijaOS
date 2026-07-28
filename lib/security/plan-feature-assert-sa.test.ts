@@ -33,9 +33,15 @@ import {
  *   - Excel API expenses_reports_excel → FIN-API-002
  *   - Pure helpers → PLAN-UNIT-*
  *
+ * Cross-catalog (same SA path — no duplicate probe):
+ *   - CAL-INT-005 (DnD / reschedule without calendar_advanced) — UI
+ *     `day-week-grid` DnD calls `rescheduleAppointmentAction`, which
+ *     asserts `calendar_advanced` after `calendar_basic`. The starter
+ *     deny + pro allow row below is the automated gate for both IDs.
+ *
  * Out of scope (no SA assertFeature, D-03 residual / other IDs):
  *   - Features without SA gates (sms/ai/portal — UI-only or N/A)
- *   - installments_calculator uses clinicHasFeature → FIN-INT-010 (GAP)
+ *   - installments_calculator uses clinicHasFeature → FIN-INT-010 (COVERED)
  *   - Starter-enabled features (patients_chart, odontogram, …) — no
  *     starter deny path for PLAN-INT-011
  *
@@ -409,6 +415,12 @@ describeSecurity(
     it("PLAN-INT-011 inventory_basic already COVERED by PLAN-SEC-001 (no duplicate probe)", () => {
       // Anchor so the catalog row stays discoverable from this file's suite.
       expect(PRO_FEATURES_OFF_ON_STARTER).toContain("inventory_basic");
+    });
+
+    it("CAL-INT-005 DnD/reschedule gate already COVERED by calendar_advanced row above (no duplicate)", () => {
+      // Anchor: catalog CAL-INT-005 = same SA path as PLAN-INT-011
+      // calendar_advanced → rescheduleAppointmentAction (starter blocked).
+      expect(PRO_FEATURES_OFF_ON_STARTER).toContain("calendar_advanced");
     });
   },
 );

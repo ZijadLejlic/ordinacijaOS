@@ -252,20 +252,22 @@ describeSecurity("invite token reuse / expiry (release blocker)", () => {
     expect(result.error?.message).toMatch(/expired/i);
     expect(result.clinicId).toBeNull();
 
+    // `accept_clinic_invite` UPDATEs status→expired then RAISE EXCEPTION.
+    // Postgres rolls that UPDATE back with the error, so status stays
+    // `pending` after a failed accept. The durable flip is on
+    // `peek_clinic_invite` (no raise) / `expire_stale_clinic_invites`.
+    const peekAfter = await service.rpc("peek_clinic_invite", {
+      p_token_hash: invite.tokenHash,
+    });
+    expect(peekAfter.error).toBeNull();
+    expect(peekAfter.data?.[0]?.status).toBe("expired");
+
     const { data: expiredInvite } = await service
       .from("clinic_invites")
       .select("status")
       .eq("id", invite.inviteId)
       .single();
     expect(expiredInvite?.status).toBe("expired");
-
-    // Confirm expiry is enforced identically on the read-side `peek` RPC
-    // (used by the public /invite/[token] page before password entry).
-    const peekAfter = await service.rpc("peek_clinic_invite", {
-      p_token_hash: invite.tokenHash,
-    });
-    expect(peekAfter.error).toBeNull();
-    expect(peekAfter.data?.[0]?.status).toBe("expired");
   });
 
   it("AUTH-SEC-001 bonus: a nonexistent token is rejected the same way as a real one, not with a distinguishing error", async () => {
@@ -290,13 +292,10 @@ describeSecurity("invite token reuse / expiry (release blocker)", () => {
     expect(result.error?.message).toMatch(/not found/i);
     expect(result.clinicId).toBeNull();
 
-    // Note (not asserted here — that's AUTH-SEC-003's job, still GAP): the
-    // *error message* for a nonexistent token ("Invite not found") differs
-    // from an expired one ("Invite expired"), which is a real, narrow
-    // existence-leak surface for `accept_clinic_invite` specifically (as
-    // opposed to `peek_clinic_invite`, which already returns an
-    // indistinguishable empty array for both "never existed" and, before
-    // this file's changes, would have for "wrong hash" too). Flagging here
-    // per the P1.4 task brief rather than expanding scope into AUTH-SEC-003.
+    // Note (AUTH-SEC-003 covers lockout RPC enumeration separately — COVERED
+    // in lockout-email-enumeration.test.ts). Invite accept still has a
+    // narrow existence-leak surface ("Invite not found" vs "Invite expired")
+    // on `accept_clinic_invite`; flagged here per the P1.4 task brief rather
+    // than expanding AUTH-SEC-003 beyond lockout RPCs.
   });
 });

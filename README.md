@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DentOrd
 
-## Getting Started
+Multi-tenant dental clinic SaaS ([dentord.com](https://dentord.com)). Product source of truth: [`docs/PRD-OrdinacijaOS.md`](docs/PRD-OrdinacijaOS.md).
 
-First, run the development server:
+## Getting started
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000). Copy `.env.example` → `.env.local` and fill Supabase keys.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tests
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run test:unit          # pure units (no DB)
+npm run test:security      # RLS / INT (needs Supabase env)
+npm run test:e2e           # Playwright (build + Chromium)
+npm run lint && npm run typecheck
+```
 
-## Learn More
+QA catalog and roadmap: [`docs/QA/`](docs/QA/).
 
-To learn more about Next.js, take a look at the following resources:
+**CI:** [`.github/workflows/release-gate.yml`](.github/workflows/release-gate.yml) is the single PR/`main` gate (lint + unit/coverage + local-Supabase security + Playwright E2E).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Flaky quarantine (P5.6)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Playwright already retries **once** in CI (`retries: 1` in `playwright.config.ts`). Do **not** raise retries to hide flakes.
 
-## Deploy on Vercel
+When a test fails intermittently:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. **Open a GitHub issue** with the failure signature, last green SHA, and flake rate if known.
+2. **Quarantine** — do not delete the test:
+   - Prefer `test.fix('…', { annotation: { type: 'issue', description: '#NNN' } }, …)` (Playwright) or `it.fix('… #NNN', …)` (Vitest), **or**
+   - Tag `@flaky` and exclude that tag from the required CI job until fixed.
+3. Quarantined tests **must not** be release blockers. `@blocker` E2E stay required; move a blocker off `@blocker` only while quarantined, and restore the tag when un-quarantined.
+4. **Un-quarantine** in the same PR that fixes the root cause. Silent removal of coverage is not allowed.
+5. Track open quarantines in the issue milestone / project board; max open quarantine window should be one sprint unless explicitly extended.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Vitest RLS/INT suites are the source of truth for policy behaviour. Optional pgTAP (`supabase test db`) is **deferred** until those suites become slow or flaky (P5.5).

@@ -105,25 +105,29 @@ supabase db reset
 
 ---
 
-### D-04 — Custom JWT access-token hook optional (S1)
+### D-04 — Custom JWT access-token hook optional (S1) — **ACCEPTED for MVP 2026-07-28** *(TEN-SEC-003 residual closed P6b.8)*
 
 **Evidence**
 
 - [`supabase/migrations/20260713000006_code_review_b5_jwt_custom_claims.sql`](../../supabase/migrations/20260713000006_code_review_b5_jwt_custom_claims.sql).
 - [`docs/DB-OrdinacijaOS.md`](../DB-OrdinacijaOS.md) §2: “mora se ručno uključiti u dashboardu”.
 - Helpers fall back to `profiles` when JWT claims missing.
+- Local CI: [`supabase/config.toml`](../../supabase/config.toml) `[auth.hook.custom_access_token] enabled = true` since P0.2 — security suite always runs with hook on.
+- `TEN-SEC-004` COVERED (P1.8) — hook-off fallback still resolves `current_clinic_id` from `profiles`.
+- **P6b.8:** `TEN-SEC-003` closed — [`20260728040000_fix_stale_jwt_role_prefer_profiles.sql`](../../supabase/migrations/20260728040000_fix_stale_jwt_role_prefer_profiles.sql) makes `current_app_role` / `is_clinic_owner` **profiles-first** (demotion no longer trusts stale JWT `app_role`). `current_clinic_id()` stays JWT-first (D7).
 
 **Impact**
 
-- Misconfigured prod → extra DB reads; stale claim bugs harder to detect; MFA/role propagation depends on token refresh timing.
+- Misconfigured prod → extra DB reads; MFA/role claim freshness still depends on token refresh for `clinic_id` claim path; **role authorization no longer stale**.
 
 **Catching tests**
 
-- `TEN-SEC-003`, `TEN-SEC-004`; Production-Ops checklist item.
+- `TEN-SEC-004` COVERED; `TEN-SEC-003` COVERED (P6b.8); Production-Ops checklist item for hook enablement.
 
 **Resolution**
 
-- Automate hook enablement in ops; test both paths; fail CI against local config that enables the hook.
+- **ACCEPTED for MVP 2026-07-28 (P5 exit):** dual-path (JWT claims + profiles) remains intentional for hook on/off. Local/CI hook on. Prod Free-tier may leave hook off — fallback OK for UAT.
+- **P6b.8 (2026-07-28):** stale-role demotion residual fixed at DB helpers (profiles-first for role). Not a JWT-hook model rewrite.
 
 ---
 
@@ -155,27 +159,27 @@ supabase db reset
 
 ---
 
-### D-06 — D13 owner notification incomplete (S1)
+### D-06 — D13 owner notification incomplete (S1) — **RESOLVED 2026-07-28 (product decision)**
 
 **Evidence**
 
-- PRD D13: “5 failed logins → notifikacija owneru”.
+- PRD D13 previously: “5 failed logins → notifikacija owneru” / “email/in-app”.
 - [`supabase/migrations/20260713000004_code_review_b2_login_lockout.sql`](../../supabase/migrations/20260713000004_code_review_b2_login_lockout.sql): `record_failed_login` sets lock + inserts `audit_events` `auth.login_lockout`.
-- [`lib/auth/actions.ts`](../../lib/auth/actions.ts): calls RPCs; no Resend to owner observed.
+- [`lib/auth/actions.ts`](../../lib/auth/actions.ts): calls RPCs; no Resend to owner.
 - Audit UI is owner-only — notification is passive (must open audit), not push email/in-app bell.
 
 **Impact**
 
-- Owner may not learn of attacks in near-real-time.
+- Owner may not learn of attacks in near-real-time without opening Audit.
 
 **Catching tests**
 
-- `AUTH-INT-002` (GAP) — expect email or in-app notification row.
+- `AUTH-DB-001` COVERED (lock + audit insert).
+- `AUTH-INT-002` COVERED — owner JWT can read `auth.login_lockout`; doctor cannot ([`lib/security/lockout-owner-notify.test.ts`](../../lib/security/lockout-owner-notify.test.ts)).
 
 **Resolution**
 
-- Implement Resend to clinic owner on lockout **or** downgrade PRD wording to “audit event visible to owner”.
-
+- **RESOLVED 2026-07-28 (product decision):** MVP owner notification = `audit_events` `auth.login_lockout` in owner Audit UI. Push email / in-app bell deferred until §6.16 notification center. PRD D13 / §8.1 aligned. No Resend path invented for MVP.
 ---
 
 ### D-07 — D12 force logout is per-user (product decision) — **RESOLVED 2026-07-28 (docs)**
@@ -246,7 +250,7 @@ supabase db reset
 **Evidence**
 
 - PRD §12.1 marks nearly all MVP acceptance items `[x]`.
-- Traceability shows many `GAP`/`PARTIAL` (invites E2E, GDPR export API, ZIP backup API, branding, CRM send, peer amounts, aal2 RLS, etc.).
+- Traceability shows many `GAP`/`PARTIAL` (GDPR export API residual notes, branding, CRM send, peer amounts, aal2 RLS, etc.). Invite accept E2E (`AUTH-E2E-002`) COVERED as of P4.2.
 
 **Impact**
 
@@ -283,9 +287,9 @@ supabase db reset
 
 ---
 
-### D-12 — Session TTL 7 days not asserted in repo (S2)
+### D-12 — Session TTL 7 days not asserted in repo (S2) — **RESOLVED 2026-07-28 (P6b)**
 
-**Evidence**
+**Evidence (original)**
 
 - PRD D12 / Tech §5 claim TTL 7 days.
 - No automated test or checked-in Auth config proving JWT/refresh expiry = 7d.
@@ -301,28 +305,28 @@ supabase db reset
 
 **Resolution**
 
-- Document exact Auth settings; add ops assertion script.
+- **RESOLVED 2026-07-28 (P6b):** Local `supabase/config.toml` already pins `jwt_expiry = 604800` and `[auth.sessions] timebox = "168h"` (P0.2). Added [`lib/security/session-ttl-config.test.ts`](../../lib/security/session-ttl-config.test.ts) asserting those values. Documented hosted dashboard mirror in [`docs/Production-Ops.md`](../Production-Ops.md). No GoTrue API invented.
 
 ---
 
-### D-13 — RLS spot-checks (confirm in P1; partially documented) (S1)
+### D-13 — RLS spot-checks (confirm in P1; partially documented) (S1) — **RESOLVED 2026-07-28**
 
 | Spot-check | Documented intent | Automated today |
 |---|---|---|
-| `leads` deny-all for anon/authenticated | DB doc §3.1 + migration `marketing_leads` | **No** → `MKT-SEC-001` |
-| `clinic_subscriptions` no INSERT policy | DB doc §3.2 | **No** → `PLAN-RLS-001` |
-| `audit_events` SELECT owner-only | migration `phase3c_audit_log_ui` | **Yes** (`RBAC-RLS-005`) |
-| Storage buckets non-public list | Tech §6 | **Partial** (`TEN-RLS-009` patient-files only) |
-| Payments / invoice_lines append-only | Tech finance | **RESOLVED** (2026-07-28) — RESTRICTIVE MFA + REVOKE UPDATE/DELETE; `FIN-RLS-001` COVERED |
-| `pin_hash` not selectable | DB doc D10 | Covered indirectly via RPC tests |
+| `leads` deny-all for anon/authenticated | DB doc §3.1 + migration `marketing_leads` | **COVERED** `MKT-SEC-001` (P1.5) |
+| `clinic_subscriptions` no INSERT policy | DB doc §3.2 | **COVERED** under `PLAN-RLS-001` ID-drift cite (P1.5) |
+| `audit_events` SELECT owner-only | migration `phase3c_audit_log_ui` | **COVERED** `RBAC-RLS-005` |
+| Storage buckets non-public list | Tech §6 | **COVERED** `FILE-SEC-001` + `FILE-RLS-002` / `FILE-SEC-003` (P1.2) |
+| Payments / invoice_lines append-only | Tech finance | **RESOLVED** — `FIN-RLS-001` COVERED (D-20) |
+| `pin_hash` not selectable | DB doc D10 | Covered via `AUTH-SEC-002` + PIN RPC tests |
 
 **Impact**
 
-- Undetected policy regressions on marketing leads / finance append-only / branding storage.
+- Was: undetected policy regressions on marketing leads / finance append-only / branding storage.
 
 **Resolution**
 
-- P1 expand security suite table matrix.
+- **RESOLVED 2026-07-28 (P5 exit):** P1–P2 security suite closed every spot-check row above. No open S1 residual under this ID.
 
 ---
 
@@ -484,6 +488,11 @@ Stripe, AI, SMS/WhatsApp, portal, online booking, mini-site, lab — correctly o
 
 - Set `coverage.thresholds.statements = 10` in `vitest.config.ts` (just under the measured 10.34%, so the gate catches **regressions** going forward, not the pre-existing gap) and added `"test:coverage"` npm script (mirrors `test:unit`'s DB-free scope).
 - Raising this threshold is still tracked as **P5.2** ("≥60% statements on `lib/`"), which will only be realistic once P1–P4 add INT-level tests for the currently-0%-covered `actions.ts`/`rbac.ts` files. Intermediate re-measurements should happen at the end of each phase (P1–P4), not just at P5.
+
+**P5.2 follow-up (2026-07-28)**
+
+- Unit-reachable surface (excl. `lib/**/actions.ts`, `lib/supabase/**`, factories, legal/seo/observability): **Statements 30.72%**. Threshold raised **10 → 30**; `test:coverage` wired into `.github/workflows/unit.yml`.
+- Aspirational **60% on all of `lib/`** still deferred (SA/INT files stay out of the unit-coverage denominator). Owner list: include security suite in a coverage job, or expand pure units on validations/rbac helpers.
 - Implementation-Plan.md table row text left as originally written (per existing convention); actual numbers and rationale tracked here + in the Progress log.
 
 ---
@@ -531,6 +540,28 @@ Stripe, AI, SMS/WhatsApp, portal, online booking, mini-site, lab — correctly o
 
 ---
 
+### D-24 — Treatment plans MFA PERMISSIVE FOR ALL leaks cross-clinic (S1) — **RESOLVED 2026-07-28**
+
+**Evidence (release-gate Security CI + local `db reset`)**
+
+- `phase2b_treatment_plans.sql` created `treatment_plans_owner_mfa_aal2` / `treatment_plan_items_owner_mfa_aal2` as **PERMISSIVE FOR ALL** (P0.1 matched remote dump; comment said do not flip to RESTRICTIVE).
+- Postgres OR-semantics: non-owner `owner_mfa_ok() → true` alone grants SELECT/INSERT on **every** clinic’s plans — bypassing `clinic_id = current_clinic_id()`.
+- Caught live by `TEN-RLS-012` / `TEN-SEC-002` in `tenant-isolation-expanded.test.ts` (same class as D-20 finance).
+
+**Impact**
+
+- Cross-tenant treatment-plan read/write for any authenticated non-owner.
+
+**Catching tests**
+
+- `TEN-RLS-012`, `TEN-SEC-002` (`lib/security/tenant-isolation-expanded.test.ts`).
+
+**Resolution**
+
+- **Done (2026-07-28):** migration `20260728050000_fix_treatment_plans_mfa_restrictive.sql` flips both MFA policies to **RESTRICTIVE**. Applied via Supabase MCP; `pg_policies.permissive = RESTRICTIVE` verified.
+
+---
+
 ## 3. Summary table
 
 | ID | Sev | Topic | Test IDs |
@@ -538,16 +569,16 @@ Stripe, AI, SMS/WhatsApp, portal, online booking, mini-site, lab — correctly o
 | D-01 | S0 | Migrations stubs / non-reproducible DB | P0 harness — **RESOLVED** (2026-07-23), `supabase start`/`db reset` proven green in CI run `30048179856` |
 | D-02 | S0 | Image limit app-only | `FILE-DB-001` — **RESOLVED** (2026-07-28), DB trigger `plan_limit_images` |
 | D-03 | S0 | Feature entitlements app-only | `PLAN-SEC-001` — **WAIVED MVP** (2026-07-28), Option B accepted residual |
-| D-04 | S1 | JWT hook manual | `TEN-SEC-004` |
+| D-04 | S1 | JWT hook manual | `TEN-SEC-004` ACCEPTED MVP dual-path; `TEN-SEC-003` **COVERED** (2026-07-28 P6b.8 profiles-first role helpers) |
 | D-05 | S1 | Unit tests not in CI | P0 CI — **RESOLVED** (2026-07-23): unit.yml + security.yml (local Supabase) + fail-closed gate all green in CI run `30048179856` |
-| D-06 | S1 | Lockout owner notify | `AUTH-INT-002` |
+| D-06 | S1 | Lockout owner notify | `AUTH-INT-002` — **RESOLVED** (2026-07-28): MVP = audit event; email/bell deferred §6.16 |
 | D-07 | S2 | Force logout scope | `AUTH-INT-020` — **RESOLVED** (2026-07-28 docs): per-user product decision; PRD aligned |
 | D-08 | S2 | Invoice legal settings gates | `FIN-INT-015` — **RESOLVED** (2026-07-28): write-block via `requireInvoiceWriter`; `assertFeature("invoices")` added |
 | D-09 | S2 | Patient RBAC wording | RBAC suite |
 | D-10 | S2 | Acceptance checkbox optimism | Traceability |
 | D-11 | S2 | Visit closes plan item | `PII-INT-011` |
-| D-12 | S2 | Session TTL unasserted | `AUTH-INT-021` |
-| D-13 | S1 | RLS spot-check gaps | `MKT-SEC-001`, `FIN-RLS-001`, … |
+| D-12 | S2 | Session TTL unasserted | `AUTH-INT-021` — **RESOLVED** (2026-07-28): config.toml + Production-Ops + unit assert |
+| D-13 | S1 | RLS spot-check gaps | **RESOLVED** (2026-07-28): `MKT-SEC-001`, storage FILE-SEC/RLS, `FIN-RLS-001`, audit, PIN — all COVERED |
 | D-14 | S2 | Invoice allocate fallback | `FIN-SEC-001` — **RESOLVED** (2026-07-28): RPC P2.1 + app fallback removed P2.9 |
 | D-15 | S1 | Security suite skip-open | P0 — **RESOLVED** (P0.4 skip-crash fix + P0.8 `SECURITY_TESTS_REQUIRED` fail-closed gate, both live in CI) |
 | D-16 | S3 | Demo exemption (tested) | `LIFE-SEC-002` COVERED |
@@ -558,6 +589,7 @@ Stripe, AI, SMS/WhatsApp, portal, online booking, mini-site, lab — correctly o
 | D-21 | S2 | `FILE-INT-020` ID-drift; GDPR storage is SA not RPC | `PII-INT-001` — documented P2.5 |
 | D-22 | S1 | `admin.signOut(profileId)` wrong API (needs JWT) | `AUTH-INT-020` — **RESOLVED** (2026-07-28): `revoke_user_sessions` RPC |
 | D-23 | S1 | deactivate UPDATE `updated_at` without column GRANT | `AUTH-INT-020` — **RESOLVED** (2026-07-28): update `is_active` only |
+| D-24 | S1 | Treatment plans MFA PERMISSIVE FOR ALL (cross-clinic) | `TEN-RLS-012` / `TEN-SEC-002` — **RESOLVED** (2026-07-28): RESTRICTIVE MFA |
 
 ---
 
@@ -573,4 +605,4 @@ No application code was changed for this report.
 
 ---
 
-*Discrepancies — DentOrd QA — 2026-07-23.*
+*Discrepancies — DentOrd QA — updated 2026-07-28 (P5 exit: all S0/S1 fixed, waived, or accepted).*

@@ -212,10 +212,13 @@ describeSecurity("owner MFA aal2 write denial under RLS (release blocker)", () =
   }
 
   async function updateProbeClinic(client: DbClient) {
+    // `.select("id")` so a restrictive RLS USING denial returns 0 rows
+    // (PostgREST often leaves `error` null on filtered UPDATEs).
     return client
       .from("clinics")
       .update({ settings_json: { aal2_probe: randomTag() } })
-      .eq("id", clinicId);
+      .eq("id", clinicId)
+      .select("id");
   }
 
   it("AUTH-RLS-001 setup: enroll+verify raises the enrolling session to aal2, and that aal2 session can write", async () => {
@@ -228,6 +231,7 @@ describeSecurity("owner MFA aal2 write denial under RLS (release blocker)", () =
 
     const clinicUpdate = await updateProbeClinic(enrollSession);
     expect(clinicUpdate.error).toBeNull();
+    expect(clinicUpdate.data ?? []).toHaveLength(1);
   });
 
   it("AUTH-RLS-001: a fresh owner login (verified factor, not stepped up) is aal1, and its writes are denied", async () => {
@@ -241,10 +245,13 @@ describeSecurity("owner MFA aal2 write denial under RLS (release blocker)", () =
     expect(patientInsert.error).not.toBeNull();
 
     const clinicUpdate = await updateProbeClinic(freshLogin);
-    expect(clinicUpdate.error).not.toBeNull();
+    expect(clinicUpdate.error).toBeNull();
+    expect(clinicUpdate.data ?? []).toHaveLength(0);
   });
 
-  it("AUTH-RLS-001 positive control: stepping the SAME aal1 session up to aal2 makes the identical writes succeed", async () => {
+  it(
+    "AUTH-RLS-001 positive control: stepping the SAME aal1 session up to aal2 makes the identical writes succeed",
+    async () => {
     const freshLogin = await signInAs(url, anonKey, owner.email, owner.password);
 
     const { data: beforeStepUp } = await freshLogin.auth.getSession();
@@ -260,7 +267,10 @@ describeSecurity("owner MFA aal2 write denial under RLS (release blocker)", () =
 
     const clinicUpdate = await updateProbeClinic(freshLogin);
     expect(clinicUpdate.error).toBeNull();
-  });
+    expect(clinicUpdate.data ?? []).toHaveLength(1);
+  },
+    30_000,
+  );
 
   it("AUTH-RLS-001 bonus: non-owner (doctor) aal1 write is NOT blocked by owner_mfa_ok() (restriction targets owner only)", async () => {
     const doctorSession = await signInAs(url, anonKey, doctor.email, doctor.password);

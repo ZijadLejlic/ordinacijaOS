@@ -38,13 +38,15 @@ UNIT (parsers, money, entitlements, CSV, templates)
 
 ### 1.3 Regression gates (CI)
 
-| Gate | Today | Target after P5 |
-|---|---|---|
-| Lint / typecheck | Manual/local | CI job |
-| Unit Vitest (all `*.test.ts` except optional live) | **Not in CI** | Always |
-| Security Vitest (RLS/RBAC) | `security.yml` (remote) | Local Supabase in CI |
-| Playwright blockers | `e2e.yml` | Keep + expand High journeys |
-| Migration reset smoke | None | `supabase db reset` in P0 |
+Single entry: [`.github/workflows/release-gate.yml`](../../.github/workflows/release-gate.yml) (P5). Leaf workflows are `workflow_call`-only (no double-run).
+
+| Gate | Status |
+|---|---|
+| Lint / typecheck | `lint-typecheck.yml` via release gate |
+| Unit Vitest + coverage threshold | `unit.yml` via release gate |
+| Security Vitest (RLS/RBAC/INT) | `security.yml` — local `supabase start` + `db reset` + `SECURITY_TESTS_REQUIRED=1` |
+| Playwright blockers | `e2e.yml` — secrets inherit; includes PLAT-SEC-003 bundle check |
+| Aggregator | `release-gate` job fails unless all four succeed |
 
 ---
 
@@ -55,7 +57,7 @@ UNIT (parsers, money, entitlements, CSV, templates)
 | Unit / INT | **Vitest** (keep) | Already configured; add coverage thresholds in P0 |
 | E2E | **Playwright** (keep) | Already CI; Chromium sufficient for MVP |
 | Local DB | **Supabase CLI** `supabase start` / `db reset` | Hermetic; matches prod Postgres+Auth+Storage |
-| Pure SQL policy tests | Optional **pgTAP** via `supabase test db` | Only if Vitest RLS proves slow/flaky |
+| Pure SQL policy tests | Optional **pgTAP** via `supabase test db` | **Deferred (P5.5)** — Vitest RLS/INT is SoT; revisit only if those suites become slow/flaky |
 | HTTP mocks | **MSW** (add if needed) | Resend/PostHog/Sentry; do not mock Supabase for RLS tests |
 | TOTP in E2E | **otpauth** (keep) | Already in `e2e/helpers/mfa.ts` |
 | Do **not** replace | Jest, Cypress, Playwright→Selenium, etc. | No strong reason |
@@ -188,7 +190,7 @@ Format per row: **ID** · Requirement · Risk · Level · Preconditions · Expec
 |---|---|---|---|---|---|---|---|
 | PLAN-DB-001 | D8 | Over user seats via invite | DB | starter at cap | `plan_limit_users` | Critical | COVERED |
 | PLAN-DB-002 | D8 | 3rd location on Pro | DB | 2 active locations | `plan_limit_locations` | Critical | COVERED |
-| PLAN-DB-003 | D8 | 6th doctor on Pro | DB | 5 doctors + doctor invite | `plan_limit_doctors` | Critical | GAP |
+| PLAN-DB-003 | D8 | 6th doctor on Pro | DB | 5 doctors + doctor invite | `plan_limit_doctors` | Critical | COVERED |
 | FILE-DB-001 | D22 | Image limit bypass via INSERT | DB | at plan cap | deny (`plan_limit_images`) + SA block | Critical | COVERED |
 | PLAN-SEC-001 | D42 | Feature table insert without entitlement | SEC | starter + inventory INSERT | document fail/gap; prefer deny | Critical | COVERED |
 
@@ -198,22 +200,22 @@ Format per row: **ID** · Requirement · Risk · Level · Preconditions · Expec
 
 | ID | Requirement | Risk prevented | Level | Preconditions | Expected result | Priority | Status |
 |---|---|---|---|---|---|---|---|
-| AUTH-E2E-001 | D4 D43 §12.1 | Broken onboarding | E2E | fresh signup | MFA + onboarding step 1 OK | High | COVERED |
-| AUTH-E2E-002 | D9 | Staff cannot join | E2E | owner invite | accept → role correct | High | GAP |
-| AUTH-INT-001 | D4 D46 D47 | Wrong trial/defaults | INT | signup | trial_ends_at 2026-12-31; TZ/phone defaults | High | GAP |
+| AUTH-E2E-001 | D4 D43 §12.1 | Broken onboarding | E2E | fresh signup | MFA + onboarding steps 1–3 (service + skip invite) → dashboard | High | COVERED |
+| AUTH-E2E-002 | D9 | Staff cannot join | E2E | owner invite | doctor + reception accept → role correct + dashboard | High | COVERED |
+| AUTH-INT-001 | D4 D46 D47 | Wrong trial/defaults | INT | signup | trial_ends_at 2026-12-31; TZ/phone defaults | High | COVERED |
 | AUTH-INT-010 | D9 D8 | Invite over limit | INT | at user cap | assertCanInviteStaff blocks (+ createInviteAction `userLimit`) | High | COVERED |
-| AUTH-INT-011 | D10 | PIN audit missing | INT | create+switch | audit operator_id set | High | PARTIAL |
+| AUTH-INT-011 | D10 | PIN audit missing | INT | create+switch | audit operator_id set | High | COVERED |
 | AUTH-INT-020 | D12 | Force logout ineffective | INT | owner forces user | sessions revoked (per-user; non-owner deny; deactivate soft+revoke) | High | COVERED |
 | CAL-E2E-001 | D14 §12.2 | Double booking | E2E | overlapping slot | error toast | High | COVERED |
 | CAL-DB-001 | D14 | EXCLUDE bypass via RPC | DB | overlapping INSERT | exclusion violation | High | COVERED (via E2E/DB) |
-| CAL-INT-001 | D15 | Wrong default duration | INT | service 30m | ends_at = start+30m | High | GAP |
-| CAL-INT-003 | D25 | Waitlist not offered | INT | cancel + matching wait | notification/offer created | High | GAP |
+| CAL-INT-001 | D15 | Wrong default duration | INT | service 30m | ends_at = start+30m | High | COVERED |
+| CAL-INT-003 | D25 | Waitlist not offered | INT | cancel + matching wait | waitlistSuggestions + `waitlist.auto_suggested` audit (status stays waiting; no outbound) | High | COVERED |
 | CAL-INT-004 | §3.2 | Doctor edits peer calendar | INT | doctor A vs B | forbidden (SA) + RLS deny | High | COVERED |
 | RBAC-INT-005 | §3.2 | Doctor peer calendar (SA) | INT | doctor A vs B appt | forbidden — same suite as CAL-INT-004 | High | COVERED |
 | FIN-INT-001 | D29 | Wrong serial format | INT | create invoice | `YYYY-####` | High | COVERED |
 | FIN-INT-003 | D29 | Payment status wrong | INT | partial then full pay | unpaid→partial→paid | High | COVERED |
 | FIN-INT-004 | D29 | Void still payable | INT | void invoice | payments rejected (SA `invoiceVoid`; DB INSERT residual noted) | High | COVERED |
-| FIN-INT-010 | D29 D42 | Installments on Starter | INT | starter entitlements | feature blocked | High | GAP |
+| FIN-INT-010 | D29 D42 | Installments on Starter | INT | starter entitlements | feature blocked | High | COVERED |
 | FIN-INT-015 | D29 D-08 | Legal settings gates | INT | owner writable / readonly / accountant | settingsSaved; clinicReadonly; forbidden | High | COVERED |
 | FIN-API-001 | D29 | PDF without finance role | API | doctor session; no session | 403; unauth 401 (FILE-SEC-003 + matrix) | High | COVERED |
 | FIN-API-002 | D29 | Excel without feature/role | API | reception / starter; no session | 403; unauth 401 (matrix) | High | COVERED |
@@ -257,8 +259,8 @@ Format per row: **ID** · Requirement · Risk · Level · Preconditions · Expec
 | RBAC-INT-027 | D43 | Onboarding SA RBAC | INT | doctor saveOnboardingClinic | forbidden | High | COVERED |
 | PLAN-UNIT-002 | D3 D5 | Free period features on | UNIT | now < 2027-01-01 | SMS/AI/portal off | High | COVERED |
 | PLAN-INT-011 | D42 | assertFeature bypassed in SA | INT | each Pro feature SA on starter | featureDisabled; pro allow | High | COVERED |
-| CRM-INT-001 | D23 §12.1 | Reminder send broken | INT | owner template + send | outbound_messages row | High | GAP |
-| IMP-INT-001 | D30 | Bad CSV committed | INT | dry-run errors | commit blocked; good rows OK | High | GAP |
+| CRM-INT-001 | D23 §12.1 | Reminder send broken | INT | owner template + send | outbound_messages row (`sent` + audit) | High | COVERED |
+| IMP-INT-001 | D30 | Bad CSV committed | INT | dry-run errors | commit blocked; good rows OK | High | COVERED |
 
 ---
 
@@ -282,25 +284,25 @@ Format per row: **ID** · Requirement · Risk · Level · Preconditions · Expec
 | PLAN-UNIT-001 | D8 D42 | limits parse wrong | UNIT | limits_json | numbers/null unlimited | Medium | COVERED |
 | PLAN-UNIT-003 | D22 | Image assert wrong | UNIT | at cap | hard block | Medium | COVERED |
 | PLAN-UNIT-010 | D2 | Branding parse | UNIT | json | colors/logo | Medium | COVERED |
-| PII-INT-010 | D18 | Invalid FDI stored | INT | tooth 99 | rejected | Medium | GAP |
-| PII-INT-011 | D19 | Bad plan status | INT | item statuses | enum enforced | Medium | GAP |
-| PII-INT-012 | D20 | Consent PDF missing | INT | draw-sign | PDF+PNG paths | Medium | GAP |
-| PLAN-INT-020 | D16 | Shared pricelist | INT | toggle on | services.location_id cleared | Medium | GAP |
-| PLAN-INT-021 | §6.12 | Inventory low-stock | INT | qty≤threshold | badge/list flag | Medium | GAP |
-| PLAN-INT-022 | §6.13 | Branding not applied | INT | colors set | branding_json persisted | Medium | GAP |
-| CRM-INT-002 | D24 | CRM auto-send without human | INT | generate+send | send only via action | Medium | GAP |
-| AUTH-INT-002 | D13 | Owner not notified on lock | INT | 5 fails | email or in-app event | Medium | GAP |
-| AUTH-INT-021 | D12 | Session TTL ≠ 7d | INT/ops | Auth settings | matches D12 | Medium | GAP |
-| TEN-SEC-003 | B5 | Stale JWT role | SEC | role changed | old JWT limited / re-login | Medium | GAP |
+| PII-INT-010 | D18 | Invalid FDI stored | INT | tooth 99 | rejected (SA `invalid` + DB CHECK) | Medium | COVERED |
+| PII-INT-011 | D19 | Bad plan status | INT | item statuses | enum enforced (SA + DB); visit→item = D-11 open | Medium | COVERED |
+| PII-INT-012 | D20 | Consent PDF missing | INT | draw-sign | PDF+PNG paths under `consents/` | Medium | COVERED |
+| PLAN-INT-020 | D16 | Shared pricelist | INT | toggle on | services.location_id cleared | Medium | COVERED |
+| PLAN-INT-021 | §6.12 | Inventory low-stock | INT | qty≤threshold | badge/list flag | Medium | COVERED |
+| PLAN-INT-022 | §6.13 | Branding not applied | INT | colors set | branding_json persisted | Medium | COVERED |
+| CRM-INT-002 | D24 | CRM auto-send without human | INT | generate+send | generate → open only; send only via SA | Medium | COVERED |
+| AUTH-INT-002 | D13 | Owner not notified on lock | INT | 5 fails | owner JWT reads `auth.login_lockout` audit (MVP notify); doctor denied | Medium | COVERED |
+| AUTH-INT-021 | D12 | Session TTL ≠ 7d | INT/ops | Auth settings | matches D12 | Medium | COVERED |
+| TEN-SEC-003 | B5 | Stale JWT role | SEC | role changed | old JWT limited / re-login | Medium | COVERED |
 | TEN-SEC-004 | B5 | Hook off fallback | SEC | hook disabled | current_clinic_id still works | Medium | COVERED |
-| FILE-INT-001 | D21 D22 | Non-image upload as image | INT | exe | rejected / converted | Medium | GAP |
-| FILE-INT-011 | §6.13 | Branding upload ACL | INT | doctor | denied | Medium | GAP |
-| IMP-INT-002 | D30 | Oversized CSV | INT | >1MB / >500 rows | rejected | Medium | GAP |
-| MKT-INT-001 | W13 | Rate limit bypass | INT | 6 leads / hour same IP | 6th blocked | Medium | GAP |
-| MKT-E2E-002 | §7 | Pricing CTA broken | E2E | marketing pages | CTA → signup | Medium | GAP |
-| MKT-E2E-004 | §13.4 | Cookie banner missing | E2E | fresh browser | banner; PostHog gated | Medium | GAP |
+| FILE-INT-001 | D21 D22 | Non-image upload as image | INT | exe | rejected / converted | Medium | COVERED |
+| FILE-INT-011 | §6.13 | Branding upload ACL | INT | doctor | denied | Medium | COVERED |
+| IMP-INT-002 | D30 | Oversized CSV | INT | >1MB / >500 rows | rejected | Medium | COVERED |
+| MKT-INT-001 | W13 | Rate limit bypass | INT | 6 leads / hour same IP | 6th blocked | Medium | COVERED |
+| MKT-E2E-002 | §7 | Pricing CTA broken | E2E | marketing pages | CTA → signup | Medium | COVERED |
+| MKT-E2E-004 | §13.4 | Cookie banner missing | E2E | fresh browser | banner; PostHog gated | Medium | COVERED |
 | RBAC-INT-010 | §3.2 | Dashboard KPI overshare | INT | assistant session | canSeeDashboardKpis false; doctor true | Medium | COVERED |
-| CAL-INT-005 | D14 | DnD without calendar_advanced | INT | starter/basic | blocked | Medium | GAP |
+| CAL-INT-005 | D14 | DnD without calendar_advanced | INT | starter/basic | blocked | Medium | COVERED |
 
 ---
 
@@ -308,7 +310,7 @@ Format per row: **ID** · Requirement · Risk · Level · Preconditions · Expec
 
 | ID | Requirement | Risk prevented | Level | Preconditions | Expected result | Priority | Status |
 |---|---|---|---|---|---|---|---|
-| MKT-E2E-001 | D37 | Locale/hreflang broken | E2E | /bs /hr /sr /en | 200 + hreflang | Low | GAP |
+| MKT-E2E-001 | D37 | Locale/hreflang broken | E2E | /bs /hr /sr /en | 200 + hreflang | Low | COVERED |
 | MKT-E2E-003 | D40 | Mobile layout broken | E2E | mobile viewport | key screens usable | Low | GAP |
 | CAL-E2E-002 | D40 | Calendar mobile unusable | E2E | day view mobile | no forced overflow | Low | GAP |
 | TEN-SEC-001 | D51 | Cross-clinic switcher appears | SEC | v1 build | no membership UI | Low | GAP |
@@ -324,12 +326,12 @@ Already listed above where Critical. Additional:
 
 | ID | Requirement | Risk prevented | Level | Preconditions | Expected result | Priority | Status |
 |---|---|---|---|---|---|---|---|
-| PII-SEC-001 | D33 | Patient name in analytics | SEC | track event helpers | payload keys allowlist | Critical | GAP |
+| PII-SEC-001 | D33 | Patient name in analytics | SEC | track event helpers | payload keys allowlist | Critical | COVERED |
 | PLAT-INT-001 | D41 | Impersonation unaudited | INT | platform admin | audit start/stop rows | Critical | COVERED |
 | PLAT-SEC-001 | D41 | user_metadata admin | SEC | crafted JWT claims in unit | rejected | Critical | COVERED (unit) |
-| PLAT-SEC-002 | D41 | Sticky impersonation | SEC | stop then navigate | cookie cleared; platform only | High | GAP |
-| AUTH-SEC-003 | D13 | Email enumeration | SEC | lockout RPC | generic error | Medium | GAP |
-| MKT-SEC-002 | W13 | Honeypot bypass | SEC | bot field filled | rejected | Medium | COVERED (unit) |
+| PLAT-SEC-002 | D41 | Sticky impersonation | SEC | stop then navigate | cookie cleared; platform only | High | COVERED |
+| AUTH-SEC-003 | D13 | Email enumeration | SEC | lockout RPC | generic error | Medium | COVERED |
+| MKT-SEC-002 | W13 | Honeypot bypass | SEC | bot field filled | rejected | Medium | COVERED |
 | LIFE-SEC-001 | D34 | Non-EU project | SEC/ops | Production-Ops | checklist pass | Low | N/A auto |
 
 ---
@@ -363,8 +365,14 @@ Already listed above where Critical. Additional:
 
 ### Regression
 - Tag `@blocker` for CI required suites.
-- Flaky policy: quarantine with issue link; max 1 retry in CI (already configured).
-
+- Flaky policy (P5.6 — also in root [`README.md`](../../README.md)):
+  1. Open GitHub issue with signature + last green SHA.
+  2. Quarantine with `test.fix` / `it.fix` + issue link, or `@flaky` excluded from required CI — **do not delete**.
+  3. Quarantined tests are not release blockers; restore `@blocker` when fixed.
+  4. Un-quarantine in the fix PR; silent coverage removal forbidden.
+  5. Max open quarantine ≈ one sprint unless extended.
+- Max **1** retry in CI (Playwright `retries: 1` — already configured). Do not raise retries to hide flakes.
+- pgTAP optional inventory: **deferred** (P5.5) until Vitest RLS/INT is slow/flaky.
 ---
 
 ## 6. Mapping to implementation phases
