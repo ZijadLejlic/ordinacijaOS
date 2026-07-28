@@ -53,7 +53,7 @@
 | D42 | Entitlements | plans → features[] not UI-only | `PLAN-UNIT-001`, `PLAN-INT-011`, `PLAN-SEC-001` | COVERED | Features from DB + free override; Pro SA assertFeature INT COVERED (DB residual = D-03 waived) |
 | D43 | Onboarding | In-app 3 steps | `AUTH-E2E-001` | PARTIAL | Step 1 COVERED; steps 2–3 GAP |
 | D44 | Support | support@ Resend | `CRM-INT-003` | GAP | Ops / smoke |
-| D45 | Clinic close | Export → 7d grace → hard delete | `LIFE-INT-001`, `LIFE-INT-002`, `PII-API-002`, `LIFE-SEC-002`, `LIFE-RLS-001` | COVERED | Closure + grace→pending_delete + demo skip + SA write-block COVERED (P2.6/P2.7/P3.6) |
+| D45 | Clinic close | Export → 7d grace → hard delete | `LIFE-INT-001`, `LIFE-INT-002`, `PII-API-002`, `LIFE-SEC-002`, `LIFE-RLS-001`, `RBAC-INT-024` | COVERED | Closure RPC + SA doctor deny + grace→pending_delete + demo skip + write-block COVERED |
 | D46 | Phone default | +387; owner changeable | `AUTH-INT-001` | PARTIAL | Signup sets default; change GAP |
 | D47 | TZ default | Europe/Sarajevo | `CAL-UNIT-002`, `AUTH-E2E-001` | PARTIAL | Calendar ranges unit COVERED |
 | D48 | Annual sub | 2 months free (2027+) | — | N/A | Faza 4 |
@@ -165,13 +165,13 @@ Inventory tests use IDs `PLAN-INT-021` / `RBAC-INT-021` in the strategy catalog 
 
 | Item | Test IDs | Status |
 |---|---|---|
-| Role set owner/doctor/assistant/reception/accountant | `RBAC-INT-001..005`, `006..010`, `012..017`, `021` (P3.1–P3.2) | COVERED |
-| §3.2 module matrix | `RBAC-RLS-*` + `RBAC-INT-*` SA runner + doctor calendar scope | PARTIAL |
+| Role set owner/doctor/assistant/reception/accountant | `RBAC-INT-001..005`, `006..011`, `012..027` (P3.1–P3.2 + P3 exit) | COVERED |
+| §3.2 module matrix | `RBAC-RLS-*` + `RBAC-INT-*` SA + doctor calendar + Critical SA exit file | COVERED |
 | Peer amounts asterisk for doctors | `FIN-INT-020` | COVERED |
-| Invite flow + plan limit before invite | `AUTH-INT-010`, `PLAN-DB-001` | COVERED |
+| Invite flow + plan limit before invite | `AUTH-INT-010`, `PLAN-DB-001`, `RBAC-INT-022` | COVERED |
 | Auth rules (owner MFA, 7d session, lockout, force logout) | See D11–D13 | PARTIAL |
 
-Existing Vitest coverage for RBAC matrix (finances, clinical, front desk, owner-only, audit) is in `lib/security/rbac-and-lifecycle.test.ts` — mapped as `RBAC-RLS-001..004`, `AUTH-RLS-010`, `PII-RLS-001`, `LIFE-RLS-001` (RLS half). P3.1 Server Action matrix: `lib/security/rbac-int-matrix.test.ts`. P3.2 doctor peer calendar: `lib/security/doctor-calendar-scope.test.ts` (`CAL-INT-004` / `RBAC-INT-005`). P3.6 SA write-block: `lib/security/clinic-write-block-sa.test.ts` (extends `LIFE-RLS-001`). P3.7 invoice legal settings: `lib/security/invoice-legal-settings-sa.test.ts` (`FIN-INT-015`).
+Existing Vitest coverage for RBAC matrix (finances, clinical, front desk, owner-only, audit) is in `lib/security/rbac-and-lifecycle.test.ts` — mapped as `RBAC-RLS-001..004`, `AUTH-RLS-010`, `PII-RLS-001`, `LIFE-RLS-001` (RLS half). P3.1 Server Action matrix: `lib/security/rbac-int-matrix.test.ts`. P3.2 doctor peer calendar: `lib/security/doctor-calendar-scope.test.ts` (`CAL-INT-004` / `RBAC-INT-005`). P3.6 SA write-block: `lib/security/clinic-write-block-sa.test.ts` (extends `LIFE-RLS-001`). P3.7 invoice legal settings: `lib/security/invoice-legal-settings-sa.test.ts` (`FIN-INT-015`). P3 exit Critical SA / module polarity: `lib/security/p3-exit-critical-sa-rbac.test.ts` (`RBAC-INT-011`, `018–020`, `022–027`). Audit UI remains RLS-only (`RBAC-RLS-005`).
 
 ---
 
@@ -210,6 +210,14 @@ Existing Vitest coverage for RBAC matrix (finances, clinical, front desk, owner-
 | `lib/security/tenant-isolation.test.ts` | `TEN-RLS-001..009`, `AUTH-DB-001`, `PLAN-DB-001`, `AUTH-RLS-002` | isolation + lockout + self-promote + starter invite limit |
 | `lib/security/rbac-and-lifecycle.test.ts` | `RBAC-RLS-001..004`, `RBAC-RLS-005`, `AUTH-RLS-010`, `PLAN-DB-002`, `PII-RLS-001`, `LIFE-RLS-001` (RLS), `LIFE-INT-001` | RBAC, PIN, GDPR, lifecycle |
 | `lib/security/clinic-write-block-sa.test.ts` | `LIFE-RLS-001` (SA half across modules) | readonly/pending_delete write-block |
+| `lib/security/rbac-int-matrix.test.ts` | `RBAC-INT-001..004`, `006..010`, `012..017`, `021` | SA role allow/deny matrix |
+| `lib/security/doctor-calendar-scope.test.ts` | `CAL-INT-004`, `RBAC-INT-005` | doctor peer calendar |
+| `lib/security/invite-force-logout-deactivate.test.ts` | `AUTH-INT-010`, `AUTH-INT-020` | invite seat + force logout + deactivate |
+| `lib/security/plan-feature-assert-sa.test.ts` | `PLAN-INT-011` | Pro SA assertFeature |
+| `lib/security/invoice-legal-settings-sa.test.ts` | `FIN-INT-015` | legal settings gates |
+| `lib/security/p3-exit-critical-sa-rbac.test.ts` | `RBAC-INT-011`, `018..020`, `022..027` | Critical SA wrong-role + polarity |
+| `lib/security/finance-api-rbac.test.ts` | `FIN-API-001`, `FIN-API-002` | PDF/Excel RBAC |
+| `lib/security/privacy-api-rbac.test.ts` | `PII-API-001`, `PII-API-002` | patient JSON / clinic ZIP RBAC |
 | `e2e/signup-onboarding.spec.ts` | `AUTH-E2E-001` | signup MFA onboarding step 1 |
 | `e2e/mfa-gate.spec.ts` | `AUTH-E2E-003` | owner MFA redirect |
 | `e2e/appointment.spec.ts` | `CAL-E2E-001` | create + overlap |

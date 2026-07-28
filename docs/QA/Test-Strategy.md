@@ -238,13 +238,23 @@ Format per row: **ID** · Requirement · Risk · Level · Preconditions · Expec
 | RBAC-INT-007 | §3.2 | Expense SA RBAC | INT | accountant allow / reception deny | createExpense | High | COVERED |
 | RBAC-INT-008 | §3.2 | CRM SA RBAC | INT | reception past-RBAC / doctor deny | dismissCrm | High | COVERED |
 | RBAC-INT-009 | §3.2 | Email template write | INT | owner allow / reception deny | updateTemplate | High | COVERED |
+| RBAC-INT-011 | §3.2 | Assistant calendar write | INT | assistant createAppointment | allow | High | COVERED |
 | RBAC-INT-012 | §3.2 | GDPR request SA | INT | doctor allow / accountant deny | requestErasure | High | COVERED |
 | RBAC-INT-013 | §3.2 | GDPR manage SA | INT | owner past-RBAC / doctor deny | rejectErasure | High | COVERED |
 | RBAC-INT-014 | §3.2 | Branding SA RBAC | INT | owner allow / doctor deny | updateColors | High | COVERED |
 | RBAC-INT-015 | §3.2 | Treatment plan write | INT | doctor allow / assistant deny | createPlan | High | COVERED |
 | RBAC-INT-016 | §3.2 | Import patients SA | INT | owner past-RBAC / doctor deny | importPatients | High | COVERED |
 | RBAC-INT-017 | §3.2 | Calendar write SA | INT | reception allow / accountant deny | createAppointment | High | COVERED |
+| RBAC-INT-018 | §3.2 | Consent form write | INT | doctor updateConsentForm | forbidden (owner write; PLAN-INT-011 owner allow) | High | COVERED |
+| RBAC-INT-019 | §3.2 | Services CRUD SA | INT | doctor createService | forbidden | High | COVERED |
+| RBAC-INT-020 | §3.2 | Locations SA | INT | doctor createLocation | forbidden | High | COVERED |
 | RBAC-INT-021 | §6.12 | Inventory SA RBAC | INT | doctor allow / accountant deny | createItem | High | COVERED |
+| RBAC-INT-022 | §3.2 | Invite create SA | INT | doctor createInvite | forbidden | High | COVERED |
+| RBAC-INT-023 | §3.2 | GDPR approve SA | INT | doctor approveErasure | forbidden | High | COVERED |
+| RBAC-INT-024 | D45 | Clinic closure SA | INT | doctor requestClinicClosure | forbidden | High | COVERED |
+| RBAC-INT-025 | D29 | Void invoice SA RBAC | INT | doctor voidInvoice | forbidden | High | COVERED |
+| RBAC-INT-026 | §3.2 | Waitlist SA RBAC | INT | doctor addWaitlist | forbidden (reception allow = PLAN-INT-011) | High | COVERED |
+| RBAC-INT-027 | D43 | Onboarding SA RBAC | INT | doctor saveOnboardingClinic | forbidden | High | COVERED |
 | PLAN-UNIT-002 | D3 D5 | Free period features on | UNIT | now < 2027-01-01 | SMS/AI/portal off | High | COVERED |
 | PLAN-INT-011 | D42 | assertFeature bypassed in SA | INT | each Pro feature SA on starter | featureDisabled; pro allow | High | COVERED |
 | CRM-INT-001 | D23 §12.1 | Reminder send broken | INT | owner template + send | outbound_messages row | High | GAP |
