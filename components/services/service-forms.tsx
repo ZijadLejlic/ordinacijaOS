@@ -7,7 +7,7 @@ import {
   useState,
   useTransition,
 } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Field, FieldGroup, FieldLabel, FieldError } from "@/components/ui/field";
@@ -25,6 +25,7 @@ import {
   updateServiceAction,
   type ServiceActionState,
 } from "@/lib/services/actions";
+import { currencyLabel, formatMoney } from "@/lib/money/format";
 
 const KNOWN_ERRORS = [
   "invalid",
@@ -136,6 +137,7 @@ function LocationField({
 
 function ServiceFields({ service }: { service?: ServiceRow }) {
   const t = useTranslations("Services");
+  const locale = useLocale();
   return (
     <FieldGroup className="grid gap-3 sm:grid-cols-2">
       <Field>
@@ -159,7 +161,9 @@ function ServiceFields({ service }: { service?: ServiceRow }) {
         />
       </Field>
       <Field>
-        <FieldLabel htmlFor="priceEur">{t("priceEur")}</FieldLabel>
+        <FieldLabel htmlFor="priceEur">
+          {t("priceEur", { currency: currencyLabel(locale) })}
+        </FieldLabel>
         <Input
           id="priceEur"
           name="priceEur"
@@ -315,6 +319,7 @@ export function ServicesTable({
   canWrite: boolean;
 }) {
   const t = useTranslations("Services");
+  const locale = useLocale();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -375,7 +380,7 @@ export function ServicesTable({
                   ) : null}
                 </TableCell>
                 <TableCell>{service.durationMinutes} min</TableCell>
-                <TableCell>{service.priceEur.toFixed(2)} €</TableCell>
+                <TableCell>{formatMoney(service.priceEur, locale)}</TableCell>
                 <TableCell>{formatVatPercent(service.vatRate)}</TableCell>
                 {showLocation ? (
                   <TableCell>{locationName(service.locationId)}</TableCell>

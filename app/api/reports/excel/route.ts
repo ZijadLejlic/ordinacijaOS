@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import { addMonths, format, startOfMonth } from "date-fns";
 import { fromZonedTime, toZonedTime } from "date-fns-tz";
+import { getLocale } from "next-intl/server";
 import { CLINIC_TIMEZONE, formatDateKey } from "@/lib/calendar/time";
 import { clinicHasFeature } from "@/lib/entitlements";
 import { canAccessExpenses } from "@/lib/expenses/rbac";
 import { formatInvoiceNumber, roundMoney } from "@/lib/invoices/money";
+import { currencyLabel } from "@/lib/money/format";
 import { buildFinanceWorkbook } from "@/lib/reports/excel";
 import { createClient } from "@/lib/supabase/server";
 
@@ -157,9 +159,11 @@ export async function GET(request: Request) {
     };
   });
 
+  const locale = await getLocale();
   const buffer = await buildFinanceWorkbook({
     clinicName: clinic?.name ?? "Clinic",
     generatedAt: new Date().toISOString(),
+    currencyLabel: currencyLabel(locale),
     expenses: expenseRows,
     payments: paymentRows,
     months,

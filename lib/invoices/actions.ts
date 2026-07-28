@@ -21,6 +21,7 @@ import {
   roundMoney,
 } from "@/lib/invoices/money";
 import { renderInvoicePdf } from "@/lib/invoices/pdf";
+import { currencyForLocale } from "@/lib/money/format";
 import { asUploadBlob, PATIENT_FILES_BUCKET } from "@/lib/patients/storage";
 import { createClient } from "@/lib/supabase/server";
 import type { Database, Json } from "@/lib/supabase/database.types";
@@ -288,7 +289,7 @@ export async function createInvoiceAction(
       seriesYear,
       seriesNumber,
       issuedAt: invoice.issued_at,
-      currency: "EUR",
+      currency: currencyForLocale(locale),
       subtotalAmount: subtotal,
       vatAmount: vatTotal,
       totalAmount: grandTotal,

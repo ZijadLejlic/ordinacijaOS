@@ -181,15 +181,22 @@ function SignaturesList({
               size="sm"
               disabled={isPending}
               onClick={() => {
+                setError(null);
+                // Safari blocks async window.open after await — open blank first.
+                const popup = window.open("about:blank", "_blank");
                 startTransition(async () => {
-                  setError(null);
                   const res = await createSignedFileUrlAction(
                     sig.pdfStoragePath,
                   );
-                  if (res.url) {
-                    window.open(res.url, "_blank", "noopener,noreferrer");
-                  } else {
+                  if (!res.url) {
+                    popup?.close();
                     setError(res.error ?? "signedUrlFailed");
+                    return;
+                  }
+                  if (popup) {
+                    popup.location.href = res.url;
+                  } else {
+                    window.location.assign(res.url);
                   }
                 });
               }}

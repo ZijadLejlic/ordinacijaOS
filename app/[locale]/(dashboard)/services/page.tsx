@@ -13,6 +13,7 @@ import {
   ServicesTable,
 } from "@/components/services/service-forms";
 import { canReadServices, canWriteServices } from "@/lib/patients/rbac";
+import { currencyLabel } from "@/lib/money/format";
 import { createClient } from "@/lib/supabase/server";
 import type { Json } from "@/lib/supabase/database.types";
 
@@ -97,7 +98,9 @@ export default async function ServicesPage({ params, searchParams }: Props) {
     <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-4 py-10">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
-        <p className="text-muted-foreground text-sm">{t("subtitle")}</p>
+        <p className="text-muted-foreground text-sm">
+          {t("subtitle", { currency: currencyLabel(locale) })}
+        </p>
         {sharedPricelist ? (
           <p className="text-muted-foreground mt-1 text-xs">
             {t("locationShared")}

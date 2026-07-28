@@ -1,9 +1,10 @@
 import { CheckIcon } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Reveal } from "@/components/marketing/reveal";
 import { buttonVariants } from "@/components/ui/button";
 import { MARKETING_PLANS } from "@/lib/marketing/plans";
+import { formatSubscriptionPrice } from "@/lib/money/format";
 import { cn } from "@/lib/utils";
 
 function formatLimit(
@@ -16,6 +17,7 @@ function formatLimit(
 export async function PricingGrid() {
   const t = await getTranslations("Marketing.pricing");
   const tFeatures = await getTranslations("Marketing.pricing.features");
+  const locale = await getLocale();
 
   return (
     <section className="bg-[var(--marketing-surface)] pb-8 md:pb-12">
@@ -51,8 +53,15 @@ export async function PricingGrid() {
 
                 <p className="mt-5 font-[family-name:var(--font-marketing-display)] text-4xl font-semibold tracking-tight text-[var(--marketing-ink)]">
                   {plan.priceMonthly === null
-                    ? t("from", { amount: 60 })
-                    : t("perMonth", { amount: plan.priceMonthly })}
+                    ? t("from", {
+                        price: formatSubscriptionPrice(60, locale),
+                      })
+                    : t("perMonth", {
+                        price: formatSubscriptionPrice(
+                          plan.priceMonthly,
+                          locale,
+                        ),
+                      })}
                 </p>
                 <p className="mt-1 text-xs text-[color-mix(in_oklab,var(--marketing-ink)_72%,transparent)]">
                   {t("vat")}

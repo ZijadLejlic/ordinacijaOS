@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { AllergyWarningBanner } from "@/components/patients/allergy-warning-banner";
 import {
   AllergiesTable,
   AllergyForm,
@@ -246,6 +247,8 @@ export default async function PatientDetailPage({ params }: Props) {
           ) : null}
         </div>
       </div>
+
+      <AllergyWarningBanner allergies={allergies ?? []} />
 
       <Card>
         <CardHeader>

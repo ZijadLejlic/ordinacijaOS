@@ -8,12 +8,12 @@ const MODULE_SHOT: Record<string, MarketingShotId> = {
   odontogram: "odontogram",
   planTerapije: "plan",
   kalendar: "calendar",
-  finansije: "invoice",
+  finansije: "payments",
   podsjetnici: "reminder",
-  dokumenti: "chart",
+  dokumenti: "patients",
   inventar: "inventory",
   tim: "settings",
-  branding: "invoice",
+  branding: "settings",
 };
 
 type ModulePreviewProps = {

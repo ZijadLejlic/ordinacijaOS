@@ -24,18 +24,11 @@ import {
   canAccessPatients,
   canReadServices,
 } from "@/lib/patients/rbac";
+import { formatMoney } from "@/lib/money/format";
 
 type Props = {
   params: Promise<{ locale: string }>;
 };
-
-function formatEur(n: number | null | undefined, locale: string) {
-  if (n == null) return "—";
-  return new Intl.NumberFormat(locale === "bs" ? "bs-BA" : "en-US", {
-    style: "currency",
-    currency: "EUR",
-  }).format(n);
-}
 
 export default async function DashboardPage({ params }: Props) {
   const { locale } = await params;
@@ -173,7 +166,7 @@ export default async function DashboardPage({ params }: Props) {
               <CardHeader className="pb-2">
                 <CardDescription>{t("kpiTodayRevenue")}</CardDescription>
                 <CardTitle className="text-2xl">
-                  {formatEur(kpis.todayRevenue, locale)}
+                  {formatMoney(kpis.todayRevenue, locale)}
                 </CardTitle>
               </CardHeader>
             </Card>
@@ -191,7 +184,7 @@ export default async function DashboardPage({ params }: Props) {
               <CardHeader className="pb-2">
                 <CardDescription>{t("kpiMonthProfit")}</CardDescription>
                 <CardTitle className="text-2xl">
-                  {formatEur(kpis.monthProfit, locale)}
+                  {formatMoney(kpis.monthProfit, locale)}
                 </CardTitle>
               </CardHeader>
             </Card>
@@ -200,7 +193,7 @@ export default async function DashboardPage({ params }: Props) {
               <CardHeader className="pb-2">
                 <CardDescription>{t("kpiMonthRevenue")}</CardDescription>
                 <CardTitle className="text-2xl">
-                  {formatEur(kpis.monthRevenue, locale)}
+                  {formatMoney(kpis.monthRevenue, locale)}
                 </CardTitle>
               </CardHeader>
             </Card>
@@ -254,7 +247,7 @@ export default async function DashboardPage({ params }: Props) {
                     >
                       <span className="truncate">{row.doctorName}</span>
                       <span className="font-medium whitespace-nowrap">
-                        {formatEur(row.amount, locale)}
+                        {formatMoney(row.amount, locale)}
                       </span>
                     </li>
                   ))}
@@ -295,15 +288,15 @@ export default async function DashboardPage({ params }: Props) {
                         <tr key={row.month} className="border-b last:border-0">
                           <td className="py-2 pr-3">{row.month}</td>
                           <td className="py-2 pr-3">
-                            {formatEur(row.revenue, locale)}
+                            {formatMoney(row.revenue, locale)}
                           </td>
                           {includeExpenses ? (
                             <>
                               <td className="py-2 pr-3">
-                                {formatEur(row.expenses, locale)}
+                                {formatMoney(row.expenses, locale)}
                               </td>
                               <td className="py-2">
-                                {formatEur(row.profit, locale)}
+                                {formatMoney(row.profit, locale)}
                               </td>
                             </>
                           ) : null}

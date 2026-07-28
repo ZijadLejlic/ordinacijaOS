@@ -12,6 +12,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { FieldError } from "@/components/ui/field";
 import { AppointmentForm } from "@/components/calendar/appointment-form";
 import type {
@@ -172,153 +178,174 @@ export function CalendarShell({
         ) : null}
       </div>
 
-      {flash && !panel ? (
+      {flash ? (
         <p className="text-sm text-emerald-700" role="status">
           {t(`messages.${flash}` as "messages.appointmentCreated")}
         </p>
       ) : null}
-      {error && !panel ? <FieldError>{error}</FieldError> : null}
+      {error ? <FieldError>{error}</FieldError> : null}
 
-      {panel ? (
-        <Card data-testid="calendar-appointment-panel">
-          <CardHeader>
-            <CardTitle className="text-base">
-              {panel.type === "create" ? t("newTitle") : t("editTitle")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {flash ? (
-              <p className="text-sm text-emerald-700" role="status">
-                {t(`messages.${flash}` as "messages.appointmentCreated")}
-              </p>
-            ) : null}
-            {error ? <FieldError>{error}</FieldError> : null}
-            <AppointmentForm
-              mode={panel.type === "create" ? "create" : "edit"}
-              initial={
-                panel.type === "create"
-                  ? {
-                      doctorId: defaultDoctorId,
-                      patientId: "",
-                      locationId: null,
-                      serviceId: null,
-                      startsAt: panel.startsAt,
-                      endsAt: panel.endsAt,
-                      status: "confirmed",
-                      notes: null,
-                    }
-                  : {
-                      id: panel.appointment.id,
-                      doctorId: panel.appointment.doctorId,
-                      patientId: panel.appointment.patientId,
-                      locationId: panel.appointment.locationId,
-                      serviceId: panel.appointment.serviceId,
-                      startsAt: panel.appointment.startsAt,
-                      endsAt: panel.appointment.endsAt,
-                      status: panel.appointment.status,
-                      notes: panel.appointment.notes,
-                    }
-              }
-              doctors={doctors}
-              patients={patients}
-              services={services}
-              locations={locations}
-              canPickDoctor={canPickDoctor}
-              onClose={() => setPanel(null)}
-              onSuccess={(message) => {
-                setFlash(message ?? null);
-                setPanel(null);
-              }}
-            />
-            {panel.type === "edit" && (canWrite || canSendReminder) ? (
-              <div className="flex flex-wrap gap-2 border-t pt-4">
-                {canWrite ? (
-                  <select
-                    className="border-input bg-background h-8 rounded-lg border px-2 text-sm"
-                    defaultValue={panel.appointment.status}
-                    disabled={pending}
-                    onChange={(e) => {
-                      const status = e.target.value;
-                      startTransition(async () => {
-                        const result = await updateAppointmentStatusAction(
-                          panel.appointment.id,
-                          status,
-                        );
-                        if (result?.error) {
-                          setError(t(`errors.${result.error}` as "errors.saveFailed"));
-                          return;
+      <Dialog
+        open={panel !== null}
+        onOpenChange={(open) => {
+          if (!open) setPanel(null);
+        }}
+      >
+        <DialogContent
+          className="max-h-[min(90vh,44rem)] overflow-y-auto sm:max-w-lg"
+          data-testid="calendar-appointment-panel"
+        >
+          {panel ? (
+            <>
+              <DialogHeader>
+                <DialogTitle>
+                  {panel.type === "create" ? t("newTitle") : t("editTitle")}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <AppointmentForm
+                  key={
+                    panel.type === "create"
+                      ? `create-${panel.startsAt}`
+                      : panel.appointment.id
+                  }
+                  mode={panel.type === "create" ? "create" : "edit"}
+                  initial={
+                    panel.type === "create"
+                      ? {
+                          doctorId: defaultDoctorId,
+                          patientId: "",
+                          locationId: null,
+                          serviceId: null,
+                          startsAt: panel.startsAt,
+                          endsAt: panel.endsAt,
+                          status: "confirmed",
+                          notes: null,
                         }
-                        if (result?.waitlistSuggestions?.length) {
-                          setSuggestions(result.waitlistSuggestions);
+                      : {
+                          id: panel.appointment.id,
+                          doctorId: panel.appointment.doctorId,
+                          patientId: panel.appointment.patientId,
+                          locationId: panel.appointment.locationId,
+                          serviceId: panel.appointment.serviceId,
+                          startsAt: panel.appointment.startsAt,
+                          endsAt: panel.appointment.endsAt,
+                          status: panel.appointment.status,
+                          notes: panel.appointment.notes,
                         }
-                        setFlash(result?.message ?? "appointmentUpdated");
-                        setPanel(null);
-                      });
-                    }}
-                  >
-                    {appointmentStatuses.map((s) => (
-                      <option key={s} value={s}>
-                        {t(`statuses.${s}`)}
-                      </option>
-                    ))}
-                  </select>
-                ) : null}
-                {canSendReminder &&
-                panel.appointment.status !== "cancelled" &&
-                panel.appointment.status !== "no_show" ? (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    disabled={pending}
-                    onClick={() => {
-                      startTransition(async () => {
-                        const result = await sendAppointmentReminderAction(
-                          panel.appointment.id,
-                          locale,
-                        );
-                        if (result?.error) {
-                          setError(
-                            t(`errors.${result.error}` as "errors.saveFailed"),
-                          );
-                          return;
-                        }
-                        setFlash("reminderSent");
-                      });
-                    }}
-                  >
-                    {t("sendReminder")}
-                  </Button>
-                ) : null}
-                {canWrite ? (
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    disabled={pending}
-                    onClick={() => {
-                      startTransition(async () => {
-                        const result = await cancelAppointmentAction(
-                          panel.appointment.id,
-                        );
-                        if (result?.error) {
-                          setError(t(`errors.${result.error}` as "errors.saveFailed"));
-                          return;
-                        }
-                        if (result?.waitlistSuggestions?.length) {
-                          setSuggestions(result.waitlistSuggestions);
-                        }
-                        setFlash("appointmentCancelled");
-                        setPanel(null);
-                      });
-                    }}
-                  >
-                    {t("cancelAppointment")}
-                  </Button>
+                  }
+                  doctors={doctors}
+                  patients={patients}
+                  services={services}
+                  locations={locations}
+                  canPickDoctor={canPickDoctor}
+                  onClose={() => setPanel(null)}
+                  onSuccess={(message) => {
+                    setFlash(message ?? null);
+                    setPanel(null);
+                  }}
+                />
+                {panel.type === "edit" && (canWrite || canSendReminder) ? (
+                  <div className="flex flex-wrap gap-2 border-t pt-4">
+                    {canWrite ? (
+                      <select
+                        className="border-input bg-background h-8 rounded-lg border px-2 text-sm"
+                        defaultValue={panel.appointment.status}
+                        disabled={pending}
+                        onChange={(e) => {
+                          const status = e.target.value;
+                          startTransition(async () => {
+                            const result = await updateAppointmentStatusAction(
+                              panel.appointment.id,
+                              status,
+                            );
+                            if (result?.error) {
+                              setError(
+                                t(
+                                  `errors.${result.error}` as "errors.saveFailed",
+                                ),
+                              );
+                              return;
+                            }
+                            if (result?.waitlistSuggestions?.length) {
+                              setSuggestions(result.waitlistSuggestions);
+                            }
+                            setFlash(result?.message ?? "appointmentUpdated");
+                            setPanel(null);
+                          });
+                        }}
+                      >
+                        {appointmentStatuses.map((s) => (
+                          <option key={s} value={s}>
+                            {t(`statuses.${s}`)}
+                          </option>
+                        ))}
+                      </select>
+                    ) : null}
+                    {canSendReminder &&
+                    panel.appointment.status !== "cancelled" &&
+                    panel.appointment.status !== "no_show" ? (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        disabled={pending}
+                        onClick={() => {
+                          startTransition(async () => {
+                            const result = await sendAppointmentReminderAction(
+                              panel.appointment.id,
+                              locale,
+                            );
+                            if (result?.error) {
+                              setError(
+                                t(
+                                  `errors.${result.error}` as "errors.saveFailed",
+                                ),
+                              );
+                              return;
+                            }
+                            setFlash("reminderSent");
+                          });
+                        }}
+                      >
+                        {t("sendReminder")}
+                      </Button>
+                    ) : null}
+                    {canWrite ? (
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        disabled={pending}
+                        onClick={() => {
+                          startTransition(async () => {
+                            const result = await cancelAppointmentAction(
+                              panel.appointment.id,
+                            );
+                            if (result?.error) {
+                              setError(
+                                t(
+                                  `errors.${result.error}` as "errors.saveFailed",
+                                ),
+                              );
+                              return;
+                            }
+                            if (result?.waitlistSuggestions?.length) {
+                              setSuggestions(result.waitlistSuggestions);
+                            }
+                            setFlash("appointmentCancelled");
+                            setPanel(null);
+                          });
+                        }}
+                      >
+                        {t("cancelAppointment")}
+                      </Button>
+                    ) : null}
+                  </div>
                 ) : null}
               </div>
-            ) : null}
-          </CardContent>
-        </Card>
-      ) : null}
+            </>
+          ) : null}
+        </DialogContent>
+      </Dialog>
 
       <Card>
         <CardHeader className="gap-3 px-4 sm:px-6">

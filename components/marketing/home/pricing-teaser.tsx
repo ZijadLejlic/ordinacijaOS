@@ -1,14 +1,16 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { Reveal } from "@/components/marketing/reveal";
 import { SectionShell } from "@/components/marketing/section-shell";
 import { buttonVariants } from "@/components/ui/button";
 import { MARKETING_PLANS } from "@/lib/marketing/plans";
+import { formatSubscriptionPrice } from "@/lib/money/format";
 import { cn } from "@/lib/utils";
 
 export async function PricingTeaser() {
   const t = await getTranslations("Marketing.home.pricing");
   const tPlans = await getTranslations("Marketing.pricing.plans");
+  const locale = await getLocale();
 
   return (
     <SectionShell tone="white" eyebrow={t("eyebrow")} title={t("title")}>
@@ -36,8 +38,15 @@ export async function PricingTeaser() {
               </p>
               <p className="mt-3 font-[family-name:var(--font-marketing-display)] text-3xl font-semibold tracking-tight text-[var(--marketing-ink)]">
                 {plan.priceMonthly === null
-                  ? t("from", { amount: 60 })
-                  : t("perMonth", { amount: plan.priceMonthly })}
+                  ? t("from", {
+                      price: formatSubscriptionPrice(60, locale),
+                    })
+                  : t("perMonth", {
+                      price: formatSubscriptionPrice(
+                        plan.priceMonthly,
+                        locale,
+                      ),
+                    })}
               </p>
               <p className="mt-1 text-xs text-[color-mix(in_oklab,var(--marketing-ink)_50%,transparent)]">
                 {t("vat")}

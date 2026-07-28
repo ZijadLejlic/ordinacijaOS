@@ -19,6 +19,7 @@ import { CLINIC_TIMEZONE, formatDateKey } from "@/lib/calendar/time";
 import { clinicHasFeature } from "@/lib/entitlements";
 import { canAccessExpenses, canWriteExpenses } from "@/lib/expenses/rbac";
 import { roundMoney } from "@/lib/invoices/money";
+import { formatMoney, currencyLabel } from "@/lib/money/format";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "@/i18n/navigation";
 import {
@@ -142,8 +143,8 @@ export default async function ExpensesPage({ params, searchParams }: Props) {
         <CardHeader>
           <CardTitle>{t("listTitle")}</CardTitle>
           <CardDescription>
-            {t("listDescription")} · {t("activeTotal")}: {activeTotal.toFixed(2)}{" "}
-            €
+            {t("listDescription")} · {t("activeTotal")}:{" "}
+            {formatMoney(activeTotal, locale)}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -159,7 +160,9 @@ export default async function ExpensesPage({ params, searchParams }: Props) {
         <Card>
           <CardHeader>
             <CardTitle>{t("createTitle")}</CardTitle>
-            <CardDescription>{t("createDescription")}</CardDescription>
+            <CardDescription>
+              {t("createDescription", { currency: currencyLabel(locale) })}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <CreateExpenseForm />

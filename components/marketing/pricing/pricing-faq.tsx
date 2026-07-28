@@ -1,5 +1,5 @@
-import { ChevronDownIcon } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { FaqAccordion } from "@/components/marketing/faq-accordion";
 import { Reveal } from "@/components/marketing/reveal";
 import { SectionShell } from "@/components/marketing/section-shell";
 
@@ -16,23 +16,27 @@ export type PricingFaqKey = (typeof PRICING_FAQ_KEYS)[number];
 export async function PricingFaq() {
   const t = await getTranslations("Marketing.pricing.faq");
 
+  const items = PRICING_FAQ_KEYS.map((key) => ({
+    id: `pricing-${key}`,
+    question: t(`items.${key}.q`),
+    answer: t(`items.${key}.a`),
+  }));
+
   return (
     <SectionShell tone="white" eyebrow={t("eyebrow")} title={t("title")}>
-      <Reveal>
-        <div className="mx-auto max-w-3xl divide-y divide-[color-mix(in_oklab,var(--marketing-ink)_10%,transparent)] rounded-2xl border border-[var(--marketing-mist)] bg-[var(--marketing-surface)]">
-          {PRICING_FAQ_KEYS.map((key) => (
-            <details key={key} className="group px-5 py-1 md:px-6">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-4 text-left text-base font-medium text-[var(--marketing-ink)] marker:content-none [&::-webkit-details-marker]:hidden">
-                <span>{t(`items.${key}.q`)}</span>
-                <ChevronDownIcon className="size-4 shrink-0 text-[var(--marketing-accent)] transition-transform duration-150 group-open:rotate-180" />
-              </summary>
-              <p className="pb-4 text-base leading-relaxed text-[color-mix(in_oklab,var(--marketing-ink)_75%,transparent)]">
-                {t(`items.${key}.a`)}
-              </p>
-            </details>
-          ))}
-        </div>
-      </Reveal>
+      <div className="relative mx-auto max-w-3xl">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -inset-x-8 -top-10 -z-10 h-40 rounded-full opacity-70 blur-3xl md:-inset-x-16"
+          style={{
+            background:
+              "radial-gradient(ellipse at center, color-mix(in_oklab, var(--marketing-accent) 14%, transparent), transparent 70%)",
+          }}
+        />
+        <Reveal>
+          <FaqAccordion items={items} source="pricing" />
+        </Reveal>
+      </div>
     </SectionShell>
   );
 }

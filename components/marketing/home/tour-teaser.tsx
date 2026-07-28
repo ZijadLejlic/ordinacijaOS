@@ -1,10 +1,31 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { BrowserFrame } from "@/components/marketing/browser-frame";
+import { MarketingShot } from "@/components/marketing/marketing-shot";
 import { Reveal } from "@/components/marketing/reveal";
 import { SectionShell } from "@/components/marketing/section-shell";
 import { buttonVariants } from "@/components/ui/button";
+import type { MarketingShotId } from "@/lib/marketing/screenshots";
 import { cn } from "@/lib/utils";
+
+/** Matches the three Brzi-start steps: register → services/team → first appointment. */
+const STACK: { id: MarketingShotId; rotate: string; className: string }[] = [
+  {
+    id: "signup",
+    rotate: "rotate-[-5deg]",
+    className: "top-0 left-3 z-0 w-[76%] opacity-75",
+  },
+  {
+    id: "onboarding-2",
+    rotate: "rotate-[3.5deg]",
+    className: "top-7 right-1 z-10 w-[76%] opacity-90",
+  },
+  {
+    id: "calendar",
+    rotate: "rotate-[-1deg]",
+    className: "right-6 bottom-0 z-20 w-[82%]",
+  },
+];
 
 export async function TourTeaser() {
   const t = await getTranslations("Marketing.home.tour");
@@ -41,26 +62,30 @@ export async function TourTeaser() {
         </Reveal>
 
         <Reveal delayMs={90}>
-          <div className="relative mx-auto h-[280px] w-full max-w-md md:h-[320px]">
-            <div className="absolute top-0 left-6 w-[78%] rotate-[-4deg] opacity-70">
-              <BrowserFrame url={tHero("browserUrl")}>
-                <div className="h-28 bg-gradient-to-br from-[var(--marketing-mist)] to-white p-3 md:h-32" />
-              </BrowserFrame>
-            </div>
-            <div className="absolute top-8 right-2 w-[78%] rotate-[3deg] opacity-85">
-              <BrowserFrame url={tHero("browserUrl")}>
-                <div className="h-28 bg-gradient-to-br from-white to-[var(--marketing-wash)] p-3 md:h-32" />
-              </BrowserFrame>
-            </div>
-            <div className="absolute right-8 bottom-0 w-[82%]">
-              <BrowserFrame url={tHero("browserUrl")}>
-                <div className="space-y-2 p-3 md:p-4">
-                  <div className="h-3 w-1/3 rounded bg-[var(--marketing-mist)]" />
-                  <div className="h-16 rounded-lg bg-white ring-1 ring-[color-mix(in_oklab,var(--marketing-ink)_6%,transparent)]" />
-                  <div className="h-10 rounded-lg bg-[var(--marketing-wash)]" />
-                </div>
-              </BrowserFrame>
-            </div>
+          <div
+            className="relative mx-auto h-[300px] w-full max-w-md md:h-[360px]"
+            aria-hidden
+          >
+            {STACK.map((card) => (
+              <div
+                key={card.id}
+                className={cn(
+                  "absolute shadow-[0_18px_40px_-18px_rgb(15_27_61_/_0.45)]",
+                  card.className,
+                  card.rotate,
+                )}
+              >
+                <BrowserFrame url={tHero("browserUrl")}>
+                  <div className="h-[7.25rem] overflow-hidden md:h-[8.5rem]">
+                    <MarketingShot
+                      id={card.id}
+                      alt=""
+                      className="origin-top scale-[1.15]"
+                    />
+                  </div>
+                </BrowserFrame>
+              </div>
+            ))}
           </div>
         </Reveal>
       </div>

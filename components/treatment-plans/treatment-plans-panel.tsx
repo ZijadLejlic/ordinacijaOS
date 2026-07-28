@@ -7,7 +7,7 @@ import {
   useState,
   useTransition,
 } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -25,6 +25,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { FDI_TEETH } from "@/lib/odontogram/fdi";
+import { currencyLabel, formatMoney } from "@/lib/money/format";
 import {
   addTreatmentPlanItemAction,
   createTreatmentPlanAction,
@@ -173,6 +174,7 @@ function AddItemFormInner({
   onAdded: () => void;
 }) {
   const t = useTranslations("TreatmentPlan");
+  const locale = useLocale();
   const [state, formAction, pending] = useActionState(
     addTreatmentPlanItemAction.bind(null, patientId, planId),
     null,
@@ -210,7 +212,7 @@ function AddItemFormInner({
           >
             {services.map((service) => (
               <option key={service.id} value={service.id}>
-                {service.name} ({service.priceEur.toFixed(2)} €)
+                {service.name} ({formatMoney(service.priceEur, locale)})
               </option>
             ))}
           </select>
@@ -233,7 +235,7 @@ function AddItemFormInner({
         </Field>
         <Field>
           <FieldLabel htmlFor={`estimatedPriceEur-${planId}`}>
-            {t("estimatedPrice")}
+            {t("estimatedPrice", { currency: currencyLabel(locale) })}
           </FieldLabel>
           <Input
             key={`${planId}-${selectedServiceId}`}
@@ -306,6 +308,7 @@ function PlanCard({
   canWrite: boolean;
 }) {
   const t = useTranslations("TreatmentPlan");
+  const locale = useLocale();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -323,7 +326,9 @@ function PlanCard({
           ) : null}
           <p className="text-muted-foreground text-xs">
             {plan.isActive ? t("active") : t("inactive")} ·{" "}
-            {t("estimateTotal", { amount: estimateTotal.toFixed(2) })}
+            {t("estimateTotal", {
+              amount: formatMoney(estimateTotal, locale),
+            })}
           </p>
         </div>
         {canWrite ? (
@@ -378,7 +383,7 @@ function PlanCard({
                   ) : null}
                 </TableCell>
                 <TableCell>{item.fdiNumber ?? "—"}</TableCell>
-                <TableCell>{item.estimatedPriceEur.toFixed(2)} €</TableCell>
+                <TableCell>{formatMoney(item.estimatedPriceEur, locale)}</TableCell>
                 <TableCell>
                   {canWrite && plan.isActive ? (
                     <select

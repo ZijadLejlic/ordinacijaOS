@@ -16,6 +16,7 @@ import {
   canImportPatients,
   canImportServices,
 } from "@/lib/import/rbac";
+import { currencyLabel } from "@/lib/money/format";
 import { needsOnboarding } from "@/lib/onboarding/parse";
 import { createClient } from "@/lib/supabase/server";
 
@@ -83,7 +84,9 @@ export default async function SettingsImportPage({ params }: Props) {
         <Card>
           <CardHeader>
             <CardTitle>{t("services.title")}</CardTitle>
-            <CardDescription>{t("services.description")}</CardDescription>
+            <CardDescription>
+              {t("services.description", { currency: currencyLabel(locale) })}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <ServicesImportForm />

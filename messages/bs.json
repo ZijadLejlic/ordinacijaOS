@@ -27,7 +27,7 @@
       "whyDentord": {
         "eyebrow": "Zašto DentOrd",
         "title": "Zašto ordinacije biraju DentOrd?",
-        "description": "Napravljen za BiH, Hrvatsku i Srbiju — jezik našeg regiona, EUR + PDV, EU hosting.",
+        "description": "Napravljen za BiH, Hrvatsku i Srbiju — jezik našeg regiona, KM + PDV, EU hosting.",
         "comingSoon": "Detaljno poređenje i benefiti stižu uskoro."
       },
       "tour": {
@@ -158,7 +158,7 @@
           },
           "invoices": {
             "title": "Fakture i finansije",
-            "body": "Fakture u EUR sa PDV-om, uplate, rate i pregled dugovanja — bez Excela."
+            "body": "Fakture u KM sa PDV-om, uplate, rate i pregled dugovanja — bez Excela."
           },
           "reminders": {
             "title": "Email podsjetnici",
@@ -212,8 +212,8 @@
         "title": "Jednostavne cijene. Trenutno — besplatno.",
         "badge": "Besplatno do 31.12.2026",
         "vat": "sa PDV-om",
-        "from": "od {amount} €/mj",
-        "perMonth": "{amount} €/mj",
+        "from": "od {price}/mj",
+        "perMonth": "{price}/mj",
         "popular": "Najpopularniji",
         "cta": "Uporedite pakete"
       },
@@ -243,13 +243,13 @@
     },
     "pricing": {
       "eyebrow": "Cijene",
-      "title": "Besplatno do 31.12.2026. Poslije — od 15 € mjesečno.",
+      "title": "Besplatno do 31.12.2026. Poslije — od 30 KM mjesečno.",
       "subtitle": "Registrujte se danas i koristite puni Professional paket bez ijedne marke troška do kraja 2026. Bez kartice.",
       "freeBadge": "Besplatno do 31.12.2026",
       "popular": "Najpopularniji",
       "vat": "sa PDV-om",
-      "perMonth": "{amount} €/mj",
-      "from": "od {amount} €/mj",
+      "perMonth": "{price}/mj",
+      "from": "od {price}/mj",
       "cta": "Registruj se besplatno",
       "annualNote": "Od 2027. godišnja pretplata donosi 2 mjeseca gratis.",
       "limits": {
@@ -393,9 +393,9 @@
           },
           "preview": {
             "title": "Plan terapije",
-            "row1": "Higijena · 40 € · završeno",
-            "row2": "Plomba 26 · 55 € · u toku",
-            "row3": "Krunica 16 · 280 € · planirano"
+            "row1": "Higijena · 40 KM · završeno",
+            "row2": "Plomba 26 · 55 KM · u toku",
+            "row3": "Krunica 16 · 280 KM · planirano"
           }
         },
         "kalendar": {
@@ -416,16 +416,16 @@
         },
         "finansije": {
           "eyebrow": "Fakture i finansije",
-          "title": "Fakture u EUR sa PDV-om — bez Excela.",
+          "title": "Fakture u KM sa PDV-om — bez Excela.",
           "body": "Od tretmana do fakture, uplata i rata. Troškovi i mjesečni izvještaji s izvozom u Excel kad vam trebaju za knjigovodstvo.",
           "bullets": {
-            "1": "Fakture u EUR sa PDV-om",
+            "1": "Fakture u KM sa PDV-om",
             "2": "Uplate, dugovanja i rate (Pro)",
             "3": "Troškovi i Excel izvještaji (Pro)"
           },
           "preview": {
             "title": "Faktura · INV-2026-0042",
-            "row1": "Ukupno · 95,00 €",
+            "row1": "Ukupno · 95,00 KM",
             "row2": "PDV 17% · uključeno",
             "row3": "Status · djelimično plaćeno"
           }
@@ -516,6 +516,7 @@
       "eyebrow": "FAQ",
       "title": "Česta pitanja",
       "subtitle": "Odgovori o registraciji, cijenama, sigurnosti i svakodnevnom korištenju.",
+      "navAria": "Kategorije pitanja",
       "categories": {
         "gettingStarted": {
           "eyebrow": "Početak",
@@ -658,7 +659,7 @@
       },
       "pricing": {
         "title": "Cijene — DentOrd",
-        "description": "Paketi Starter, Professional, Premium AI i Enterprise. Cijene u EUR sa PDV-om. Besplatno do kraja 2026."
+        "description": "Paketi Starter, Professional, Premium AI i Enterprise. Cijene u KM sa PDV-om. Besplatno do kraja 2026."
       },
       "features": {
         "title": "Funkcije — DentOrd",
@@ -666,7 +667,7 @@
       },
       "whyDentord": {
         "title": "Zašto DentOrd",
-        "description": "Napravljen za BiH, Hrvatsku i Srbiju: jezik našeg regiona, EUR + PDV, EU hosting i GDPR."
+        "description": "Napravljen za BiH, Hrvatsku i Srbiju: jezik našeg regiona, KM + PDV, EU hosting i GDPR."
       },
       "tour": {
         "title": "Tour — DentOrd",
@@ -770,9 +771,9 @@
         },
         "services": {
           "title": "Cjenovnik usluga",
-          "body": "Dodajte usluge ručno ili uvezite CSV. Cijene u EUR s PDV-om — spremno za fakture.",
+          "body": "Dodajte usluge ručno ili uvezite CSV. Cijene u KM s PDV-om — spremno za fakture.",
           "a1": "Ručni unos ili CSV import",
-          "a2": "EUR + PDV po stavci"
+          "a2": "KM + PDV po stavci"
         },
         "team": {
           "title": "Pozovite tim",
@@ -824,7 +825,7 @@
         },
         "invoice": {
           "title": "Faktura iz tretmana",
-          "body": "Iz završenog tretmana generišete fakturu u EUR s PDV-om i brendom ordinacije.",
+          "body": "Iz završenog tretmana generišete fakturu u KM s PDV-om i brendom ordinacije.",
           "a1": "Stavke s PDV-om",
           "a2": "PDF spreman za slanje"
         },
@@ -887,9 +888,9 @@
         },
         "services": {
           "title": "Cjenovnik",
-          "row1": "Kontrola · 25 €",
-          "row2": "Plomba · 45 €",
-          "row3": "Higijena · 35 €"
+          "row1": "Kontrola · 25 KM",
+          "row2": "Plomba · 45 KM",
+          "row3": "Higijena · 35 KM"
         },
         "team": {
           "title": "Pozivnice",
@@ -917,8 +918,8 @@
         },
         "plan": {
           "title": "Plan terapije",
-          "row1": "Plomba 16 · 45 €",
-          "row2": "Higijena · 35 €",
+          "row1": "Plomba 16 · 45 KM",
+          "row2": "Higijena · 35 KM",
           "row3": "Kontrola · zakazano"
         },
         "calendar": {
@@ -942,14 +943,14 @@
         },
         "invoice": {
           "title": "Faktura FA-2026-014",
-          "row1": "Plomba · 45 €",
+          "row1": "Plomba · 45 KM",
           "row2": "PDV 17%",
-          "row3": "Ukupno 52,65 €"
+          "row3": "Ukupno 52,65 KM"
         },
         "payments": {
           "title": "Uplate",
-          "row1": "Uplaćeno 30 €",
-          "row2": "Preostalo 22,65 €",
+          "row1": "Uplaćeno 30 KM",
+          "row2": "Preostalo 22,65 KM",
           "row3": "2 rate"
         },
         "reports": {
@@ -1016,7 +1017,7 @@
             "title": "Dashboard",
             "caption": "KPI i današnji termini na jednom ekranu.",
             "row1": "12 pacijenata",
-            "row2": "480 € danas",
+            "row2": "480 KM danas",
             "row3": "8 termina"
           },
           "patients": {
@@ -1042,9 +1043,9 @@
           },
           "invoice": {
             "title": "Fakture",
-            "caption": "EUR + PDV, brend ordinacije.",
+            "caption": "KM + PDV, brend ordinacije.",
             "row1": "FA-2026-014",
-            "row2": "52,65 €",
+            "row2": "52,65 KM",
             "row3": "Plaćeno djelomično"
           },
           "crm": {
@@ -1080,7 +1081,7 @@
     "whyDentord": {
       "eyebrow": "Zašto DentOrd",
       "title": "Zašto ordinacije biraju DentOrd?",
-      "subtitle": "Umjesto papira i Excela — jedna aplikacija na jeziku našeg regiona, s EUR + PDV-om, EU hostingom i jasnim ulogama za cijeli tim.",
+      "subtitle": "Umjesto papira i Excela — jedna aplikacija na jeziku našeg regiona, s KM + PDV-om, EU hostingom i jasnim ulogama za cijeli tim.",
       "beforeAfter": {
         "eyebrow": "Prije / poslije",
         "title": "Isti posao — manje haosa.",
@@ -1098,7 +1099,7 @@
           },
           "invoices": {
             "before": "Ručne fakture, greške u PDV-u i nejasno ko je šta naplatio.",
-            "after": "Fakture u EUR sa PDV-om, uplate, rate i pregled dugovanja."
+            "after": "Fakture u KM sa PDV-om, uplate, rate i pregled dugovanja."
           },
           "reminders": {
             "before": "Podsjetnici ručno — ili nikako. Više no-show-ova.",
@@ -1124,7 +1125,7 @@
             "body": "Interfejs i komunikacija na jeziku našeg regiona; engleski je sekundarni jezik (D37)."
           },
           "currency": {
-            "title": "EUR + PDV",
+            "title": "KM + PDV",
             "body": "Cijene i fakture u eurima s PDV-om — bez ručnog prepravljanja za lokalnu praksu."
           },
           "phone": {
@@ -1316,14 +1317,14 @@
     "listDescription": "Filtriraj po kategoriji ili opisu.",
     "activeTotal": "Aktivni zbir (prikaz)",
     "createTitle": "Novi rashod",
-    "createDescription": "Iznosi u EUR. Storniranje umjesto brisanja.",
+    "createDescription": "Iznosi u {currency}. Storniranje umjesto brisanja.",
     "searchPlaceholder": "Opis ili dobavljač…",
     "search": "Traži",
     "categoryFilter": "Kategorija",
     "categoryAll": "Sve",
     "category": "Kategorija",
     "description": "Opis",
-    "amount": "Iznos (EUR)",
+    "amount": "Iznos ({currency})",
     "date": "Datum",
     "vendor": "Dobavljač",
     "notes": "Napomena",
@@ -1469,7 +1470,7 @@
     "invoice": "Faktura",
     "backToList": "← Sve fakture",
     "downloadPdf": "Preuzmi PDF",
-    "totalsSummary": "Osnovica {subtotal} EUR · PDV {vat} EUR · Ukupno {total} EUR · Dug {balance} EUR",
+    "totalsSummary": "Osnovica {subtotal} · PDV {vat} · Ukupno {total} · Dug {balance}",
     "voidedReason": "Razlog storniranja",
     "paymentsTitle": "Uplate",
     "paymentsDescription": "Samo evidencija do Stripe 2027 (D5). Append-only.",
@@ -1492,7 +1493,7 @@
     "createPlan": "Kreiraj plan",
     "planCreated": "Plan rata kreiran.",
     "cancelPlan": "Otkaži plan",
-    "activePlan": "Aktivni plan: {count} rata · {total} EUR",
+    "activePlan": "Aktivni plan: {count} rata · {total}",
     "noPlan": "Nema aktivnog plana rata.",
     "legalName": "Pravno ime",
     "taxId": "Poreski ID / PDV broj",
@@ -1817,7 +1818,7 @@
     "serviceName": "Naziv usluge",
     "serviceCode": "Šifra",
     "durationMinutes": "Trajanje (min)",
-    "priceEur": "Cijena (EUR)",
+    "priceEur": "Cijena ({currency})",
     "vatRate": "PDV (npr. 0.17)",
     "addService": "Dodaj uslugu",
     "serviceCreated": "Usluga dodana.",
@@ -1900,7 +1901,7 @@
     },
     "services": {
       "title": "Usluge",
-      "description": "Vlasnik ili računovodstvo. Obavezno: naziv i cijena (EUR).",
+      "description": "Vlasnik ili računovodstvo. Obavezno: naziv i cijena ({currency}).",
       "columns": "Kolone (EN ili BS aliasi):",
       "headerLine": "name,code,duration_minutes,price_eur,vat_rate",
       "exampleLine": "Pregled,PR01,30,50,0.17"
@@ -2021,6 +2022,7 @@
     "notes": "Napomene",
     "allergiesTitle": "Alergije",
     "allergiesDescription": "Važne alergije za klinički rad.",
+    "allergyWarningTitle": "Upozorenje: alergije",
     "allergen": "Alergen",
     "severity": "Ozbiljnost",
     "allergyNotes": "Napomena",
@@ -2092,7 +2094,7 @@
   },
   "Services": {
     "title": "Usluge",
-    "subtitle": "Cjenovnik usluga (EUR sa PDV-om).",
+    "subtitle": "Cjenovnik usluga ({currency} sa PDV-om).",
     "new": "Nova usluga",
     "newTitle": "Nova usluga",
     "newDescription": "Samo vlasnik može uređivati cjenovnik.",
@@ -2114,7 +2116,7 @@
     "name": "Naziv",
     "code": "Šifra",
     "durationMinutes": "Trajanje (min)",
-    "priceEur": "Cijena (EUR)",
+    "priceEur": "Cijena ({currency})",
     "vatRate": "PDV stopa (0–1)",
     "location": "Lokacija",
     "locationAll": "Sve lokacije",
@@ -2188,7 +2190,7 @@
     "service": "Usluga",
     "tooth": "Zub (FDI)",
     "toothNone": "Bez zuba",
-    "estimatedPrice": "Procjena (EUR)",
+    "estimatedPrice": "Procjena ({currency})",
     "create": "Kreiraj plan",
     "addItem": "Dodaj stavku",
     "submitting": "Sačekaj…",
@@ -2202,7 +2204,7 @@
     "readOnly": "Samo owner i doktor mogu uređivati plan terapije.",
     "planCreated": "Plan je kreiran.",
     "itemAdded": "Stavka je dodana.",
-    "estimateTotal": "Procjena: {amount} €",
+    "estimateTotal": "Procjena: {amount}",
     "columns": {
       "service": "Usluga",
       "tooth": "Zub",

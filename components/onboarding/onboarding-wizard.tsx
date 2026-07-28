@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { BRAND_LOGO, PRODUCT_NAME } from "@/lib/brand/constants";
+import { currencyLabel } from "@/lib/money/format";
 import {
   advanceOnboardingServicesAction,
   createOnboardingServiceAction,
@@ -294,6 +295,7 @@ function StepServices({
   onBack: () => void;
 }) {
   const t = useTranslations("Onboarding");
+  const locale = useLocale();
   const [localCount, setLocalCount] = useState(serviceCount);
   const [createState, createAction, createPending] = useActionState(
     createOnboardingServiceAction,
@@ -354,7 +356,9 @@ function StepServices({
               />
             </Field>
             <Field>
-              <FieldLabel htmlFor="priceEur">{t("priceEur")}</FieldLabel>
+              <FieldLabel htmlFor="priceEur">
+                {t("priceEur", { currency: currencyLabel(locale) })}
+              </FieldLabel>
               <Input
                 id="priceEur"
                 name="priceEur"

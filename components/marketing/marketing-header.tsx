@@ -53,7 +53,7 @@ export function MarketingHeader({ showBlogNav = false }: MarketingHeaderProps) {
       className={cn(
         "sticky top-0 z-40 border-b transition-[background-color,border-color,backdrop-filter] duration-200",
         scrolled
-          ? "border-[var(--marketing-mist)] bg-white/90 backdrop-blur-md"
+          ? "border-[var(--marketing-mist)] bg-white"
           : "border-transparent bg-white",
       )}
     >
@@ -118,22 +118,26 @@ export function MarketingHeader({ showBlogNav = false }: MarketingHeaderProps) {
       {open ? (
         <div
           id="marketing-mobile-nav"
-          className="fixed inset-0 top-16 z-40 bg-white lg:hidden"
+          className={cn(
+            "fixed inset-0 top-16 z-50 lg:hidden",
+            "animate-in fade-in slide-in-from-top-2 duration-200",
+            "border-t border-[var(--marketing-mist)] bg-white",
+          )}
         >
-          <nav className="mx-auto flex h-[calc(100dvh-4rem)] w-full max-w-[1200px] flex-col px-6 pb-8 pt-4">
+          <nav className="mx-auto flex h-[calc(100dvh-4rem)] w-full max-w-[1200px] flex-col bg-white px-6 pb-8 pt-4">
             <div className="flex flex-1 flex-col gap-1 overflow-y-auto">
               {navLinks.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={() => setOpen(false)}
-                  className="rounded-xl px-3 py-3 text-base font-medium text-[var(--marketing-ink)] hover:bg-[var(--marketing-wash)]"
+                  className="rounded-xl px-3 py-3 text-base font-medium text-[var(--marketing-ink)] transition-colors hover:bg-[var(--marketing-wash)]"
                 >
                   {t(item.labelKey)}
                 </Link>
               ))}
             </div>
-            <div className="mt-4 space-y-3 border-t border-[var(--marketing-mist)] pt-4">
+            <div className="mt-4 space-y-3 border-t border-[var(--marketing-mist)] bg-white pt-4">
               <LocaleSwitcher className="w-fit" />
               <Link
                 href="/login"

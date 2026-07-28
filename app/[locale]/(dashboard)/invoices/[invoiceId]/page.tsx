@@ -25,6 +25,7 @@ import {
 import { clinicHasFeature } from "@/lib/entitlements";
 import { canAccessInvoices, canWriteInvoices } from "@/lib/invoices/rbac";
 import { formatInvoiceNumber, roundMoney } from "@/lib/invoices/money";
+import { formatMoney } from "@/lib/money/format";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -160,10 +161,10 @@ export default async function InvoiceDetailPage({ params }: Props) {
           <CardTitle>{t("lines")}</CardTitle>
           <CardDescription>
             {t("totalsSummary", {
-              subtotal: Number(invoice!.subtotal_amount).toFixed(2),
-              vat: Number(invoice!.vat_amount).toFixed(2),
-              total: total.toFixed(2),
-              balance: balance.toFixed(2),
+              subtotal: formatMoney(Number(invoice!.subtotal_amount), locale),
+              vat: formatMoney(Number(invoice!.vat_amount), locale),
+              total: formatMoney(total, locale),
+              balance: formatMoney(balance, locale),
             })}
           </CardDescription>
         </CardHeader>
@@ -240,7 +241,7 @@ export default async function InvoiceDetailPage({ params }: Props) {
                       {t(`methods.${payment.method}`)}
                     </TableCell>
                     <TableCell className="text-right">
-                      {Number(payment.amount).toFixed(2)} EUR
+                      {formatMoney(Number(payment.amount), locale)}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -267,7 +268,7 @@ export default async function InvoiceDetailPage({ params }: Props) {
               <p className="text-sm">
                 {t("activePlan", {
                   count: activePlan.installment_count,
-                  total: Number(activePlan.total_amount).toFixed(2),
+                  total: formatMoney(Number(activePlan.total_amount), locale),
                 })}
               </p>
               <Table>
@@ -300,7 +301,7 @@ export default async function InvoiceDetailPage({ params }: Props) {
                         <TableCell>{inst.sequence_number}</TableCell>
                         <TableCell>{inst.due_date}</TableCell>
                         <TableCell className="text-right">
-                          {Number(inst.amount).toFixed(2)} EUR
+                          {formatMoney(Number(inst.amount), locale)}
                         </TableCell>
                         <TableCell>
                           {t(`installmentStatus.${inst.status}` as "installmentStatus.pending")}

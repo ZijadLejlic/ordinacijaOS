@@ -1,0 +1,7 @@
+Apache License
+Version 2.0, January 2004
+http://www.apache.org/licenses/
+
+Roboto font files in this directory are Copyright Google LLC.
+Licensed under the Apache License, Version 2.0.
+See https://github.com/googlefonts/roboto-2 for the full license text.

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-21T20:20:31.262Z",
+  "generatedAt": "2026-07-28T21:14:05.131Z",
   "shots": [
     "signup",
     "onboarding-1",
@@ -23,5 +23,5 @@
     "mobile-calendar",
     "mobile-chart"
   ],
-  "note": "Content panels for BrowserFrame; phone shots include device chrome."
+  "note": "Dense app-chrome mocks for BrowserFrame; phone shots include device chrome."
 }

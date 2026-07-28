@@ -6,6 +6,10 @@ import {
   PRODUCT_URL,
 } from "@/lib/brand/constants";
 import { MARKETING_PLANS } from "@/lib/marketing/plans";
+import {
+  amountForLocale,
+  currencyForLocale,
+} from "@/lib/money/format";
 
 type JsonLdValue =
   | string
@@ -35,12 +39,13 @@ export function softwareApplicationJsonLd(input: {
     href: "/pricing",
   });
   const pricingUrl = `${PRODUCT_URL}${pricingPath}`;
+  const priceCurrency = currencyForLocale(input.locale);
 
   const offers = MARKETING_PLANS.map((plan) => ({
     "@type": "Offer",
     name: plan.code,
-    price: String(plan.priceMonthly ?? 60),
-    priceCurrency: "EUR",
+    price: String(amountForLocale(plan.priceMonthly ?? 60, input.locale)),
+    priceCurrency,
     url: pricingUrl,
   }));
 

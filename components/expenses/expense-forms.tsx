@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,6 +20,7 @@ import {
   voidExpenseAction,
   type ExpenseActionState,
 } from "@/lib/expenses/actions";
+import { formatMoney, currencyLabel } from "@/lib/money/format";
 import {
   EXPENSE_CATEGORIES,
   type ExpenseCategory,
@@ -125,6 +126,7 @@ export function ExpenseSearchForm({
 
 export function CreateExpenseForm() {
   const t = useTranslations("Expenses");
+  const locale = useLocale();
   const formRef = useRef<HTMLFormElement>(null);
   const [state, action, pending] = useActionState(
     createExpenseAction,
@@ -152,7 +154,9 @@ export function CreateExpenseForm() {
         </Field>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field>
-            <FieldLabel htmlFor="amount">{t("amount")}</FieldLabel>
+            <FieldLabel htmlFor="amount">
+              {t("amount", { currency: currencyLabel(locale) })}
+            </FieldLabel>
             <Input
               id="amount"
               name="amount"
@@ -189,6 +193,7 @@ export function CreateExpenseForm() {
 
 function EditExpenseForm({ row }: { row: ExpenseRow }) {
   const t = useTranslations("Expenses");
+  const locale = useLocale();
   const [state, action, pending] = useActionState(
     updateExpenseAction,
     null as ExpenseActionState,
@@ -219,7 +224,9 @@ function EditExpenseForm({ row }: { row: ExpenseRow }) {
         </Field>
         <div className="grid gap-3 sm:grid-cols-2">
           <Field>
-            <FieldLabel htmlFor={`amt-${row.id}`}>{t("amount")}</FieldLabel>
+            <FieldLabel htmlFor={`amt-${row.id}`}>
+              {t("amount", { currency: currencyLabel(locale) })}
+            </FieldLabel>
             <Input
               id={`amt-${row.id}`}
               name="amount"
@@ -309,6 +316,7 @@ export function ExpensesTable({
   canWrite: boolean;
 }) {
   const t = useTranslations("Expenses");
+  const locale = useLocale();
   const [editingId, setEditingId] = useState<string | null>(null);
 
   if (rows.length === 0) {
@@ -352,7 +360,7 @@ export function ExpensesTable({
                   ) : null}
                 </TableCell>
                 <TableCell className="text-right whitespace-nowrap">
-                  {row.amount.toFixed(2)} €
+                  {formatMoney(row.amount, locale)}
                 </TableCell>
                 <TableCell>
                   {voided ? t("statusVoid") : t("statusActive")}

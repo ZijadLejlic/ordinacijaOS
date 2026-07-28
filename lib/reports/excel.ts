@@ -29,10 +29,12 @@ export type ExcelMonthRow = {
 export async function buildFinanceWorkbook(opts: {
   clinicName: string;
   generatedAt: string;
+  currencyLabel?: string;
   expenses: ExcelExpenseRow[];
   payments: ExcelPaymentRow[];
   months: ExcelMonthRow[];
 }): Promise<Buffer> {
+  const currency = opts.currencyLabel ?? "EUR";
   const workbook = new ExcelJS.Workbook();
   workbook.creator = PRODUCT_NAME;
   workbook.created = new Date();
@@ -40,9 +42,9 @@ export async function buildFinanceWorkbook(opts: {
   const summary = workbook.addWorksheet("Profit");
   summary.columns = [
     { header: "Month", key: "month", width: 12 },
-    { header: "Revenue EUR", key: "revenue", width: 14 },
-    { header: "Expenses EUR", key: "expenses", width: 14 },
-    { header: "Profit EUR", key: "profit", width: 14 },
+    { header: `Revenue ${currency}`, key: "revenue", width: 14 },
+    { header: `Expenses ${currency}`, key: "expenses", width: 14 },
+    { header: `Profit ${currency}`, key: "profit", width: 14 },
   ];
   for (const row of opts.months) {
     summary.addRow(row);
@@ -67,7 +69,7 @@ export async function buildFinanceWorkbook(opts: {
     { header: "Category", key: "category", width: 14 },
     { header: "Description", key: "description", width: 36 },
     { header: "Vendor", key: "vendor", width: 20 },
-    { header: "Amount EUR", key: "amount", width: 14 },
+    { header: `Amount ${currency}`, key: "amount", width: 14 },
     { header: "Status", key: "status", width: 10 },
   ];
   for (const row of opts.expenses) {
@@ -80,7 +82,7 @@ export async function buildFinanceWorkbook(opts: {
     { header: "Paid at", key: "paidAt", width: 20 },
     { header: "Invoice", key: "invoiceNumber", width: 12 },
     { header: "Method", key: "method", width: 14 },
-    { header: "Amount EUR", key: "amount", width: 14 },
+    { header: `Amount ${currency}`, key: "amount", width: 14 },
     { header: "Doctor", key: "doctorName", width: 22 },
   ];
   for (const row of opts.payments) {
@@ -91,7 +93,7 @@ export async function buildFinanceWorkbook(opts: {
   const meta = workbook.addWorksheet("Meta");
   meta.addRow(["Clinic", opts.clinicName]);
   meta.addRow(["Generated at", opts.generatedAt]);
-  meta.addRow(["Currency", "EUR"]);
+  meta.addRow(["Currency", currency]);
 
   const buffer = await workbook.xlsx.writeBuffer();
   return Buffer.from(buffer);

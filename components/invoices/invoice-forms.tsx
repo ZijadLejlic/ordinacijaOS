@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useMemo, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -24,6 +24,7 @@ import {
   type InvoiceActionState,
 } from "@/lib/invoices/actions";
 import { formatInvoiceNumber, roundMoney } from "@/lib/invoices/money";
+import { formatMoney } from "@/lib/money/format";
 import { Link } from "@/i18n/navigation";
 
 const KNOWN_ERRORS = [
@@ -129,6 +130,7 @@ export function InvoicesTable({
   }[];
 }) {
   const t = useTranslations("Invoices");
+  const locale = useLocale();
   if (rows.length === 0) {
     return <p className="text-muted-foreground text-sm">{t("empty")}</p>;
   }
@@ -163,10 +165,10 @@ export function InvoicesTable({
               {t(`status.${row.status}` as "status.unpaid")}
             </TableCell>
             <TableCell className="text-right">
-              {row.total.toFixed(2)} EUR
+              {formatMoney(row.total, locale)}
             </TableCell>
             <TableCell className="text-right">
-              {row.balance.toFixed(2)} EUR
+              {formatMoney(row.balance, locale)}
             </TableCell>
             <TableCell>
               {new Date(row.issuedAt).toLocaleDateString()}

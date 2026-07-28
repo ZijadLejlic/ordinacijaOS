@@ -82,7 +82,7 @@ function termsBs(): LegalDocument {
         id: "naknade",
         title: "9. Naknade, PDV i neplaćanje",
         paragraphs: [
-          "Cijene su u EUR sa PDV-om kako je prikazano na stranici Cijene. Metered troškovi (npr. SMS/WhatsApp, AI) naplaćuju se od uključivanja kanala po objavljenim jediničnim cijenama.",
+          "Cijene su u KM sa PDV-om kako je prikazano na stranici Cijene. Metered troškovi (npr. SMS/WhatsApp, AI) naplaćuju se od uključivanja kanala po objavljenim jediničnim cijenama.",
           "Neplaćanje može dovesti do readonly režima, a zatim do brisanja u skladu s politikom čuvanja i grace periodom za export.",
         ],
       },

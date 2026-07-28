@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: process.cwd(),
   },
+  // Bundle Roboto for invoice/consent PDF generation (Latin Extended diacritics).
+  outputFileTracingIncludes: {
+    "/api/**/*": ["./assets/fonts/**/*"],
+    "/*": ["./assets/fonts/**/*"],
+  },
   // Patient PDFs allow 20 MB; Server Actions default to 1 MB and reject larger
   // image/document uploads with 413 before the action runs (prod smoke finding).
   experimental: {

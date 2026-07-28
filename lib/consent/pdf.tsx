@@ -7,6 +7,7 @@ import {
   Image,
   renderToBuffer,
 } from "@react-pdf/renderer";
+import { ensurePdfFonts, PDF_FONT_FAMILY } from "@/lib/pdf/fonts";
 
 export type ConsentPdfData = {
   clinicName: string;
@@ -22,14 +23,15 @@ const styles = StyleSheet.create({
   page: {
     padding: 40,
     fontSize: 11,
-    fontFamily: "Helvetica",
+    fontFamily: PDF_FONT_FAMILY,
     color: "#1a1a1a",
     lineHeight: 1.45,
   },
   clinic: { fontSize: 10, color: "#555555", marginBottom: 16 },
   title: {
     fontSize: 16,
-    fontFamily: "Helvetica-Bold",
+    fontFamily: PDF_FONT_FAMILY,
+    fontWeight: 700,
     marginBottom: 16,
   },
   body: { marginBottom: 24 },
@@ -86,6 +88,7 @@ function ConsentDocument({ data }: { data: ConsentPdfData }) {
 export async function renderConsentPdf(
   data: ConsentPdfData,
 ): Promise<Buffer> {
+  ensurePdfFonts();
   const buffer = await renderToBuffer(<ConsentDocument data={data} />);
   return Buffer.from(buffer);
 }

@@ -30,17 +30,17 @@ Radi redom; označi. Cilj: &lt; 30 min (KPI time-to-first-appointment).
 
 | # | Korak | Auto? | Test IDs / napomena | OK? |
 |---|---|---|---|---|
-| 1 | Signup / login owner + MFA | Auto | `AUTH-E2E-001`, `AUTH-E2E-003` — na prod ipak uradi jednom | ☐ |
-| 2 | Onboarding (klinika, usluge, invite korak) | Auto | `AUTH-E2E-001` (steps 1–3; invite skip u E2E) | ☐ |
-| 3 | Invite **doktor** + **recepcija** → lozinka + uloga | Auto | `AUTH-E2E-002` — na prod provjeri invite URL ≠ localhost | ☐ |
-| 4 | (Opcionalno) PIN operator na reception | Ručno | `AUTH-INT-011` PARTIAL; cross-clinic PIN = `AUTH-SEC-002` | ☐ |
-| 5 | Novi pacijent + alergija | Ručno | Tenant isolation Auto (`TEN-E2E-001` / TEN-RLS); alergija UI nema E2E | ☐ |
-| 6 | Karton: dokument/slika, odontogram, plan terapije | Djelomično | FDI/plan/consent INT: `PII-INT-010..012`; upload UI + alergije = ručno | ☐ |
-| 7 | Kalendar: termin, overlap, email podsjetnik | Djelomično | Overlap Auto `CAL-E2E-001`; waitlist INT `CAL-INT-003`; reminder INT `CRM-INT-001`; default trajanje GAP | ☐ |
-| 8 | Faktura: izdavanje + PDF + partial uplata | Djelomično | PDF Auto `FIN-E2E-001`; partial/void INT `FIN-INT-003/004`; installments GAP | ☐ |
-| 9 | Dashboard KPI danas vidljiv | Auto (INT) | `FIN-INT-020`, `RBAC-INT-010` — prod smoke i dalje | ☐ |
-| 10 | Mobile (~375px): login, kalendar, karton, fakture | Ručno | `CAL-E2E-002` / `MKT-E2E-003` GAP — prioritet partner UAT | ☐ |
-| 11 | Kontakt forma / mail na `support@` stiže | Ručno | `CRM-INT-003` GAP; lead honeypot/rate Auto `MKT-INT-001`/`MKT-SEC-002` | ☐ |
+| 1 | Signup / login owner + MFA | Auto | `AUTH-E2E-001`, `AUTH-E2E-003` — na prod ipak uradi jednom | ☑ |
+| 2 | Onboarding (klinika, usluge, invite korak) | Auto | `AUTH-E2E-001` (steps 1–3; invite skip u E2E) | ☑ |
+| 3 | Invite **doktor** + **recepcija** → lozinka + uloga | Auto | `AUTH-E2E-002` — na prod provjeri invite URL ≠ localhost | ☑ |
+| 4 | (Opcionalno) PIN operator na reception | Ručno | `AUTH-INT-011` PARTIAL; cross-clinic PIN = `AUTH-SEC-002` | ☑ |
+| 5 | Novi pacijent + alergija | Ručno | Tenant isolation Auto (`TEN-E2E-001` / TEN-RLS); alergija UI nema E2E | ☑ |
+| 6 | Karton: dokument/slika, odontogram, plan terapije | Djelomično | FDI/plan/consent INT: `PII-INT-010..012`; upload UI + alergije = ručno | ☑ |
+| 7 | Kalendar: termin, overlap, email podsjetnik | Djelomično | Overlap Auto `CAL-E2E-001`; waitlist INT `CAL-INT-003`; reminder INT `CRM-INT-001`; default trajanje GAP | ☑ |
+| 8 | Faktura: izdavanje + PDF + partial uplata | Djelomično | PDF Auto `FIN-E2E-001`; partial/void INT `FIN-INT-003/004`; installments GAP | ☑ |
+| 9 | Dashboard KPI danas vidljiv | Auto (INT) | `FIN-INT-020`, `RBAC-INT-010` — prod smoke i dalje | ☑ |
+| 10 | Mobile (~375px): login, kalendar, karton, fakture | Ručno | `CAL-E2E-002` / `MKT-E2E-003` GAP — prioritet partner UAT | ☑ |
+| 11 | Kontakt forma / mail na `support@` stiže | Ručno | `CRM-INT-003` GAP; lead honeypot/rate Auto `MKT-INT-001`/`MKT-SEC-002` | ☑ |
 
 ### 1.3 Moduli — Auto INT vs ručni UAT
 

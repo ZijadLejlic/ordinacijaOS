@@ -8,6 +8,11 @@ import {
   Image,
 } from "@react-pdf/renderer";
 import { formatInvoiceNumber, roundMoney } from "@/lib/invoices/money";
+import { ensurePdfFonts, PDF_FONT_FAMILY } from "@/lib/pdf/fonts";
+import {
+  formatMoney,
+  type DisplayCurrency,
+} from "@/lib/money/format";
 
 export type InvoicePdfLine = {
   description: string;
@@ -26,7 +31,7 @@ export type InvoicePdfData = {
   seriesYear: number;
   seriesNumber: number;
   issuedAt: string;
-  currency: string;
+  currency: DisplayCurrency;
   subtotalAmount: number;
   vatAmount: number;
   totalAmount: number;
@@ -39,7 +44,7 @@ const styles = StyleSheet.create({
   page: {
     padding: 40,
     fontSize: 10,
-    fontFamily: "Helvetica",
+    fontFamily: PDF_FONT_FAMILY,
     color: "#1a1a1a",
   },
   header: {
@@ -48,7 +53,12 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   logo: { width: 72, height: 72, objectFit: "contain" },
-  title: { fontSize: 18, fontFamily: "Helvetica-Bold", marginBottom: 4 },
+  title: {
+    fontSize: 18,
+    fontFamily: PDF_FONT_FAMILY,
+    fontWeight: 700,
+    marginBottom: 4,
+  },
   muted: { color: "#555555", marginBottom: 2 },
   section: { marginBottom: 16 },
   tableHeader: {
@@ -57,7 +67,8 @@ const styles = StyleSheet.create({
     borderBottomColor: "#cccccc",
     paddingBottom: 4,
     marginBottom: 4,
-    fontFamily: "Helvetica-Bold",
+    fontFamily: PDF_FONT_FAMILY,
+    fontWeight: 700,
   },
   row: {
     flexDirection: "row",
@@ -79,19 +90,20 @@ const styles = StyleSheet.create({
   },
   totalLabel: { width: 100, textAlign: "right", color: "#555555" },
   totalValue: { width: 80, textAlign: "right" },
-  grandTotal: { fontFamily: "Helvetica-Bold", fontSize: 12 },
+  grandTotal: {
+    fontFamily: PDF_FONT_FAMILY,
+    fontWeight: 700,
+    fontSize: 12,
+  },
+  bold: {
+    fontFamily: PDF_FONT_FAMILY,
+    fontWeight: 700,
+    marginBottom: 2,
+  },
 });
 
-function money(n: number, currency: string, locale: string) {
-  try {
-    return new Intl.NumberFormat(locale === "bs" ? "bs-BA" : "en-US", {
-      style: "currency",
-      currency,
-      minimumFractionDigits: 2,
-    }).format(n);
-  } catch {
-    return `${roundMoney(n).toFixed(2)} ${currency}`;
-  }
+function money(n: number, currency: DisplayCurrency, locale: string) {
+  return formatMoney(n, locale, currency);
 }
 
 function InvoiceDocument({ data }: { data: InvoicePdfData }) {
@@ -128,7 +140,7 @@ function InvoiceDocument({ data }: { data: InvoicePdfData }) {
         </View>
 
         <View style={styles.section}>
-          <Text style={{ fontFamily: "Helvetica-Bold", marginBottom: 2 }}>
+          <Text style={styles.bold}>
             {data.locale === "bs" ? "Pacijent" : "Patient"}
           </Text>
           <Text>{data.patientName}</Text>
@@ -193,7 +205,7 @@ function InvoiceDocument({ data }: { data: InvoicePdfData }) {
 
         {data.notes ? (
           <View style={[styles.section, { marginTop: 24 }]}>
-            <Text style={{ fontFamily: "Helvetica-Bold", marginBottom: 2 }}>
+            <Text style={styles.bold}>
               {data.locale === "bs" ? "Napomena" : "Notes"}
             </Text>
             <Text>{data.notes}</Text>
@@ -207,6 +219,7 @@ function InvoiceDocument({ data }: { data: InvoicePdfData }) {
 export async function renderInvoicePdf(
   data: InvoicePdfData,
 ): Promise<Buffer> {
+  ensurePdfFonts();
   const buffer = await renderToBuffer(<InvoiceDocument data={data} />);
   return Buffer.from(buffer);
 }
