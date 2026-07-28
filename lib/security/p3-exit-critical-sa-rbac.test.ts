@@ -33,7 +33,7 @@ import {
  *   RBAC-INT-022 createInvite doctor deny
  *   RBAC-INT-023 approvePatientErasure doctor deny
  *   RBAC-INT-024 requestClinicClosure SA doctor deny
- *   RBAC-INT-025 voidInvoice doctor deny
+ *   RBAC-INT-025 voidInvoice doctor role allow (D53) → invoiceNotFound on missing id
  *   RBAC-INT-026 waitlist doctor deny
  *   RBAC-INT-027 onboarding doctor deny
  *
@@ -223,13 +223,13 @@ describeSecurity("P3 exit Critical SA wrong-role + module polarity gaps", () => 
     expect(result).toEqual({ error: "forbidden" });
   });
 
-  it("RBAC-INT-025: doctor voidInvoiceAction → forbidden", async () => {
+  it("RBAC-INT-025: doctor voidInvoiceAction passes role gate (D53); missing id → invoiceNotFound", async () => {
     asRole("doctor");
     const fd = new FormData();
     fd.set("invoiceId", FAKE_UUID);
-    fd.set("reason", "RBAC deny probe");
+    fd.set("reason", "RBAC allow probe");
     const result = await voidInvoiceAction(null, fd);
-    expect(result).toEqual({ error: "forbidden" });
+    expect(result).toEqual({ error: "invoiceNotFound" });
   });
 
   it("RBAC-INT-026: doctor addWaitlistAction → forbidden", async () => {

@@ -82,6 +82,8 @@ Odluke su finalne za v1 planiranje. Agent/developer **ne nagađa** mimo ovog log
 | D49 | Buyer | Primarno **vlasnik ordinacije** |
 | D50 | Security stance | Alat za evidenciju; medicinske odluke donosi doktor |
 | D51 | Cross-clinic membership | v1 ostaje **1 user = 1 klinika** (D7). **Poslije razmotriti**: `clinic_memberships` + aktivna klinika / switcher (npr. doktor u više ordinacija) |
+| D52 | Appointment reminder send | Owner + reception + **doktor (samo svoj termin)**; edit šablona ostaje owner; CRM send ostaje owner/reception (D24) |
+| D53 | Invoice issue by doctor | Doktor može **izdati fakturu**, PDF i uplate (kao accountant); rashodi/Excel i legal settings ostaju owner/accountant |
 
 ---
 
@@ -143,7 +145,7 @@ Razlikovanje od postojećih rješenja (alpinDent i slični):
 | Rola | Opis | Paket |
 |---|---|---|
 | `owner` | Vlasnik; finansije, useri, settings, branding, GDPR approve | Svi |
-| `doctor` | Pacijenti, karton, odontogram, plan terapije, svoji termini, tretmani | Svi |
+| `doctor` | Pacijenti, karton, odontogram, plan terapije, svoji termini, tretmani, **podsjetnik na svoj termin**, **fakture/uplate** | Svi |
 | `assistant` | Raspored, priprema pacijenata; shared + PIN | Pro+ |
 | `reception` | Termini, osnovni podaci, slanje reminder/CRM poruka; shared + PIN | Svi |
 | `accountant` | Finansije (fakture, uplate, rashodi, export) | Pro+ |
@@ -158,9 +160,9 @@ Razlikovanje od postojećih rješenja (alpinDent i slični):
 | Pacijenti / karton | Da | Da | Read/assist | Osnovno | Ne |
 | Odontogram / plan terapije | Da | Da | Read | Ne | Ne |
 | Kalendar | Da | Svoji (+ filter) | Da | Svi | Ne |
-| Fakture / uplate | Da | Ne* | Ne | Ne | Da |
+| Fakture / uplate | Da | Da (D53) | Ne | Ne | Da |
 | Rashodi / Excel | Da | Ne | Ne | Ne | Da |
-| Email šabloni | Da | Ne | Ne | Read/send | Ne |
+| Email šabloni | Da | Send\* | Ne | Read/send | Ne |
 | CRM notifikacije / waitlist | Da | Ne | Ne | Da | Ne |
 | Korisnici / invite | Da | Ne | Ne | Ne | Ne |
 | Settings / branding | Da | Ne | Ne | Ne | Ne |
@@ -168,7 +170,9 @@ Razlikovanje od postojećih rješenja (alpinDent i slični):
 | Audit log UI | Da | Ne | Ne | Ne | Ne |
 | Inventar basic | Da | Da | Da | Da | Ne |
 
-\* Doktor može vidjeti iznose na **vlastitim** unosima; tuđi KM zavise od clinic settinga `doctors_see_peer_amounts`.
+\* Dashboard KPI: doktor vidi iznose na **vlastitim** unosima; tuđi KM zavise od clinic settinga `doctors_see_peer_amounts` (D17).
+\* Email: doktor **šalje podsjetnik samo za svoj termin** iz kalendara (D52); ne edituje šablone i nema `/settings/email`. CRM send ostaje owner/reception (D24).
+\* Fakture (D53): doktor izdaje/PDF/uplate; **ne** rashodi/Excel; legal invoice settings ostaju owner.
 
 ### 3.3 Staff invite flow (zaključano)
 

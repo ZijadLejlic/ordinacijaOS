@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { writeAuditEvent } from "@/lib/audit/log";
 import { getClinicWriteBlock } from "@/lib/clinic/writable";
 import { sendTemplatedEmail } from "@/lib/email/resend";
+import { canManageAllDoctors } from "@/lib/calendar/rbac";
 import {
   canReadEmailTemplates,
   canSendEmailReminders,
@@ -179,6 +180,11 @@ export async function sendTestEmailAction(
   const { error, supabase, user, profile } = await requireEmailAccess("send");
   if (error || !user || !profile) return { error: error ?? "unauthorized" };
 
+  // Test-to-self lives on settings/email — doctor calendar-only (D52).
+  if (!canReadEmailTemplates(profile.role)) {
+    return { error: "forbidden" };
+  }
+
   const feature = await assertFeature(
     supabase,
     profile.clinic_id,
@@ -305,6 +311,12 @@ export async function sendAppointmentReminderAction(
     .maybeSingle();
 
   if (!appointment) return { error: "appointmentNotFound" };
+  if (
+    !canManageAllDoctors(profile.role) &&
+    appointment.doctor_id !== profile.id
+  ) {
+    return { error: "forbidden" };
+  }
   if (
     appointment.status === "cancelled" ||
     appointment.status === "no_show"

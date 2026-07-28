@@ -59,7 +59,7 @@ Zaključati **kako** gradimo DentOrd (stack, patterni, granice), da agent/develo
 | Branding (Faza 2G) | `/settings/branding` — owner logo + colors (`branding_json`); feature `branding_custom` (Pro+); private bucket `clinic-branding`; applied in AppShell + invoice PDF |
 | CSV import (Faza 2H) | `/settings/import` — dry-run preview + commit; patients (owner); services (owner/accountant); CSV parse+Zod; max 500 rows / 1 MB; audit `*_csv_imported` (count only) |
 | Onboarding (Faza 2I) | `/onboarding` — owner 3-step wizard (clinic+hours → services/CSV → invite doctor|reception); `settings_json.onboarding` + `working_hours`; middleware force redirect; skip invite allowed |
-| Email (Faza 3A) | `/settings/email` — BS/EN templates (`appointment_reminder` + CRM keys); owner edit; reception read/send; calendar manual send + test to self; `outbound_messages` log; feature `email_reminders` |
+| Email (Faza 3A) | `/settings/email` — BS/EN templates (`appointment_reminder` + CRM keys); owner edit; reception read/send; **doctor sends reminder from own calendar only (D52)**; `outbound_messages` log; feature `email_reminders` |
 | CRM light (Faza 3B) | `/crm` inbox — birthday (7d) / recall (180d) / control (`next_control_at`); reception/owner send email or dismiss; nav badge; feature `crm_light`; audit `crm.notification_*` |
 | Audit log (Faza 3C) | `/settings/audit` — owner-only; `audit_events` SELECT RLS owner; filter + pagination; payload old/new when present |
 | GDPR (Faza 3C) | `/settings/privacy` + patient chart export/request; `gdpr_erasure_requests`; owner approve → `approve_gdpr_patient_erasure` hard delete + storage cleanup; JSON export `GET /api/privacy/patients/[id]/export` |
@@ -243,6 +243,8 @@ Prati PRD §11. Tech doc se širi po fazama; ne specifikovati Enterprise module 
 | 2026-07-13 | Faza 2H: `/settings/import` CSV patients+services; dry-run; `can_import_services` for accountant INSERT |
 | 2026-07-13 | Faza 2I: `/onboarding` 3-step wizard; `settings_json.onboarding`+`working_hours`; create_clinic seeds incomplete |
 | 2026-07-13 | Faza 3A: email templates + reminders (D23); `/settings/email`; calendar send; `outbound_messages` |
+| 2026-07-28 | D52: doctor may send appointment reminder for **own** calendar slot; RLS `can_send_outbound_messages` / `can_read_email_templates` + SA scope; settings/CRM unchanged |
+| 2026-07-28 | D53: doctor may access/write invoices (create, PDF, payments, void); RLS `can_access_invoices` / `can_write_invoices`; expenses + legal settings unchanged |
 | 2026-07-14 | Brand **DentOrd** / `dentord.com`; Resend From `noreply@`; `lib/brand/constants.ts`; assets u `brand/` |
 | 2026-07-14 | Faza 3B: CRM light `/crm` + `crm_notifications`; birthday/recall/control; `patients.next_control_at` |
 | 2026-07-14 | Faza 3C: owner audit UI `/settings/audit`; GDPR export + erasure approve/hard-delete `/settings/privacy` |

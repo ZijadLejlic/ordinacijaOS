@@ -323,7 +323,7 @@ Migracija `phase2d_invoices` (+ revoke anon EXECUTE follow-up).
 | `payments` | Append-only; method `cash\|card\|bank_transfer\|other`; trigger recompute invoice status; RESTRICTIVE MFA + `REVOKE UPDATE, DELETE` (D-20) |
 | `payment_plans` + `payment_plan_installments` | Rate kalkulator; app gate `installments_calculator` |
 
-**RLS helpers:** `can_access/write_invoices` (owner/accountant only — PRD §3.2). Finance `*_owner_mfa_aal2` policies are **RESTRICTIVE** (D-20 / `fix_finance_mfa_restrictive_append_only`).
+**RLS helpers:** `can_access/write_invoices` (owner / accountant / **doctor** — D53). Finance `*_owner_mfa_aal2` policies are **RESTRICTIVE** (D-20 / `fix_finance_mfa_restrictive_append_only`).
 
 **Storage:** `{clinic_id}/{patient_id}/invoices/{invoice_id}.pdf` u `patient-files` (+ finance storage policies).
 
@@ -389,7 +389,8 @@ Migracija `phase3a_email_templates` (+ seed membership guard):
 | `outbound_messages` | append-ish log (insert+status update); channel `email`; test vs appointment send |
 | `can_read_email_templates` | owner + reception |
 | `can_write_email_templates` | owner |
-| `can_send_outbound_messages` | owner + reception |
+| `can_send_outbound_messages` | owner + reception + doctor (D52; doctor SA scoped to own appt) |
+| `can_read_email_templates` | owner + reception + doctor (RLS read for send path; settings UI app-gated) |
 | `seed_default_email_templates(clinic_id)` | SECURITY DEFINER; member-only; called on clinic create + lazy ensure |
 
 **Varijable:** `{{ime}}`, `{{datum}}`, `{{vrijeme}}`, `{{ordinacija}}`, `{{doktor}}`, `{{usluga}}`.

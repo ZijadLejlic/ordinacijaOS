@@ -172,120 +172,27 @@ export function CalendarShell({
         ) : null}
       </div>
 
-      <Card>
-        <CardHeader className="gap-3 px-4 sm:px-6">
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-            <div className="min-w-0">
-              <CardTitle className="text-base leading-snug">{title}</CardTitle>
-              <CardDescription className="hidden sm:block">
-                {t("timezoneHint")}
-              </CardDescription>
-            </div>
-            <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                className="w-full sm:w-auto"
-                onClick={() =>
-                  navigate({ date: shiftAnchor(view, anchor, -1) })
-                }
-              >
-                {t("prev")}
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                className="w-full sm:w-auto"
-                onClick={() => navigate({ date: new Date() })}
-              >
-                {t("today")}
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                className="w-full sm:w-auto"
-                onClick={() =>
-                  navigate({ date: shiftAnchor(view, anchor, 1) })
-                }
-              >
-                {t("next")}
-              </Button>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-            <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
-              {(["day", "week", "month"] as const).map((v) => (
-                <Button
-                  key={v}
-                  type="button"
-                  size="sm"
-                  variant={view === v ? "default" : "outline"}
-                  className="w-full sm:w-auto"
-                  onClick={() => navigate({ view: v })}
-                >
-                  {t(`views.${v}`)}
-                </Button>
-              ))}
-            </div>
-            {canPickDoctor ? (
-              <select
-                className="border-input bg-background h-8 w-full rounded-lg border px-2 text-sm sm:h-7 sm:w-auto sm:min-w-[10rem]"
-                value={doctorFilter}
-                onChange={(e) => {
-                  setDoctorFilter(e.target.value);
-                  navigate({ doctorId: e.target.value });
-                }}
-              >
-                <option value="">{t("allDoctors")}</option>
-                {doctors.map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.fullName}
-                  </option>
-                ))}
-              </select>
-            ) : null}
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4 px-2 sm:px-6">
-          {flash ? (
-            <p className="text-sm text-emerald-700" role="status">
-              {t(`messages.${flash}` as "messages.appointmentCreated")}
-            </p>
-          ) : null}
-          {error ? <FieldError>{error}</FieldError> : null}
-
-          {view === "month" ? (
-            <MonthGrid
-              days={days}
-              currentMonthKey={monthKey}
-              appointments={filteredAppointments}
-              onSelectDay={(day) => navigate({ view: "day", date: day })}
-              onSelectAppointment={openEdit}
-            />
-          ) : (
-            <DayWeekGrid
-              days={days}
-              appointments={filteredAppointments}
-              canDrag={canDrag && canWrite}
-              onSelect={openEdit}
-              onCreatedSlot={openCreate}
-            />
-          )}
-        </CardContent>
-      </Card>
+      {flash && !panel ? (
+        <p className="text-sm text-emerald-700" role="status">
+          {t(`messages.${flash}` as "messages.appointmentCreated")}
+        </p>
+      ) : null}
+      {error && !panel ? <FieldError>{error}</FieldError> : null}
 
       {panel ? (
-        <Card>
+        <Card data-testid="calendar-appointment-panel">
           <CardHeader>
             <CardTitle className="text-base">
               {panel.type === "create" ? t("newTitle") : t("editTitle")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {flash ? (
+              <p className="text-sm text-emerald-700" role="status">
+                {t(`messages.${flash}` as "messages.appointmentCreated")}
+              </p>
+            ) : null}
+            {error ? <FieldError>{error}</FieldError> : null}
             <AppointmentForm
               mode={panel.type === "create" ? "create" : "edit"}
               initial={
@@ -412,6 +319,105 @@ export function CalendarShell({
           </CardContent>
         </Card>
       ) : null}
+
+      <Card>
+        <CardHeader className="gap-3 px-4 sm:px-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <CardTitle className="text-base leading-snug">{title}</CardTitle>
+              <CardDescription className="hidden sm:block">
+                {t("timezoneHint")}
+              </CardDescription>
+            </div>
+            <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="w-full sm:w-auto"
+                onClick={() =>
+                  navigate({ date: shiftAnchor(view, anchor, -1) })
+                }
+              >
+                {t("prev")}
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="w-full sm:w-auto"
+                onClick={() => navigate({ date: new Date() })}
+              >
+                {t("today")}
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="w-full sm:w-auto"
+                onClick={() =>
+                  navigate({ date: shiftAnchor(view, anchor, 1) })
+                }
+              >
+                {t("next")}
+              </Button>
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+            <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
+              {(["day", "week", "month"] as const).map((v) => (
+                <Button
+                  key={v}
+                  type="button"
+                  size="sm"
+                  variant={view === v ? "default" : "outline"}
+                  className="w-full sm:w-auto"
+                  onClick={() => navigate({ view: v })}
+                >
+                  {t(`views.${v}`)}
+                </Button>
+              ))}
+            </div>
+            {canPickDoctor ? (
+              <select
+                className="border-input bg-background h-8 w-full rounded-lg border px-2 text-sm sm:h-7 sm:w-auto sm:min-w-[10rem]"
+                value={doctorFilter}
+                onChange={(e) => {
+                  setDoctorFilter(e.target.value);
+                  navigate({ doctorId: e.target.value });
+                }}
+              >
+                <option value="">{t("allDoctors")}</option>
+                {doctors.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.fullName}
+                  </option>
+                ))}
+              </select>
+            ) : null}
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4 px-2 sm:px-6">
+          {view === "month" ? (
+            <MonthGrid
+              days={days}
+              currentMonthKey={monthKey}
+              appointments={filteredAppointments}
+              onSelectDay={(day) => navigate({ view: "day", date: day })}
+              onSelectAppointment={openEdit}
+            />
+          ) : (
+            <DayWeekGrid
+              days={days}
+              appointments={filteredAppointments}
+              canDrag={canDrag && canWrite}
+              onSelect={openEdit}
+              onCreatedSlot={openCreate}
+            />
+          )}
+        </CardContent>
+      </Card>
 
       {showWaitlist ? (
         <Card>

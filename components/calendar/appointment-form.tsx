@@ -2,8 +2,8 @@
 
 import { useActionState, useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
+import { AppointmentDateTimeField } from "@/components/calendar/appointment-datetime-field";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import {
@@ -138,6 +138,17 @@ export function AppointmentForm({
     setEndsLocal(formatDateTimeLocal(end.toISOString(), CLINIC_TIMEZONE));
   }
 
+  function onStartsChange(nextStartsLocal: string) {
+    setStartsLocal(nextStartsLocal);
+    const service = services.find((s) => s.id === serviceId);
+    if (!service) return;
+    const startIso = localInputToIso(nextStartsLocal, CLINIC_TIMEZONE);
+    const end = new Date(
+      new Date(startIso).getTime() + service.durationMinutes * 60_000,
+    );
+    setEndsLocal(formatDateTimeLocal(end.toISOString(), CLINIC_TIMEZONE));
+  }
+
   const startsAtIso = localInputToIso(startsLocal, CLINIC_TIMEZONE);
   const endsAtIso = localInputToIso(endsLocal, CLINIC_TIMEZONE);
 
@@ -234,26 +245,18 @@ export function AppointmentForm({
         )}
 
         <div className="grid gap-3 sm:grid-cols-2">
-          <Field>
-            <FieldLabel htmlFor="startsLocal">{t("startsAt")}</FieldLabel>
-            <Input
-              id="startsLocal"
-              type="datetime-local"
-              value={startsLocal}
-              onChange={(e) => setStartsLocal(e.target.value)}
-              required
-            />
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="endsLocal">{t("endsAt")}</FieldLabel>
-            <Input
-              id="endsLocal"
-              type="datetime-local"
-              value={endsLocal}
-              onChange={(e) => setEndsLocal(e.target.value)}
-              required
-            />
-          </Field>
+          <AppointmentDateTimeField
+            id="startsLocal"
+            label={t("startsAt")}
+            value={startsLocal}
+            onChange={onStartsChange}
+          />
+          <AppointmentDateTimeField
+            id="endsLocal"
+            label={t("endsAt")}
+            value={endsLocal}
+            onChange={setEndsLocal}
+          />
         </div>
 
         <Field>

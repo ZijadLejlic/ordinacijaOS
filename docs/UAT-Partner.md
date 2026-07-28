@@ -17,9 +17,10 @@ npm run check:production-ops
 ```
 
 - [x] MX `support@` (ImprovMX) — aktivno 2026-07-21  
-- [ ] Vercel: `NEXT_PUBLIC_APP_URL=https://www.dentord.com` + redeploy (invite linkovi)  
-- [ ] Deploy mobilnih fixeva (prioritet 2) na produkciju  
-- [ ] Test invite sa drugog maila → link na `www.dentord.com`, ne localhost  
+- [x] Vercel: `NEXT_PUBLIC_APP_URL` Production — verified 2026-07-28 via `/api/health` Bearer (`appUrl` + `appUrlLooksProduction`); value set to `https://www.dentord.com` + redeploy  
+- [x] Deploy mobilnih fixeva (prioritet 2) na produkciju — main `a4dbe9f` (PR #1) Production Ready  
+- [x] Test invite sa drugog maila → link na `www.dentord.com`, ne localhost — verified 2026-07-28  
+
 
 ### 1.2 Interni smoke (owner nalog na produkciji)
 

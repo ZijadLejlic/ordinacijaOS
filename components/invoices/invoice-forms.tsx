@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useMemo, useState } from "react";
+import { useActionState, useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -457,6 +457,12 @@ export function RecordPaymentForm({
     recordPaymentAction,
     null as InvoiceActionState,
   );
+  const remaining = roundMoney(maxAmount);
+  const [amount, setAmount] = useState(String(remaining));
+
+  useEffect(() => {
+    setAmount(String(remaining));
+  }, [remaining]);
 
   return (
     <form action={action} className="space-y-3">
@@ -469,9 +475,10 @@ export function RecordPaymentForm({
             name="amount"
             type="number"
             min="0.01"
-            max={maxAmount}
+            max={remaining}
             step="0.01"
-            defaultValue={roundMoney(maxAmount)}
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
             required
           />
         </Field>
@@ -500,7 +507,7 @@ export function RecordPaymentForm({
       {state?.message === "paymentRecorded" ? (
         <p className="text-sm text-green-700">{t("paymentRecorded")}</p>
       ) : null}
-      <Button type="submit" disabled={pending || maxAmount <= 0}>
+      <Button type="submit" disabled={pending || remaining <= 0}>
         {pending ? t("saving") : t("recordPayment")}
       </Button>
     </form>

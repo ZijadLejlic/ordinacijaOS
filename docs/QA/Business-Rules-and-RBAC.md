@@ -164,9 +164,9 @@ Legend: **Y** yes · **N** no · **L** limited · **\*** peer-amount dependent �
 | Patients / chart | Y / Y / Read-assist / Osnovno / N | Access+write: O,D,A,R (A and R both write) | **Tension** — PRD implies A/R weaker; code same write |
 | Odontogram / treatment plan | Y / Y / Read / N / N | Read O,D,A; write O,D | Yes |
 | Calendar | Y / own+filter / Y / Y / N | Access O,D,A,R; doctor scoped unless manage-all (O,A,R) | Yes |
-| Invoices / payments | Y / N* / N / N / Y | O,C only (`canAccessInvoices`) | Yes (* peer via D17 on KPIs, not invoice module) |
+| Invoices / payments | Y / Y (D53) / N / N / Y | O,C,D (`canAccessInvoices`) | Yes (D17 peer amounts still dashboard KPI) |
 | Expenses / Excel | Y / N / N / N / Y | O,C + feature gate | Yes |
-| Email templates | Y / N / N / Read-send / N | Write O; send O,R | Yes |
+| Email templates | Y / Send\* / N / Read-send / N | Write O; calendar reminder send O,R,**D own** (D52); CRM O,R | Yes |
 | CRM / waitlist | Y / N / N / Y / N | O,R | Yes |
 | Users / invite | Y / N / N / N / N | Owner SA | Yes |
 | Settings / branding | Y / N / N / N / N | Owner | Yes |
@@ -184,7 +184,7 @@ Legend: **Y** yes · **N** no · **L** limited · **\*** peer-amount dependent �
 | Finding | Detail | Test impact |
 |---|---|---|
 | Assistant/reception patient “read vs write” | Both can write patients/allergies/docs/images | RBAC tests assert **code** truth; PRD should be updated or code tightened |
-| Doctor “Ne*” on invoices | Doctors have no invoice module access; peer amounts only via dashboard RPC | `FIN-INT-020` |
+| Doctor “Ne*” on invoices | **Superseded by D53** — doctors access invoice module (issue/PDF/pay); peer amounts still D17 on dashboard KPI | `RBAC-INT-006`, `FIN-API-001` |
 | Force logout “all clinic sessions” | Implemented per-user | AUTH tests document actual behavior |
 | Image limit | Not in RLS | Critical SEC test for direct insert |
 | Feature entitlements | Not in DB triggers | Critical for CRM/inventory/consent if Starter plan forced |

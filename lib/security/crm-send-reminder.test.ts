@@ -22,9 +22,10 @@ import { ensureCrmNotifications } from "@/lib/crm/generate";
  *
  * **Mechanism (grepped, not assumed):**
  * - Reminder: `updateEmailTemplateAction` (owner, feature `email_reminders`)
- *   → `sendAppointmentReminderAction` (owner/reception) inserts
- *   `outbound_messages` queued → `sendTemplatedEmail` → status sent +
+ *   → `sendAppointmentReminderAction` (owner/reception/**doctor own**, D52)
+ *   inserts `outbound_messages` queued → `sendTemplatedEmail` → status sent +
  *   audit `email.reminder_sent`. Template key `appointment_reminder`.
+ *   Doctor peer calendar → `forbidden`.
  * - CRM light: `ensureCrmNotifications` (`lib/crm/generate.ts`) only
  *   INSERTs `crm_notifications` with `status=open` — **never** calls
  *   Resend / outbound. Send is exclusively `sendCrmNotificationAction`
@@ -87,11 +88,15 @@ describeSecurity("P4.6 CRM send + email reminder (CRM-INT-001/002)", () => {
   let owner: TestUser;
   let reception: TestUser;
   let doctor: TestUser;
+  let doctor2: TestUser;
   let ownerClient: DbClient;
   let receptionClient: DbClient;
+  let doctorClient: DbClient;
+  let doctor2Client: DbClient;
   let reminderPatientId: string;
   let crmPatientId: string;
   let appointmentId: string;
+  let peerAppointmentId: string;
   let serviceId: string;
   const created: TestUser[] = [];
 
@@ -111,12 +116,27 @@ describeSecurity("P4.6 CRM send + email reminder (CRM-INT-001/002)", () => {
     reception = clinic.byRole.reception!;
     doctor = clinic.byRole.doctor!;
 
+    const peer = await createClinicWithRoles(service, {
+      roles: ["doctor"],
+      clinicId,
+      emailPrefix: "crm-int-001-peer",
+    });
+    created.push(...peer.users);
+    doctor2 = peer.byRole.doctor!;
+
     ownerClient = await signInAs(url, anonKey, owner.email, owner.password);
     receptionClient = await signInAs(
       url,
       anonKey,
       reception.email,
       reception.password,
+    );
+    doctorClient = await signInAs(url, anonKey, doctor.email, doctor.password);
+    doctor2Client = await signInAs(
+      url,
+      anonKey,
+      doctor2.email,
+      doctor2.password,
     );
 
     const reminderPatient = await createPatient(service, clinicId, {
@@ -169,6 +189,29 @@ describeSecurity("P4.6 CRM send + email reminder (CRM-INT-001/002)", () => {
       throw new Error(apptError?.message ?? "appointment insert failed");
     }
     appointmentId = appt.id;
+
+    const peerStarts = new Date(startsAt);
+    peerStarts.setUTCHours(14, 0, 0, 0);
+    const peerEnds = new Date(peerStarts);
+    peerEnds.setUTCMinutes(30);
+    const { data: peerAppt, error: peerError } = await service
+      .from("appointments")
+      .insert({
+        clinic_id: clinicId,
+        patient_id: reminderPatientId,
+        doctor_id: doctor2.userId,
+        service_id: serviceId,
+        starts_at: peerStarts.toISOString(),
+        ends_at: peerEnds.toISOString(),
+        status: "confirmed",
+        created_by: owner.userId,
+      })
+      .select("id")
+      .single();
+    if (peerError || !peerAppt) {
+      throw new Error(peerError?.message ?? "peer appointment insert failed");
+    }
+    peerAppointmentId = peerAppt.id;
   }, 120_000);
 
   afterAll(async () => {
@@ -236,6 +279,35 @@ describeSecurity("P4.6 CRM send + email reminder (CRM-INT-001/002)", () => {
         return p?.outbound_id === outbound?.id;
       }),
     ).toBe(true);
+  }, 60_000);
+
+  it("CRM-INT-001b: doctor sends own appointment reminder; peer forbidden (D52)", async () => {
+    activeActionClient = doctorClient;
+    const own = await sendAppointmentReminderAction(appointmentId, "bs");
+    expect(own?.message).toBe("reminderSent");
+
+    const { data: outbound } = await service
+      .from("outbound_messages")
+      .select("id, status, sent_by, appointment_id")
+      .eq("clinic_id", clinicId)
+      .eq("appointment_id", appointmentId)
+      .eq("sent_by", doctor.userId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .single();
+    expect(outbound?.status).toBe("sent");
+
+    activeActionClient = doctorClient;
+    const peer = await sendAppointmentReminderAction(peerAppointmentId, "bs");
+    // Doctor RLS hides peer appointments → notFound before SA scope check.
+    expect(peer?.error).toBe("appointmentNotFound");
+
+    activeActionClient = doctor2Client;
+    const peerOwn = await sendAppointmentReminderAction(
+      peerAppointmentId,
+      "bs",
+    );
+    expect(peerOwn?.message).toBe("reminderSent");
   }, 60_000);
 
   it("CRM-INT-002: generate inserts open only; send only via sendCrmNotificationAction", async () => {

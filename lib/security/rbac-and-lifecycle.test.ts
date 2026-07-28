@@ -82,7 +82,7 @@ describeSecurity(
     }, 60_000);
 
     describe("RBAC matrix (PRD §3.2)", () => {
-      it("finances: owner + accountant can write invoices/expenses; doctor + reception cannot", async () => {
+      it("finances: owner + accountant + doctor write invoices (D53); expenses stay owner+accountant", async () => {
         const ownerClient = await signInAs(url, anonKey, owner.email, owner.password);
         const doctorClient = await signInAs(url, anonKey, doctor.email, doctor.password);
         const receptionClient = await signInAs(url, anonKey, reception.email, reception.password);
@@ -96,7 +96,7 @@ describeSecurity(
         ]);
         expect(invoiceChecks[0].data).toBe(true);
         expect(invoiceChecks[1].data).toBe(true);
-        expect(invoiceChecks[2].data).toBe(false);
+        expect(invoiceChecks[2].data).toBe(true);
         expect(invoiceChecks[3].data).toBe(false);
 
         const expenseChecks = await Promise.all([

@@ -35,7 +35,7 @@ import { canSeeDashboardKpis } from "@/lib/dashboard/rbac";
  * | 003 | Patients (D-09) | createPatientAction — assistant + reception allow |
  * | 004 | Odontogram | upsertToothStatusAction — doctor allow / reception deny |
  * | 005 | Calendar peer | **COVERED in P3.2** `doctor-calendar-scope.test.ts` |
- * | 006 | Invoices | createInvoiceAction — accountant allow / doctor deny |
+ * | 006 | Invoices | createInvoiceAction — accountant allow / doctor allow (D53) |
  * | 007 | Expenses | createExpenseAction — accountant allow / reception deny |
  * | 008 | CRM | dismissCrmNotificationAction — reception past-RBAC / doctor deny |
  * | 009 | Email templates | updateEmailTemplateAction — owner allow / reception deny |
@@ -309,20 +309,20 @@ describeSecurity("P3.1 RBAC-INT parameterized matrix (role × sensitive SA)", ()
       id: "RBAC-INT-006",
       module: "invoices",
       role: "doctor",
-      expect: "deny",
-      label: "createInvoiceAction doctor deny",
+      expect: "allow",
+      label: "createInvoiceAction doctor allow (D53)",
       run: async () => {
         asRole("doctor");
         const fd = new FormData();
         fd.set("patientId", patientId);
         fd.set("locationId", "");
-        fd.set("doctorId", "");
+        fd.set("doctorId", byRole.doctor!.userId);
         fd.set("notes", "");
         fd.set(
           "linesJson",
           JSON.stringify([
             {
-              description: "should not create",
+              description: "RBAC doctor invoice",
               quantity: 1,
               unitPrice: 10,
               vatRate: 0,

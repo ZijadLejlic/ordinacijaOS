@@ -18,8 +18,8 @@
 | Leaked Password Protection | ⏭️ Free | Pro+; skip za UAT |
 | JWT Custom Access Token hook | ⏭️ Free / ✅ local CI | Pro+ enable in dashboard; `profiles` fallback OK za UAT (D-04 ACCEPTED). Local `config.toml` hook **on** for security suite. |
 | Auth session TTL (D12) | ✅ local / ⚠️ hosted mirror | Local `config.toml`: `jwt_expiry = 604800`, `[auth.sessions] timebox = "168h"`. Hosted: Authentication → Settings → JWT expiry **604800**, Sessions timebox **168h**. Asserted by `AUTH-INT-021`. |
-| `NEXT_PUBLIC_APP_URL` na Vercel | ⚠️ ručno | Mora biti `https://www.dentord.com` — invite linkovi |
-| Mobile responsive (D40) | ✅ u kodu | Deploy potreban na produkciju |
+| `NEXT_PUBLIC_APP_URL` na Vercel | ✅ | `https://www.dentord.com` — health 2026-07-28: `appUrl` + `appUrlLooksProduction` |
+| Mobile responsive (D40) | ✅ | U kodu + na produkciji (`a4dbe9f` / PR #1) |
 
 ---
 
@@ -70,8 +70,9 @@ curl -s -H "Authorization: Bearer $CRON_SECRET" https://www.dentord.com/api/heal
 - [x] MX ImprovMX
 - [x] Cron 401 bez secret-a
 - [x] Resend SPF/DKIM
-- [ ] `NEXT_PUBLIC_APP_URL` + invite link na www
-- [ ] Redeploy (health + mobile)
+- [x] `NEXT_PUBLIC_APP_URL` Production (`appUrlLooksProduction` 2026-07-28)
+- [x] Invite smoke: link u mailu = `www.dentord.com` (ne localhost) — verified 2026-07-28
+- [x] Redeploy (health + mobile) — PR #1 / `a4dbe9f`
 - [x] Supabase Pro toggles — N/A na Free
 
 Dalje: **`docs/UAT-Partner.md`** (interni smoke → poziv partnera).

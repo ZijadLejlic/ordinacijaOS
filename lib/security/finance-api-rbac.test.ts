@@ -18,12 +18,12 @@ import {
  *
  * Where the boundary lives (read before asserting — not assumed):
  *   - `GET /api/invoices/[invoiceId]/pdf` (`app/api/invoices/.../pdf/route.ts`):
- *     session → `canAccessInvoices(role)` (owner|accountant only,
+ *     session → `canAccessInvoices(role)` (owner|accountant|doctor, D53,
  *     `lib/invoices/rbac.ts`) → `.eq("clinic_id", profile.clinic_id)` →
  *     storage download. Wrong role → **403** `{ error: "forbidden" }`.
  *     Cross-clinic IDOR → **404** is already `FILE-SEC-003` in
  *     `storage-isolation.test.ts`; this file asserts the **role** gate
- *     under the FIN-API-001 catalog id (doctor session → 403).
+ *     under the FIN-API-001 catalog id (reception session → 403).
  *   - `GET /api/reports/excel` (`app/api/reports/excel/route.ts`):
  *     session → `canAccessExpenses(role)` (owner|accountant,
  *     `lib/expenses/rbac.ts`) → `clinicHasFeature(..., "expenses_reports_excel")`
@@ -195,12 +195,31 @@ describeSecurity("finance PDF / Excel API RBAC (FIN-API-001/002)", () => {
   // FIN-API-001 — PDF without finance role
   // ---------------------------------------------------------------------
 
-  it("FIN-API-001: doctor session gets 403 on invoice PDF (not owner/accountant)", async () => {
+  it("FIN-API-001: doctor session gets 200 PDF (D53)", async () => {
     activeRouteClient = await signInAs(
       url,
       anonKey,
       proDoctor.email,
       proDoctor.password,
+    );
+
+    const response = await getInvoicePdfRoute(
+      new Request(`http://localhost/api/invoices/${invoiceId}/pdf`),
+      { params: Promise.resolve({ invoiceId }) },
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toBe("application/pdf");
+    const buffer = Buffer.from(await response.arrayBuffer());
+    expect(buffer.equals(Buffer.from(PDF_BYTES))).toBe(true);
+  });
+
+  it("FIN-API-001: reception session gets 403 on invoice PDF", async () => {
+    activeRouteClient = await signInAs(
+      url,
+      anonKey,
+      proReception.email,
+      proReception.password,
     );
 
     const response = await getInvoicePdfRoute(
