@@ -178,7 +178,7 @@ Format per row: **ID** · Requirement · Risk · Level · Preconditions · Expec
 |---|---|---|---|---|---|---|---|
 | PII-RLS-001 | D35 | Erasure without owner | RLS | doctor request; accountant approve | only owner approve; patient gone | Critical | COVERED |
 | PII-INT-001 | D35 | Partial hard delete | INT | patient with docs/images/invoices | all subtree + storage gone; audit | Critical | COVERED |
-| LIFE-RLS-001 | D6 | Writes in readonly | RLS | clinic readonly | patient INSERT fails | Critical | COVERED |
+| LIFE-RLS-001 | D6 | Writes in readonly | RLS + INT/SA | clinic readonly / pending_delete | RLS patient INSERT fails; SA `getClinicWriteBlock` → `clinicReadonly` / `clinicPendingDelete` across gated modules | Critical | COVERED |
 | LIFE-SEC-002 | D45 W8 | Demo clinic deleted | SEC | is_demo clinic pending_delete | hard_delete refuses | Critical | COVERED |
 | MKT-SEC-001 | W13 | Leads readable by users | RLS | authenticated JWT | SELECT/INSERT denied | Critical | COVERED |
 
@@ -201,24 +201,28 @@ Format per row: **ID** · Requirement · Risk · Level · Preconditions · Expec
 | AUTH-E2E-001 | D4 D43 §12.1 | Broken onboarding | E2E | fresh signup | MFA + onboarding step 1 OK | High | COVERED |
 | AUTH-E2E-002 | D9 | Staff cannot join | E2E | owner invite | accept → role correct | High | GAP |
 | AUTH-INT-001 | D4 D46 D47 | Wrong trial/defaults | INT | signup | trial_ends_at 2026-12-31; TZ/phone defaults | High | GAP |
-| AUTH-INT-010 | D9 D8 | Invite over limit | INT | at user cap | assertCanInviteStaff blocks | High | GAP |
+| AUTH-INT-010 | D9 D8 | Invite over limit | INT | at user cap | assertCanInviteStaff blocks (+ createInviteAction `userLimit`) | High | COVERED |
 | AUTH-INT-011 | D10 | PIN audit missing | INT | create+switch | audit operator_id set | High | PARTIAL |
-| AUTH-INT-020 | D12 | Force logout ineffective | INT | owner forces user | sessions revoked | High | GAP |
+| AUTH-INT-020 | D12 | Force logout ineffective | INT | owner forces user | sessions revoked (per-user; non-owner deny; deactivate soft+revoke) | High | COVERED |
 | CAL-E2E-001 | D14 §12.2 | Double booking | E2E | overlapping slot | error toast | High | COVERED |
 | CAL-DB-001 | D14 | EXCLUDE bypass via RPC | DB | overlapping INSERT | exclusion violation | High | COVERED (via E2E/DB) |
 | CAL-INT-001 | D15 | Wrong default duration | INT | service 30m | ends_at = start+30m | High | GAP |
 | CAL-INT-003 | D25 | Waitlist not offered | INT | cancel + matching wait | notification/offer created | High | GAP |
-| CAL-INT-004 | §3.2 | Doctor edits peer calendar | INT | doctor A vs B | forbidden | High | GAP |
-| RBAC-INT-005 | §3.2 | Doctor peer calendar (SA) | INT | doctor A vs B appt | forbidden — P3.2 | High | GAP |
+| CAL-INT-004 | §3.2 | Doctor edits peer calendar | INT | doctor A vs B | forbidden (SA) + RLS deny | High | COVERED |
+| RBAC-INT-005 | §3.2 | Doctor peer calendar (SA) | INT | doctor A vs B appt | forbidden — same suite as CAL-INT-004 | High | COVERED |
 | FIN-INT-001 | D29 | Wrong serial format | INT | create invoice | `YYYY-####` | High | COVERED |
 | FIN-INT-003 | D29 | Payment status wrong | INT | partial then full pay | unpaid→partial→paid | High | COVERED |
 | FIN-INT-004 | D29 | Void still payable | INT | void invoice | payments rejected (SA `invoiceVoid`; DB INSERT residual noted) | High | COVERED |
 | FIN-INT-010 | D29 D42 | Installments on Starter | INT | starter entitlements | feature blocked | High | GAP |
-| FIN-API-001 | D29 | PDF without finance role | API | doctor session | 403 | High | COVERED |
-| FIN-API-002 | D29 | Excel without feature/role | API | reception / starter | 403 | High | COVERED |
+| FIN-INT-015 | D29 D-08 | Legal settings gates | INT | owner writable / readonly / accountant | settingsSaved; clinicReadonly; forbidden | High | COVERED |
+| FIN-API-001 | D29 | PDF without finance role | API | doctor session; no session | 403; unauth 401 (FILE-SEC-003 + matrix) | High | COVERED |
+| FIN-API-002 | D29 | Excel without feature/role | API | reception / starter; no session | 403; unauth 401 (matrix) | High | COVERED |
 | FIN-INT-020 | D17 | Peer amounts leak | INT | setting false; 2 doctors | doctor sees only own | High | COVERED |
-| PII-API-001 | §8.2 | Patient export open | API | accountant | 403; clinical OK | High | COVERED |
-| PII-API-002 | §8.3 | Clinic ZIP non-owner | API | doctor | 403; owner ZIP OK | High | COVERED |
+| PII-API-001 | §8.2 | Patient export open | API | accountant; no session | 403; clinical OK; unauth 401 | High | COVERED |
+| PII-API-002 | §8.3 | Clinic ZIP non-owner | API | doctor; no session | 403; owner ZIP OK; unauth 401 | High | COVERED |
+| PLAT-API-001 | Ops | Health env leak / deny | API | no secret vs Bearer CRON_SECRET | public `{ok}` only; detailed checks only with secret | High | COVERED |
+| PLAT-API-002 | Ops | Sentry-test in prod | API | NODE_ENV=production | 404; non-prod + DSN → 200 | High | COVERED |
+| MKT-API-001 | §7 | OG image requires auth | API | no session | 200 image (intentionally public) | High | COVERED |
 | LIFE-INT-001 | D45 | Non-owner closes clinic | INT | doctor | request_clinic_closure fails | High | COVERED |
 | LIFE-INT-002 | D6 | Grace transition wrong | INT | readonly past grace | pending_delete | High | COVERED |
 | RBAC-RLS-001 | §3.2 | Finance RBAC wrong | RLS | O/C vs D/R | can_write_invoices matrix | High | COVERED |
@@ -242,7 +246,7 @@ Format per row: **ID** · Requirement · Risk · Level · Preconditions · Expec
 | RBAC-INT-017 | §3.2 | Calendar write SA | INT | reception allow / accountant deny | createAppointment | High | COVERED |
 | RBAC-INT-021 | §6.12 | Inventory SA RBAC | INT | doctor allow / accountant deny | createItem | High | COVERED |
 | PLAN-UNIT-002 | D3 D5 | Free period features on | UNIT | now < 2027-01-01 | SMS/AI/portal off | High | COVERED |
-| PLAN-INT-011 | D42 | assertFeature bypassed in SA | INT | each Pro feature SA on starter | forbidden | High | GAP |
+| PLAN-INT-011 | D42 | assertFeature bypassed in SA | INT | each Pro feature SA on starter | featureDisabled; pro allow | High | COVERED |
 | CRM-INT-001 | D23 §12.1 | Reminder send broken | INT | owner template + send | outbound_messages row | High | GAP |
 | IMP-INT-001 | D30 | Bad CSV committed | INT | dry-run errors | commit blocked; good rows OK | High | GAP |
 
@@ -341,7 +345,7 @@ Already listed above where Critical. Additional:
 
 ### API
 - Hit Route Handlers with `NextRequest` or Playwright `request` fixture.
-- Cover: PDF, Excel, patient export, clinic ZIP, cron, health (secret vs public).
+- Cover: PDF, Excel, patient export, clinic ZIP, cron, health (secret vs public), og (public), sentry-test (prod deny). Matrix: `lib/security/api-routes-auth-matrix.test.ts` (P3.3).
 
 ### E2E
 - Keep `workers: 1` until isolation-safe parallel seeds exist.

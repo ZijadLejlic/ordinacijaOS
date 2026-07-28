@@ -685,6 +685,11 @@ export async function updateInvoiceLegalSettingsAction(
 
   if (profile.role !== "owner") return { error: "forbidden" };
 
+  // Same feature gate as createInvoiceAction (D-08 consistency). Write-block
+  // already runs inside requireInvoiceWriter via getClinicWriteBlock.
+  const feature = await assertFeature(supabase, profile.clinic_id, "invoices");
+  if (!feature.ok) return { error: feature.code };
+
   const { data: clinic } = await supabase
     .from("clinics")
     .select("settings_json")

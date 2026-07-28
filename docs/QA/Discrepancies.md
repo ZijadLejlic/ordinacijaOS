@@ -97,7 +97,7 @@ supabase db reset
 
 **Catching tests**
 
-- `PLAN-INT-011` (still GAP / P3.5), `PLAN-SEC-001` (COVERED — documents residual + SA deny).
+- `PLAN-INT-011` (COVERED / P3.5 — Pro SA `assertFeature` starter deny + pro allow), `PLAN-SEC-001` (COVERED — documents DB residual + SA deny).
 
 **Resolution**
 
@@ -178,34 +178,33 @@ supabase db reset
 
 ---
 
-### D-07 — D12 force logout is per-user, not clinic-wide (S2)
+### D-07 — D12 force logout is per-user (product decision) — **RESOLVED 2026-07-28 (docs)**
 
 **Evidence**
 
-- PRD D12: “Owner može force logout **svih** sesija klinike”.
-- [`lib/invites/actions.ts`](../../lib/invites/actions.ts) `forceLogoutUserAction` (lines 337–374): `auth.admin.signOut(profileId, "global")` for **one** non-owner profile.
-- Deactivate path also signs out that user (line 324).
+- Product decision (P3.4 / D-07): force logout stays **per-user** (one `profileId`), not clinic-wide. No `forceLogoutAllClinicSessionsAction`.
+- [`lib/invites/actions.ts`](../../lib/invites/actions.ts) `forceLogoutUserAction` + deactivate path call `public.revoke_user_sessions` for that user only (sibling sessions stay valid — `AUTH-INT-020`).
 
 **Impact**
 
-- Product mismatch: no single “logout everyone” control.
+- None as product intent: owner revokes one staff member’s sessions at a time.
 
 **Catching tests**
 
-- `AUTH-INT-020` documents actual per-user behavior; add clinic-wide if product insists.
+- `AUTH-INT-020` COVERED (per-user revoke + sibling OK + non-owner deny).
 
 **Resolution**
 
-- Align PRD to per-user **or** add `forceLogoutAllClinicSessionsAction`.
+- **RESOLVED 2026-07-28 (docs-only):** PRD D12 / §8.1 wording aligned to per-user; product behavior unchanged. Per-user revoke path fixed earlier via D-22 (`revoke_user_sessions`).
 
 ---
 
-### D-08 — `updateInvoiceLegalSettingsAction` missing feature / write-block gates (S2)
+### D-08 — `updateInvoiceLegalSettingsAction` missing feature / write-block gates (S2) — **RESOLVED 2026-07-28**
 
 **Evidence**
 
-- [`lib/invoices/actions.ts`](../../lib/invoices/actions.ts) lines 670–718: uses `requireInvoiceWriter()` then **extra** `profile.role !== "owner"` check.
-- Does **not** call `assertFeature(..., "invoices")` or `getClinicWriteBlock` (unlike `createInvoiceAction`).
+- [`lib/invoices/actions.ts`](../../lib/invoices/actions.ts) `updateInvoiceLegalSettingsAction`: uses `requireInvoiceWriter()` then **extra** `profile.role !== "owner"` check.
+- Original inventory claimed missing `assertFeature(..., "invoices")` **and** `getClinicWriteBlock` (unlike `createInvoiceAction`).
 
 **Impact**
 
@@ -213,11 +212,11 @@ supabase db reset
 
 **Catching tests**
 
-- `FIN-INT-015` (proposed under High/Medium): readonly clinic + legal settings → blocked.
+- `FIN-INT-015` (High): owner writable allow; readonly → `clinicReadonly`; accountant → `forbidden`.
 
 **Resolution**
 
-- Add `getClinicWriteBlock` + optional `assertFeature` for consistency.
+- **RESOLVED 2026-07-28 (P3.7):** Live probe proved write-block was **already** present — `requireInvoiceWriter()` calls `getClinicWriteBlock` (same path as every other invoice writer). Do **not** invent a second write-block call. Residual was `assertFeature(..., "invoices")` inconsistency vs `createInvoiceAction` — added for defense-in-depth / consistency. `invoices` is enabled on all plans (seed), so no starter `featureDisabled` path (unlike PLAN-INT-011 Pro-only keys). Suite: [`lib/security/invoice-legal-settings-sa.test.ts`](../../lib/security/invoice-legal-settings-sa.test.ts) (`3 passed`).
 
 ---
 
@@ -489,6 +488,49 @@ Stripe, AI, SMS/WhatsApp, portal, online booking, mini-site, lab — correctly o
 
 ---
 
+### D-22 — `forceLogoutUserAction` / deactivate pass profile UUID to `auth.admin.signOut(jwt)` (S1) — **RESOLVED 2026-07-28**
+
+**Evidence (P3.4 live probe)**
+
+- GoTrue Admin API: `signOut(jwt: string, scope?)` — first arg is a **logged-in JWT**, not a user id ([docs](https://supabase.com/docs/reference/javascript/auth-admin-signout); `GoTrueAdminApi.d.ts`).
+- [`lib/invites/actions.ts`](../../lib/invites/actions.ts) previously called `service.auth.admin.signOut(profileId, "global")`.
+- Live: force logout returned `invalid JWT: … malformed`; target `refreshSession()` still succeeded; no `user.force_logout` audit.
+
+**Impact**
+
+- Owner “force logout” and post-deactivate session revoke were **non-functional**.
+
+**Catching tests**
+
+- `AUTH-INT-020` in [`lib/security/invite-force-logout-deactivate.test.ts`](../../lib/security/invite-force-logout-deactivate.test.ts).
+
+**Resolution**
+
+- **Done (2026-07-28):** migration [`20260728030000_revoke_user_sessions.sql`](../../supabase/migrations/20260728030000_revoke_user_sessions.sql) — `public.revoke_user_sessions(p_user_id uuid)` SECURITY DEFINER deletes `auth.sessions` for one user (`refresh_tokens` CASCADE); `REVOKE` from `public`/`anon`/`authenticated`, `GRANT EXECUTE` to `service_role` only. SAs call `service.rpc("revoke_user_sessions", { p_user_id })` after owner gate. Live `AUTH-INT-020` happy path: target refresh fails, sibling session OK (D-07 per-user), audit written. Catalog COVERED.
+
+---
+
+### D-23 — `deactivateUserAction` UPDATE includes `updated_at` without column GRANT (S1) — **RESOLVED 2026-07-28**
+
+**Evidence (P3.4 live probe)**
+
+- A1 migration [`20260713000001_code_review_a1_profiles_self_update_lock.sql`](../../supabase/migrations/20260713000001_code_review_a1_profiles_self_update_lock.sql): column GRANT `(full_name, role, is_active)` only — **no** `updated_at`.
+- `deactivateUserAction` previously did `.update({ is_active: false, updated_at: … })` → `permission denied for table profiles`.
+
+**Impact**
+
+- Owner soft-deactivate was broken end-to-end.
+
+**Catching tests**
+
+- Same `AUTH-INT-020` deactivate case in `invite-force-logout-deactivate.test.ts`.
+
+**Resolution**
+
+- **Done (2026-07-28):** SA updates `{ is_active: false }` only; `profiles_set_updated_at` trigger fills `updated_at`. Then `revoke_user_sessions` (D-22). Live: `is_active=false`, refresh fails, non-owner deny, audit `user.deactivated`.
+
+---
+
 ## 3. Summary table
 
 | ID | Sev | Topic | Test IDs |
@@ -499,8 +541,8 @@ Stripe, AI, SMS/WhatsApp, portal, online booking, mini-site, lab — correctly o
 | D-04 | S1 | JWT hook manual | `TEN-SEC-004` |
 | D-05 | S1 | Unit tests not in CI | P0 CI — **RESOLVED** (2026-07-23): unit.yml + security.yml (local Supabase) + fail-closed gate all green in CI run `30048179856` |
 | D-06 | S1 | Lockout owner notify | `AUTH-INT-002` |
-| D-07 | S2 | Force logout scope | `AUTH-INT-020` |
-| D-08 | S2 | Invoice legal settings gates | `FIN-INT-015` |
+| D-07 | S2 | Force logout scope | `AUTH-INT-020` — **RESOLVED** (2026-07-28 docs): per-user product decision; PRD aligned |
+| D-08 | S2 | Invoice legal settings gates | `FIN-INT-015` — **RESOLVED** (2026-07-28): write-block via `requireInvoiceWriter`; `assertFeature("invoices")` added |
 | D-09 | S2 | Patient RBAC wording | RBAC suite |
 | D-10 | S2 | Acceptance checkbox optimism | Traceability |
 | D-11 | S2 | Visit closes plan item | `PII-INT-011` |
@@ -514,6 +556,8 @@ Stripe, AI, SMS/WhatsApp, portal, online booking, mini-site, lab — correctly o
 | D-19 | S2 | Coverage threshold baseline | P0.5 — **RESOLVED** |
 | D-20 | S1 | Payments/lines append-only broken (PERMISSIVE MFA FOR ALL) | `FIN-RLS-001` — **RESOLVED** (2026-07-28): RESTRICTIVE MFA + REVOKE UPDATE/DELETE |
 | D-21 | S2 | `FILE-INT-020` ID-drift; GDPR storage is SA not RPC | `PII-INT-001` — documented P2.5 |
+| D-22 | S1 | `admin.signOut(profileId)` wrong API (needs JWT) | `AUTH-INT-020` — **RESOLVED** (2026-07-28): `revoke_user_sessions` RPC |
+| D-23 | S1 | deactivate UPDATE `updated_at` without column GRANT | `AUTH-INT-020` — **RESOLVED** (2026-07-28): update `is_active` only |
 
 ---
 

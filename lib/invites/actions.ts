@@ -307,9 +307,11 @@ export async function deactivateUserAction(
   const { supabase, user, profile } = owner;
   const locale = await getLocale();
 
+  // A1 column GRANT: authenticated may UPDATE (full_name, role, is_active)
+  // only — not `updated_at` (trigger `profiles_set_updated_at` handles that).
   const { data: target, error } = await supabase
     .from("profiles")
-    .update({ is_active: false, updated_at: new Date().toISOString() })
+    .update({ is_active: false })
     .eq("id", profileId)
     .eq("clinic_id", profile.clinic_id)
     .neq("role", "owner")
@@ -321,7 +323,13 @@ export async function deactivateUserAction(
   }
 
   const service = createServiceClient();
-  await service.auth.admin.signOut(profileId, "global");
+  // GoTrue Admin `signOut(jwt)` needs a JWT, not a user id — revoke via RPC.
+  const { error: revokeError } = await service.rpc("revoke_user_sessions", {
+    p_user_id: profileId,
+  });
+  if (revokeError) {
+    return { error: revokeError.message };
+  }
 
   await supabase.from("audit_events").insert({
     clinic_id: profile.clinic_id,
@@ -357,7 +365,11 @@ export async function forceLogoutUserAction(
   }
 
   const service = createServiceClient();
-  const { error } = await service.auth.admin.signOut(profileId, "global");
+  // Per-user revoke (D12 / D-07): not clinic-wide. Admin signOut expects a JWT;
+  // delete auth.sessions for this profile via service_role RPC instead.
+  const { error } = await service.rpc("revoke_user_sessions", {
+    p_user_id: profileId,
+  });
   if (error) {
     return { error: error.message };
   }

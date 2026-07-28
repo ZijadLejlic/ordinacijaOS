@@ -86,7 +86,7 @@ Each row: **Threat ID**, category, description, likelihood×impact → **Risk**,
 | T-AUTH-02 | Spoofing | Owner skips MFA / uses aal1 session for writes | Critical | MW MFA gate + RLS `owner_mfa_ok` | `AUTH-E2E-003`, `AUTH-RLS-001` |
 | T-AUTH-03 | Spoofing | Stolen invite token accepted twice / expired | High | Token hash; status transitions; expiry | `AUTH-SEC-001`, `AUTH-INT-010` |
 | T-AUTH-04 | Spoofing | PIN brute force on shared desk | High | 5 fails → 15 min lock; bcrypt | `AUTH-RLS-010`, `AUTH-SEC-002` |
-| T-AUTH-05 | Tampering | Session fixation / long-lived session after deactivate | High | `is_active` checks; force logout; JWT hook skips inactive | `AUTH-INT-020`, `AUTH-INT-021` |
+| T-AUTH-05 | Tampering | Session fixation / long-lived session after deactivate | High | `is_active` checks; force logout; JWT hook skips inactive | `AUTH-INT-020` (COVERED), `AUTH-INT-021` |
 | T-AUTH-06 | Elevation | Self-promote `role` to owner via profiles UPDATE | Critical | Trigger + RLS | `AUTH-RLS-002` (COVERED) |
 | T-AUTH-07 | Info disclosure | Lockout RPC leaks whether email exists | Medium | Generic errors; review RPC messages | `AUTH-SEC-003` |
 | T-AUTH-08 | Spoofing | Platform admin flag set via `user_metadata` | Critical | Code only trusts `app_metadata` | `PLAT-UNIT-001`, `PLAT-SEC-001` |
@@ -97,7 +97,7 @@ Each row: **Threat ID**, category, description, likelihood×impact → **Risk**,
 |---|---|---|---|---|---|
 | T-RBAC-01 | Elevation | Doctor calls invoice/expense writes via PostgREST | Critical | RLS `can_write_invoices` | `RBAC-RLS-001` (COVERED) |
 | T-RBAC-02 | Elevation | Accountant writes patients / odontogram | High | RLS clinical helpers | `RBAC-RLS-002` (COVERED) |
-| T-RBAC-03 | Elevation | Doctor mutates another doctor’s appointments | High | RLS + SA doctor scope | `RBAC-INT-005`, `CAL-INT-004` |
+| T-RBAC-03 | Elevation | Doctor mutates another doctor’s appointments | High | RLS + SA doctor scope | `RBAC-INT-005`, `CAL-INT-004` (COVERED P3.2) |
 | T-RBAC-04 | Elevation | Non-owner reads audit_events | High | Owner-only SELECT RLS | `RBAC-RLS-005` (COVERED) |
 | T-RBAC-05 | Elevation | Non-owner approves GDPR erasure | Critical | RPC owner+MFA | `PII-RLS-001` (COVERED) |
 | T-RBAC-06 | Elevation | Feature used without entitlement (Starter on CRM/inventory) | High | SA `assertFeature` only — **DB gap** | `PLAN-INT-011`, `PLAN-SEC-001` |

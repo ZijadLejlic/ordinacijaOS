@@ -42,7 +42,7 @@ Odluke su finalne za v1 planiranje. Agent/developer **ne nagađa** mimo ovog log
 | D9 | Staff nalozi | Invite-by-email (magic link) → set password → role |
 | D10 | Shared desk | Reception/assistant: shared nalog + **PIN quick switch** operatora |
 | D11 | 2FA | Obavezno samo za **owner**; ostali ne |
-| D12 | Session | TTL **7 dana**; owner može force logout svih sesija klinike |
+| D12 | Session | TTL **7 dana**; owner može force logout **jednog** korisnika (per-user; ne clinic-wide) |
 | D13 | Lockout | 5 failed logins → notifikacija owneru |
 | D14 | Kalendar | Termin vezan za **doktora**; stolice nisu u MVP; hard block overlap |
 | D15 | Trajanje termina | Default po usluzi + ručna korekcija |
@@ -199,7 +199,7 @@ Owner_signup → Clinic_created → Invite_staff_email
 - Ostali: email + password (iz invite flow-a); 2FA nije obavezna.
 - Session refresh TTL: **7 dana**.
 - 5 uzastopnih failed login pokušaja na nalog → email/in-app notifikacija owneru; privremeni lock (npr. 15 min) na taj nalog.
-- Owner: **Force logout all clinic sessions**.
+- Owner: **Force logout** jednog staff korisnika (sve sesije tog naloga; ne cijele klinike).
 
 ---
 

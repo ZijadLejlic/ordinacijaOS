@@ -11,16 +11,16 @@
 |---|---|---|---|---|---|
 | D1 | Product | Greenfield DentOrd; Avicena reference only | — | N/A | Process / scope rule |
 | D2 | MVP paket | Professional (25€/mj) + branding | `PLAN-UNIT-001`, `MKT-UNIT-001` | PARTIAL | Marketing prices + entitlements unit; no billing charge yet |
-| D3 | Van MVP free | No AI / SMS / WhatsApp / patient portal | `PLAN-UNIT-002`, `PLAN-INT-010` | PARTIAL | Free-period override unit COVERED; assertFeature INT GAP |
+| D3 | Van MVP free | No AI / SMS / WhatsApp / patient portal | `PLAN-UNIT-002`, `PLAN-INT-011` | PARTIAL | Free-period override unit COVERED; Pro SA feature INT COVERED (PLAN-INT-011); free-period INT ID PLAN-INT-010 still GAP |
 | D4 | Free trial | Self-signup; trial_ends_at ≤ 2026-12-31 | `AUTH-E2E-001`, `AUTH-INT-001` | PARTIAL | Signup E2E COVERED; trial date assert PARTIAL |
 | D5 | Billing start | Stripe from 2027-01-01 | `PLAN-UNIT-002` | PARTIAL | Date constant unit only; Stripe N/A until Faza 4 |
-| D6 | After free | 7d read-only → export → delete | `LIFE-RLS-001`, `LIFE-INT-001`, `LIFE-INT-002`, `LIFE-API-001` | COVERED | Writable + closure + grace→pending_delete + cron gate COVERED |
+| D6 | After free | 7d read-only → export → delete | `LIFE-RLS-001`, `LIFE-INT-001`, `LIFE-INT-002`, `LIFE-API-001` | COVERED | Writable + closure + grace→pending_delete + cron gate + SA write-block across modules COVERED |
 | D7 | Tenant model | 1 user = 1 clinic; owner sees all locations | `TEN-RLS-001..009`, `TEN-E2E-001` | PARTIAL | Patients/appts/storage COVERED; not all tables |
 | D8 | Pro limits | ≤5 doctors, ≤10 users, ≤2 locations; hard block | `PLAN-DB-001`, `PLAN-DB-002`, `PLAN-INT-001` | PARTIAL | Invite + location triggers COVERED; doctor seat edge GAP |
-| D9 | Staff invites | Magic link → set password → role | `AUTH-E2E-002`, `AUTH-INT-010`, `AUTH-SEC-001` | GAP | No dedicated invite E2E; actions exist |
+| D9 | Staff invites | Magic link → set password → role | `AUTH-E2E-002`, `AUTH-INT-010`, `AUTH-SEC-001` | PARTIAL | Token + SA seat gate COVERED; invite accept E2E still GAP |
 | D10 | Shared desk PIN | Operators + PIN switch + audit | `AUTH-RLS-010`, `AUTH-INT-011`, `AUTH-SEC-002` | PARTIAL | PIN create/verify/lock/cross-clinic COVERED |
 | D11 | 2FA | Owner MFA required; others not | `AUTH-E2E-003`, `AUTH-RLS-001`, `AUTH-E2E-001` | PARTIAL | MFA gate + enroll E2E COVERED; aal2 RLS write denial GAP |
-| D12 | Session | TTL 7 days; owner force logout all | `AUTH-INT-020`, `AUTH-INT-021` | GAP | Force logout action exists; TTL config not asserted |
+| D12 | Session | TTL 7 days; owner force logout **per user** | `AUTH-INT-020`, `AUTH-INT-021` | PARTIAL | Force logout/deactivate COVERED (per-user D-07 product decision; D-22/D-23 fixed); TTL config still GAP (`AUTH-INT-021`) |
 | D13 | Lockout | 5 fails → owner notify + temp lock | `AUTH-DB-001`, `AUTH-INT-002` | PARTIAL | Lock + audit COVERED; owner email notification GAP |
 | D14 | Calendar | Doctor-bound; hard block overlap | `CAL-DB-001`, `CAL-E2E-001` | COVERED | EXCLUDE + E2E overlap |
 | D15 | Duration | Default from service + manual | `CAL-INT-001` | GAP | Covered indirectly in create flow |
@@ -37,7 +37,7 @@
 | D26 | Online booking | Enterprise only | `PLAN-INT-010` | N/A | Out of MVP; assert feature off |
 | D27 | Lab/technician | Enterprise only | `PLAN-INT-010` | N/A | Out of MVP |
 | D28 | Fiscal cash | Not in app | — | N/A | Negative scope |
-| D29 | Finance MVP | Invoices, VAT, serial, payments, debts, installments, expenses, Excel | `FIN-E2E-001`, `FIN-INT-001..015`, `FIN-API-001` | PARTIAL | Invoice+PDF E2E COVERED; expenses/Excel/installments GAP |
+| D29 | Finance MVP | Invoices, VAT, serial, payments, debts, installments, expenses, Excel | `FIN-E2E-001`, `FIN-INT-001..015`, `FIN-API-001`, `FIN-API-002` | PARTIAL | Invoice+PDF E2E + PDF/Excel API + legal settings SA (FIN-INT-015) COVERED; installments GAP |
 | D30 | Import | CSV patients + services | `IMP-UNIT-001`, `IMP-INT-001` | PARTIAL | Parse/map unit COVERED; commit INT GAP |
 | D31 | AI later | Clinic-only; draft; opt-in | — | N/A | Faza 4 |
 | D32 | Metered | SMS/WA/AI/storage +15% | — | N/A | Faza 4 |
@@ -50,10 +50,10 @@
 | D39 | Deploy model | Module → prod when ready | — | N/A | Process |
 | D40 | Responsive | Full responsive required | `MKT-E2E-003`, `CAL-E2E-002` | GAP | Manual UAT today |
 | D41 | Super-admin | Impersonation + audit; entitlements | `PLAT-UNIT-001`, `PLAT-INT-001`, `PLAT-SEC-001` | COVERED | isPlatformAdmin unit + impersonation audit INT COVERED; sticky cookie SEC still GAP |
-| D42 | Entitlements | plans → features[] not UI-only | `PLAN-UNIT-001`, `PLAN-INT-011` | PARTIAL | Features from DB + free override; feature INT gates GAP |
+| D42 | Entitlements | plans → features[] not UI-only | `PLAN-UNIT-001`, `PLAN-INT-011`, `PLAN-SEC-001` | COVERED | Features from DB + free override; Pro SA assertFeature INT COVERED (DB residual = D-03 waived) |
 | D43 | Onboarding | In-app 3 steps | `AUTH-E2E-001` | PARTIAL | Step 1 COVERED; steps 2–3 GAP |
 | D44 | Support | support@ Resend | `CRM-INT-003` | GAP | Ops / smoke |
-| D45 | Clinic close | Export → 7d grace → hard delete | `LIFE-INT-001`, `LIFE-INT-002`, `PII-API-002`, `LIFE-SEC-002` | COVERED | Closure + grace→pending_delete + demo skip COVERED (P2.6/P2.7) |
+| D45 | Clinic close | Export → 7d grace → hard delete | `LIFE-INT-001`, `LIFE-INT-002`, `PII-API-002`, `LIFE-SEC-002`, `LIFE-RLS-001` | COVERED | Closure + grace→pending_delete + demo skip + SA write-block COVERED (P2.6/P2.7/P3.6) |
 | D46 | Phone default | +387; owner changeable | `AUTH-INT-001` | PARTIAL | Signup sets default; change GAP |
 | D47 | TZ default | Europe/Sarajevo | `CAL-UNIT-002`, `AUTH-E2E-001` | PARTIAL | Calendar ranges unit COVERED |
 | D48 | Annual sub | 2 months free (2027+) | — | N/A | Faza 4 |
@@ -73,7 +73,7 @@
 | 6.4 | Treatment plan | `PII-INT-011` | GAP |
 | 6.5 | Calendar day/week/month, overlap, DnD | `CAL-E2E-001`, `CAL-INT-001..005`, `CAL-DB-001` | PARTIAL |
 | 6.6 | Waitlist | `CAL-UNIT-001`, `CAL-INT-003` | PARTIAL |
-| 6.7 | Finance (invoice/payment/plans/expenses/Excel) | `FIN-E2E-001`, `FIN-INT-*`, `FIN-API-001`, `FIN-UNIT-001` | PARTIAL |
+| 6.7 | Finance (invoice/payment/plans/expenses/Excel) | `FIN-E2E-001`, `FIN-INT-*`, `FIN-API-001`, `FIN-API-002`, `FIN-UNIT-001` | PARTIAL | serial/void/append-only/peer/API/legal-settings COVERED; installments GAP |
 | 6.8 | Dashboard KPI | `FIN-INT-020`, `RBAC-INT-010` | COVERED |
 | 6.9 | Email system | `CRM-UNIT-001`, `CRM-INT-001`, `CRM-API-001` | PARTIAL |
 | 6.10 | CRM light | `CRM-UNIT-002`, `CRM-INT-002` | PARTIAL |
@@ -96,7 +96,7 @@ Inventory tests use IDs `PLAN-INT-021` / `RBAC-INT-021` in the strategy catalog 
 | 8.1 | Private storage + signed URLs | `FILE-RLS-001`, `FILE-SEC-001` | PARTIAL |
 | 8.1 | Owner 2FA | `AUTH-E2E-003`, `AUTH-RLS-001` | PARTIAL |
 | 8.1 | Lockout + owner alert | `AUTH-DB-001` | PARTIAL |
-| 8.1 | Force logout | `AUTH-INT-020` | GAP |
+| 8.1 | Force logout | `AUTH-INT-020` | COVERED | Per-user via `revoke_user_sessions` (D-07 scope; D-22/D-23 fixed) |
 | 8.1 | Secrets server-only | `PLAT-SEC-002`, `FILE-SEC-002` | GAP |
 | 8.1 | Tenant isolation = release blocker | `TEN-*` suite | PARTIAL |
 | 8.1 | Impersonation audited | `PLAT-INT-001` | COVERED |
@@ -105,8 +105,8 @@ Inventory tests use IDs `PLAN-INT-021` / `RBAC-INT-021` in the strategy catalog 
 | 8.2 | PostHog no patient names | `PII-SEC-001` | GAP |
 | 8.2 | Cookie banner | `MKT-E2E-004`, `PII-UNIT-002` | PARTIAL |
 | 8.3 | Clinic ZIP backup | `PII-API-002` | COVERED |
-| 8.3 | Close: export → grace → delete | `LIFE-INT-002`, `LIFE-SEC-002` | COVERED |
-| 8.4 | Sentry / PostHog | `MKT-UNIT-002` | GAP |
+| 8.3 | Close: export → grace → delete | `LIFE-INT-002`, `LIFE-SEC-002`, `LIFE-RLS-001` | COVERED |
+| 8.4 | Sentry / PostHog | `MKT-UNIT-002`, `PLAT-API-002` | PARTIAL | sentry-test prod deny COVERED (P3.3); PostHog/scrub still GAP |
 | 8.5 | Incident ≤72h | — | N/A | Process |
 
 ---
@@ -117,7 +117,7 @@ Inventory tests use IDs `PLAN-INT-021` / `RBAC-INT-021` in the strategy catalog 
 |---|---|---|
 | Price display Starter/Pro/Premium/Enterprise | `MKT-UNIT-001` | COVERED |
 | Limits matrix D8 | `PLAN-UNIT-001`, `PLAN-DB-001/002` | PARTIAL |
-| Feature matrix §4.3 | `MKT-UNIT-001`, `PLAN-UNIT-001`, `PLAN-INT-011` | PARTIAL |
+| Feature matrix §4.3 | `MKT-UNIT-001`, `PLAN-UNIT-001`, `PLAN-INT-011`, `PLAN-SEC-001` | COVERED |
 | Free trial = Pro minus SMS/AI/portal | `PLAN-UNIT-002` | COVERED |
 | Hard block + upsell (not soft) | `PLAN-INT-001`, `PLAN-DB-001` | PARTIAL |
 
@@ -142,7 +142,7 @@ Inventory tests use IDs `PLAN-INT-021` / `RBAC-INT-021` in the strategy catalog 
 | CSV import patients + services | `IMP-INT-001` | GAP |
 | GDPR export; delete waits owner approve | `PII-API-001`, `PII-INT-001` | COVERED |
 | Clinic ZIP backup | `PII-API-002` | COVERED |
-| Trial → readonly → delete | `LIFE-RLS-001`, `LIFE-INT-001` | PARTIAL |
+| Trial → readonly → delete | `LIFE-RLS-001` (RLS + SA write-block), `LIFE-INT-001`, `LIFE-INT-002`, `LIFE-API-001` | COVERED |
 | Clinic A cannot read Clinic B | `TEN-RLS-*`, `TEN-E2E-001` | PARTIAL |
 | Storage not publicly listable; signed URL only | `FILE-RLS-001` | PARTIAL |
 | Full responsive key screens | `CAL-E2E-002` | GAP |
@@ -155,7 +155,7 @@ Inventory tests use IDs `PLAN-INT-021` / `RBAC-INT-021` in the strategy catalog 
 | Blocker | Existing | Proposed expansions | Status |
 |---|---|---|---|
 | Signup → create clinic → onboarding step 1 | `e2e/signup-onboarding.spec.ts` | Steps 2–3, MFA verify path | PARTIAL |
-| Appointment (doctor + patient + no overlap) | `e2e/appointment.spec.ts` | Waitlist on cancel; doctor scope | PARTIAL |
+| Appointment (doctor + patient + no overlap) | `e2e/appointment.spec.ts` + `CAL-INT-004` | Waitlist on cancel; doctor peer scope COVERED | PARTIAL |
 | Invoice + PDF download | `e2e/invoice-pdf.spec.ts` | Void, partial payment, installments | PARTIAL |
 | Tenant isolation | `e2e/tenant-isolation.spec.ts` + Vitest | All modules + storage buckets | PARTIAL |
 
@@ -165,13 +165,13 @@ Inventory tests use IDs `PLAN-INT-021` / `RBAC-INT-021` in the strategy catalog 
 
 | Item | Test IDs | Status |
 |---|---|---|
-| Role set owner/doctor/assistant/reception/accountant | `RBAC-INT-001..004`, `006..010`, `012..017`, `021` (P3.1 SA matrix); `005` → P3.2 | COVERED |
-| §3.2 module matrix | `RBAC-RLS-*` + `RBAC-INT-*` SA runner (`lib/security/rbac-int-matrix.test.ts`) | PARTIAL |
+| Role set owner/doctor/assistant/reception/accountant | `RBAC-INT-001..005`, `006..010`, `012..017`, `021` (P3.1–P3.2) | COVERED |
+| §3.2 module matrix | `RBAC-RLS-*` + `RBAC-INT-*` SA runner + doctor calendar scope | PARTIAL |
 | Peer amounts asterisk for doctors | `FIN-INT-020` | COVERED |
-| Invite flow + plan limit before invite | `AUTH-INT-010`, `PLAN-DB-001` | PARTIAL |
+| Invite flow + plan limit before invite | `AUTH-INT-010`, `PLAN-DB-001` | COVERED |
 | Auth rules (owner MFA, 7d session, lockout, force logout) | See D11–D13 | PARTIAL |
 
-Existing Vitest coverage for RBAC matrix (finances, clinical, front desk, owner-only, audit) is in `lib/security/rbac-and-lifecycle.test.ts` — mapped as `RBAC-RLS-001..004`, `AUTH-RLS-010`, `PII-RLS-001`, `LIFE-RLS-001`. P3.1 Server Action matrix: `lib/security/rbac-int-matrix.test.ts` (`RBAC-INT-001..004/006..010/012..017/021`; `005` reserved for doctor peer calendar / P3.2).
+Existing Vitest coverage for RBAC matrix (finances, clinical, front desk, owner-only, audit) is in `lib/security/rbac-and-lifecycle.test.ts` — mapped as `RBAC-RLS-001..004`, `AUTH-RLS-010`, `PII-RLS-001`, `LIFE-RLS-001` (RLS half). P3.1 Server Action matrix: `lib/security/rbac-int-matrix.test.ts`. P3.2 doctor peer calendar: `lib/security/doctor-calendar-scope.test.ts` (`CAL-INT-004` / `RBAC-INT-005`). P3.6 SA write-block: `lib/security/clinic-write-block-sa.test.ts` (extends `LIFE-RLS-001`). P3.7 invoice legal settings: `lib/security/invoice-legal-settings-sa.test.ts` (`FIN-INT-015`).
 
 ---
 
@@ -185,6 +185,7 @@ Existing Vitest coverage for RBAC matrix (finances, clinical, front desk, owner-
 | Lead form (honeypot + rate limit) | `MKT-UNIT-003`, `MKT-INT-001`, `MKT-SEC-001` | PARTIAL |
 | Cookie consent gates PostHog | `PII-UNIT-002`, `MKT-E2E-004` | PARTIAL |
 | Demo clinic open | `MKT-INT-002` | GAP |
+| OG image `/api/og` | `MKT-API-001` | COVERED |
 
 ---
 
@@ -207,12 +208,15 @@ Existing Vitest coverage for RBAC matrix (finances, clinical, front desk, owner-
 | `lib/analytics/consent.test.ts` | `PII-UNIT-002` | cookie consent storage |
 | `lib/platform/admin.test.ts` | `PLAT-UNIT-001` | isPlatformAdmin + cookie parse |
 | `lib/security/tenant-isolation.test.ts` | `TEN-RLS-001..009`, `AUTH-DB-001`, `PLAN-DB-001`, `AUTH-RLS-002` | isolation + lockout + self-promote + starter invite limit |
-| `lib/security/rbac-and-lifecycle.test.ts` | `RBAC-RLS-001..004`, `RBAC-RLS-005`, `AUTH-RLS-010`, `PLAN-DB-002`, `PII-RLS-001`, `LIFE-RLS-001`, `LIFE-INT-001` | RBAC, PIN, GDPR, lifecycle |
+| `lib/security/rbac-and-lifecycle.test.ts` | `RBAC-RLS-001..004`, `RBAC-RLS-005`, `AUTH-RLS-010`, `PLAN-DB-002`, `PII-RLS-001`, `LIFE-RLS-001` (RLS), `LIFE-INT-001` | RBAC, PIN, GDPR, lifecycle |
+| `lib/security/clinic-write-block-sa.test.ts` | `LIFE-RLS-001` (SA half across modules) | readonly/pending_delete write-block |
 | `e2e/signup-onboarding.spec.ts` | `AUTH-E2E-001` | signup MFA onboarding step 1 |
 | `e2e/mfa-gate.spec.ts` | `AUTH-E2E-003` | owner MFA redirect |
 | `e2e/appointment.spec.ts` | `CAL-E2E-001` | create + overlap |
 | `e2e/invoice-pdf.spec.ts` | `FIN-E2E-001` | invoice + PDF |
 | `e2e/tenant-isolation.spec.ts` | `TEN-E2E-001` | UI isolation patient |
+| `lib/security/cron-secret-guard.test.ts` | `LIFE-API-001` | cron secret gate (unit) |
+| `lib/security/api-routes-auth-matrix.test.ts` | `PLAT-API-001/002`, `MKT-API-001`, unauth half of `FIN-API-*`/`PII-API-*` | all 8 API routes auth matrix (P3.3) |
 
 ---
 
@@ -222,7 +226,7 @@ Existing Vitest coverage for RBAC matrix (finances, clinical, front desk, owner-
 
 | Item | Issue | Recommendation |
 |---|---|---|
-| D12 session TTL “7 dana” | Supabase JWT access vs refresh vs app cookie TTL not specified; “force logout all clinic sessions” vs single-user force logout | Spec exact Auth settings (JWT expiry, refresh) and whether force logout is per-user (implemented) or clinic-wide (PRD wording) |
+| D12 session TTL “7 dana” | Supabase JWT access vs refresh vs app cookie TTL not specified; force logout is **per-user** (product decision / D-07 resolved) | Spec exact Auth settings (JWT expiry, refresh); force-logout scope settled per-user |
 | D13 lock duration | PRD says “npr. 15 min”; implementation uses 15 min — document as normative | Lock PRD to 15 minutes |
 | D13 owner notification | “email/in-app” — which is required for MVP? | Decide: email required, in-app optional (or both) |
 | §3.2 “Ograničeno” dashboard | Not quantified for doctor/reception | Define KPI subsets (implemented in `lib/dashboard/rbac.ts` — promote to PRD) |
@@ -238,7 +242,7 @@ Existing Vitest coverage for RBAC matrix (finances, clinical, front desk, owner-
 | D8 “hard block” vs D22 image limit | Users/doctors/locations enforced in DB triggers; images only in app helper | Treat image DB bypass as Critical GAP (`FILE-DB-001`) |
 | D42 entitlements vs feature tables | Feature rows insertable without plan entitlement at DB | Assert server `assertFeature` + add DB gates where Critical |
 | Free 2026 vs Pro matrix | SMS metered on Pro in matrix but disabled in free period | `PLAN-UNIT-002` is source of truth until 2027 |
-| D12 “force logout svih sesija klinike” vs Tech | Tech/app: per-user `forceLogoutUserAction` | Discrepancy — see Discrepancies.md |
+| D12 force logout scope | Product: per-user `forceLogoutUserAction` + `revoke_user_sessions`; PRD aligned (D-07 RESOLVED docs) | — |
 | PRD §12.1 checkboxes all marked done | Several items lack automated tests | Traceability Status overrides checkbox optimism |
 
 ### 10.3 Missing (implied but not written)
@@ -248,7 +252,7 @@ Existing Vitest coverage for RBAC matrix (finances, clinical, front desk, owner-
 | Explicit list of tables that must have RLS | Needed for TEN-RLS completeness checklist |
 | Append-only rules for payments / invoice_lines | Implemented; not in Decision Log as D# |
 | Demo clinic (`is_demo`) exempt from lifecycle | In DB/Tech; should be Decision or §8.3 note |
-| Cron auth for `/api/cron/clinic-lifecycle` | Ops secret — security requirement missing from PRD §8 |
+| Cron auth for `/api/cron/clinic-lifecycle` | Ops secret — security requirement missing from PRD §8; COVERED by `LIFE-API-001` + P3.3 matrix thin assert |
 | Service-role never in client bundle | Implied by D41; needs explicit SEC test |
 | Treatment plan item closed from visit | PRD §12.1 notes follow-up; still open |
 

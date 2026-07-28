@@ -172,7 +172,7 @@ Signup (`create_clinic_for_owner`) kreira default „Glavna lokacija“. Owner U
 
 Unique: jedan `pending` po `(clinic_id, lower(email))`.
 
-RPCs (service_role): `peek_clinic_invite`, `accept_clinic_invite`. Owner app: `expire_stale_clinic_invites`.
+RPCs (service_role): `peek_clinic_invite`, `accept_clinic_invite`, `revoke_user_sessions` (owner force-logout / deactivate — deletes `auth.sessions` for one user; refresh_tokens CASCADE). Owner app: `expire_stale_clinic_invites`.
 
 #### `clinic_subscriptions`
 
@@ -529,6 +529,7 @@ Location create must call `assertCanCreateLocation`; image upload must call `ass
 | `fix_allocate_invoice_number` | fix Postgres 42702 ambiguous `series_year` in `allocate_invoice_number` (ON CONFLICT vs RETURNS TABLE) — incomplete: conflict *target* still used column name |
 | `fix_allocate_invoice_number_on_conflict` | P2.1/D-14: `ON CONFLICT ON CONSTRAINT invoice_number_counters_pkey` (RPC happy path; app service-role fallback removed in P2.9) |
 | `fix_finance_mfa_restrictive_append_only` | P2.2/D-20: finance MFA → RESTRICTIVE; REVOKE UPDATE/DELETE on payments + invoice_lines |
+| `revoke_user_sessions` | P3.4/D-22: `revoke_user_sessions(uuid)` SECURITY DEFINER — delete `auth.sessions` for one user; service_role only |
 | `phase2d_invoices_revoke_anon` | revoke anon EXECUTE on invoice helpers; trigger fn not callable via API |
 | `phase2d_invoice_patient_directory` | limited patient id/name RPCs for accountant invoice UX |
 | `phase2d_invoice_patient_names` | batch patient name resolver for invoice list/detail |
@@ -583,3 +584,4 @@ Location create must call `assertCanCreateLocation`; image upload must call `ass
 | 2026-07-14 | Faza 3E: inventory_items + low-stock inventar basic (§6.12 / item 25) |
 | 2026-07-14 | Marketing `leads` (W13): platform tabela, RLS deny-all, service_role only |
 | 2026-07-14 | Marketing demo clinic (W8): `clinics.is_demo`, lifecycle/hard_delete skip, seed script |
+| 2026-07-28 | P3.4/D-22: `revoke_user_sessions(uuid)` — service_role deletes `auth.sessions` for owner force-logout/deactivate |

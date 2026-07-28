@@ -34,7 +34,7 @@ import { canSeeDashboardKpis } from "@/lib/dashboard/rbac";
  * | 002 | Patients | createPatientAction — accountant deny |
  * | 003 | Patients (D-09) | createPatientAction — assistant + reception allow |
  * | 004 | Odontogram | upsertToothStatusAction — doctor allow / reception deny |
- * | 005 | Calendar peer | **reserved GAP → P3.2 / CAL-INT-004** (T-RBAC-03) |
+ * | 005 | Calendar peer | **COVERED in P3.2** `doctor-calendar-scope.test.ts` |
  * | 006 | Invoices | createInvoiceAction — accountant allow / doctor deny |
  * | 007 | Expenses | createExpenseAction — accountant allow / reception deny |
  * | 008 | CRM | dismissCrmNotificationAction — reception past-RBAC / doctor deny |
@@ -598,7 +598,7 @@ describeSecurity("P3.1 RBAC-INT parameterized matrix (role × sensitive SA)", ()
       },
     },
 
-    // —— Calendar write (005 reserved for peer scope / P3.2) ——
+    // —— Calendar write (peer scope = RBAC-INT-005 / P3.2 separate file) ——
     {
       id: "RBAC-INT-017",
       module: "calendar",
@@ -721,10 +721,4 @@ describeSecurity("P3.1 RBAC-INT parameterized matrix (role × sensitive SA)", ()
     30_000,
   );
 
-  it("RBAC-INT-005 remains reserved for doctor peer calendar (P3.2 / CAL-INT-004) — ID not exercised here", () => {
-    // Documents ID-drift intentional: T-RBAC-03 / Business-Rules J3 cite
-    // RBAC-INT-005 for peer-doctor appointment scope, which is P3.2's job.
-    // Calendar *module write* allow/deny is covered under RBAC-INT-017.
-    expect("RBAC-INT-005").toBe("RBAC-INT-005");
-  });
 });

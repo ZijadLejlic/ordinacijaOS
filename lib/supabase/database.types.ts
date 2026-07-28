@@ -2237,6 +2237,7 @@ export type Database = {
         }[]
       }
       record_failed_login: { Args: { p_email: string }; Returns: undefined }
+      revoke_user_sessions: { Args: { p_user_id: string }; Returns: undefined }
       request_clinic_closure: { Args: never; Returns: Json }
       run_clinic_lifecycle_transitions: { Args: never; Returns: Json }
       seed_default_consent_forms: {

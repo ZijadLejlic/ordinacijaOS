@@ -92,7 +92,7 @@ Env template: `.env.example` → kopirati u `.env.local`.
 2. App generiše opaque token, čuva `sha256` u `clinic_invites.token_hash`, šalje Resend link `/{locale}/invite/{token}`.
 3. Prije inserta: `assertCanInviteStaff` (aktivni profili + pending invites vs `plans.limits_json`) — hard block + upsell copy (D8/D42).
 4. Accept: service role `peek_clinic_invite` → `auth.admin.createUser` → `accept_clinic_invite` → session.
-5. Owner: resend, revoke, deactivate (+ global signOut), force logout, password reset email.
+5. Owner: resend, revoke, deactivate (`is_active=false` + `revoke_user_sessions`), force logout (`revoke_user_sessions` per-user — D12/D-07; not Admin `signOut(jwt)`), password reset email.
 
 ### PIN operators (D10) — implementirano
 
@@ -253,6 +253,7 @@ Prati PRD §11. Tech doc se širi po fazama; ne specifikovati Enterprise module 
 | 2026-07-28 | P2.1/D-14: complete allocate ON CONFLICT fix (`invoice_number_counters_pkey`); FIN-SEC/DB/INT-001 covered; app fallback removal deferred to P2.9 |
 | 2026-07-28 | P2.9/D-14: remove dead allocate service-role fallback; allocate is RPC-only |
 | 2026-07-28 | P2.2/D-20: finance MFA → RESTRICTIVE; REVOKE UPDATE/DELETE on payments + invoice_lines; FIN-RLS-001 COVERED |
+| 2026-07-28 | P3.4/D-22/D-23: force logout + deactivate via `revoke_user_sessions` (not Admin signOut JWT); deactivate `is_active` only |
 | 2026-07-14 | Faza 3D / D20: consent templates + draw-sign PDF (`consent_forms` / `consent_signatures`) |
 | 2026-07-14 | Faza 3E / §6.12: inventar basic `/inventory` + `inventory_items` + low-stock nav badge |
 | 2026-07-14 | Marketing 1c: SEO helper (metadata/OG/JSON-LD) + cookie consent banner + PostHog consent gate |
