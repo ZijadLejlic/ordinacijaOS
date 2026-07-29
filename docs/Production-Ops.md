@@ -19,6 +19,7 @@
 | JWT Custom Access Token hook | ⏭️ Free / ✅ local CI | Pro+ enable in dashboard; `profiles` fallback OK za UAT (D-04 ACCEPTED). Local `config.toml` hook **on** for security suite. |
 | Auth session TTL (D12) | ✅ local / ⚠️ hosted mirror | Local `config.toml`: `jwt_expiry = 604800`, `[auth.sessions] timebox = "168h"`. Hosted: Authentication → Settings → JWT expiry **604800**, Sessions timebox **168h**. Asserted by `AUTH-INT-021`. |
 | `NEXT_PUBLIC_APP_URL` na Vercel | ✅ | `https://www.dentord.com` — health 2026-07-28: `appUrl` + `appUrlLooksProduction` |
+| Supabase Auth **Site URL** | ✅ | `https://www.dentord.com` + Redirect URLs (`/**` + localhost) — set 2026-07-29. Dashboard: [URL Configuration](https://supabase.com/dashboard/project/pcfroikqbjvwweeidgar/auth/url-configuration) |
 | Mobile responsive (D40) | ✅ | U kodu + na produkciji (`a4dbe9f` / PR #1) |
 
 ---
@@ -39,6 +40,21 @@ Potvrdi Production env:
 Redeploy da uđu: `/api/health`, mobile fixovi, ostale lokalne izmjene.
 
 **Smoke invite:** link u mailu = `https://www.dentord.com/...` (ne localhost).
+
+### 1.1b Supabase Auth URL Configuration (signup confirm)
+
+Signup confirmation emails use GoTrue **Site URL** when `emailRedirectTo` is missing or not allow-listed. Hosted auth logs still showed `referer: http://localhost:3000` (2026-07-29) → Site URL was never flipped for production.
+
+U [URL Configuration](https://supabase.com/dashboard/project/pcfroikqbjvwweeidgar/auth/url-configuration):
+
+| Polje | Vrijednost |
+|---|---|
+| **Site URL** | `https://www.dentord.com` |
+| **Redirect URLs** | `https://www.dentord.com/**`, `http://localhost:3000/**`, `http://127.0.0.1:3000/**` |
+
+App šalje `emailRedirectTo` → `https://www.dentord.com/auth/callback?next=/bs/login` (PKCE exchange u `app/auth/callback`).
+
+**Smoke signup:** novi nalog → confirm link u mailu = `www.dentord.com` (ne localhost) → login/MFA/onboarding.
 
 ### 1.2 Supabase Free — skip
 
@@ -73,6 +89,7 @@ curl -s -H "Authorization: Bearer $CRON_SECRET" https://www.dentord.com/api/heal
 - [x] Resend SPF/DKIM
 - [x] `NEXT_PUBLIC_APP_URL` Production (`appUrlLooksProduction` 2026-07-28)
 - [x] Invite smoke: link u mailu = `www.dentord.com` (ne localhost) — verified 2026-07-28
+- [ ] Signup confirm smoke: link u mailu = `www.dentord.com` (ne localhost) — Site URL set; verify after deploy callback
 - [x] Redeploy (health + mobile) — PR #1 / `a4dbe9f`
 - [x] Supabase Pro toggles — N/A na Free
 

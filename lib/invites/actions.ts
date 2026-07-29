@@ -4,6 +4,7 @@ import { getLocale } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "@/i18n/navigation";
 import { publicLocalePath } from "@/i18n/path";
+import { authEmailRedirectUrl } from "@/lib/auth/app-url";
 import { assertCanInviteStaff } from "@/lib/entitlements/limits";
 import {
   sendPasswordResetEmail,
@@ -415,8 +416,10 @@ export async function resetUserPasswordAction(
     return { error: getError?.message ?? "userNotFound" };
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "");
-  if (!appUrl) {
+  const redirectTo = authEmailRedirectUrl(
+    publicLocalePath(locale, "/login"),
+  );
+  if (!redirectTo) {
     return { error: "missingAppUrl" };
   }
 
@@ -425,7 +428,7 @@ export async function resetUserPasswordAction(
       type: "recovery",
       email: authUser.user.email,
       options: {
-        redirectTo: `${appUrl}${publicLocalePath(locale, "/login")}`,
+        redirectTo,
       },
     });
 

@@ -299,5 +299,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next|monitoring|api|.*\\..*).*)"],
+  // `/auth/*` is PKCE callback (no i18n) — must not run next-intl rewrite.
+  matcher: ["/((?!_next|monitoring|api|auth|.*\\..*).*)"],
 };

@@ -45,7 +45,7 @@ Zaključati **kako** gradimo DentOrd (stack, patterni, granice), da agent/develo
 | Supabase clients | `@supabase/ssr` + `@supabase/supabase-js` u `lib/supabase/` |
 | Validacija | Zod |
 | Deploy target | Vercel — `dentord.com` / `www.dentord.com` (ops: `docs/Production-Ops.md`) |
-| Auth (Faza 1) | Email/password signup+login; `create_clinic_for_owner` RPC; owner TOTP MFA (D11); staff invites D9 (`/settings/users`, `/invite/[token]`); PIN operators D10 (`/pin`, bcrypt via pgcrypto RPCs); Resend; plan limit hard-block via `lib/entitlements/` |
+| Auth (Faza 1) | Email/password signup+login; `emailRedirectTo` → `/auth/callback` (PKCE); `create_clinic_for_owner` RPC; owner TOTP MFA (D11); staff invites D9 (`/settings/users`, `/invite/[token]`); PIN operators D10 (`/pin`, bcrypt via pgcrypto RPCs); Resend; plan limit hard-block via `lib/entitlements/`. Hosted Supabase Site URL must be production (`docs/Production-Ops.md`) |
 | Entitlements (Faza 1) | `lib/entitlements/` — `getClinicEntitlements` / `assertFeature` from `plan_entitlements`; free-2026 override (SMS/AI/portal off); `assertCanInviteStaff`, `assertCanCreateLocation`, `assertCanAddPatientImage` |
 | Platform admin (Faza 1) | `(platform)/platform` — gate via `app_metadata.is_platform_admin` (never `user_metadata`); service-role clinic list/detail; plan + clinic/subscription status updates; owner impersonation with `audit_events` (D41) |
 | Clinic app shell (Faza 2A) | `(dashboard)/layout.tsx` + `components/dashboard/app-shell.tsx` — sidebar/mobile nav (RBAC: patients/services/settings), logout + PIN operator switch, impersonation banner |

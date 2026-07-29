@@ -2,7 +2,9 @@
 
 import { getLocale } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
+import { publicLocalePath } from "@/i18n/path";
 import { createClient } from "@/lib/supabase/server";
+import { authEmailRedirectUrl } from "@/lib/auth/app-url";
 import { ensureOwnerClinic } from "@/lib/auth/ensure-clinic";
 import { mfaPath, resolveOwnerMfaGate } from "@/lib/auth/mfa";
 import { resolveOnboardingGate } from "@/lib/onboarding/gate";
@@ -65,10 +67,19 @@ export async function signupAction(
   const supabase = await createClient();
   const locale = await getLocale();
 
+  // Without emailRedirectTo, GoTrue falls back to project Site URL (often localhost).
+  const emailRedirectTo = authEmailRedirectUrl(
+    publicLocalePath(locale, "/login"),
+  );
+  if (!emailRedirectTo) {
+    return { error: "missingAppUrl" };
+  }
+
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
+      emailRedirectTo,
       // Pending signup payload only — never used for authorization/RLS.
       data: {
         full_name: fullName,

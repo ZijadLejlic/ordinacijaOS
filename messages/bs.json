@@ -1237,7 +1237,8 @@
     "locked": "Previše neuspjelih pokušaja. Pokušaj ponovo za 15 minuta.",
     "confirmEmail": "Provjeri email i potvrdi nalog, zatim se prijavi.",
     "missingClinic": "Nalog nema povezanu ordinaciju. Registruj se kao vlasnik.",
-    "emailTaken": "Ovaj email već ima nalog. Prijavi se umjesto registracije."
+    "emailTaken": "Ovaj email već ima nalog. Prijavi se umjesto registracije.",
+    "missingAppUrl": "Nedostaje konfiguracija adrese aplikacije. Pokušaj ponovo kasnije."
   },
   "Mfa": {
     "enrollTitle": "Uključi 2FA",

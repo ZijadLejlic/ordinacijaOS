@@ -28,6 +28,7 @@ function mapAuthError(
   if (state.error === "locked") return t("locked");
   if (state.error === "missingClinic") return t("missingClinic");
   if (state.error === "emailTaken") return t("emailTaken");
+  if (state.error === "missingAppUrl") return t("missingAppUrl");
   if (state.error) return state.error;
   return null;
 }

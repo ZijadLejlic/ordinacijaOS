@@ -1237,7 +1237,8 @@
     "locked": "Too many failed attempts. Try again in 15 minutes.",
     "confirmEmail": "Check your email to confirm, then log in.",
     "missingClinic": "This account has no clinic. Sign up as an owner.",
-    "emailTaken": "This email already has an account. Log in instead."
+    "emailTaken": "This email already has an account. Log in instead.",
+    "missingAppUrl": "App URL is not configured. Please try again later."
   },
   "Mfa": {
     "enrollTitle": "Enable 2FA",
