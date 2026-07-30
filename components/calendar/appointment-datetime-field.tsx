@@ -157,11 +157,16 @@ export function AppointmentDateTimeField({
                   size="icon-sm"
                   variant="ghost"
                   aria-label={t("prev")}
+                  data-testid={`${id}-prev-month`}
                   onClick={() => setMonthCursor((m) => addMonths(m, -1))}
                 >
                   <ChevronLeft />
                 </Button>
-                <p className="text-sm font-semibold capitalize">
+                <p
+                  className="text-sm font-semibold capitalize"
+                  data-testid={`${id}-month`}
+                  data-month={format(monthCursor, "yyyy-MM")}
+                >
                   {format(monthCursor, "LLLL yyyy", { locale: dfLocale })}
                 </p>
                 <Button
@@ -169,6 +174,7 @@ export function AppointmentDateTimeField({
                   size="icon-sm"
                   variant="ghost"
                   aria-label={t("next")}
+                  data-testid={`${id}-next-month`}
                   onClick={() => setMonthCursor((m) => addMonths(m, 1))}
                 >
                   <ChevronRight />
@@ -192,6 +198,8 @@ export function AppointmentDateTimeField({
                     <button
                       key={day.toISOString()}
                       type="button"
+                      data-testid={`${id}-day`}
+                      data-date={format(day, "yyyy-MM-dd")}
                       onClick={() => selectDate(day)}
                       className={cn(
                         "aspect-square rounded-lg text-sm tabular-nums transition-colors",
@@ -235,6 +243,8 @@ export function AppointmentDateTimeField({
                     <button
                       key={slot}
                       type="button"
+                      data-testid={`${id}-time`}
+                      data-time={slot}
                       onClick={() => selectTime(slot)}
                       className={cn(
                         "rounded-lg border px-1.5 py-2 text-sm font-medium tabular-nums transition-colors",

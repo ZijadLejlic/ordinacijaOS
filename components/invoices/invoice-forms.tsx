@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useMemo, useState } from "react";
+import { useActionState, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -461,10 +461,11 @@ export function RecordPaymentForm({
   );
   const remaining = roundMoney(maxAmount);
   const [amount, setAmount] = useState(String(remaining));
-
-  useEffect(() => {
+  const [amountSource, setAmountSource] = useState(remaining);
+  if (amountSource !== remaining) {
+    setAmountSource(remaining);
     setAmount(String(remaining));
-  }, [remaining]);
+  }
 
   return (
     <form action={action} className="space-y-3">

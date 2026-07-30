@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 import { loginAs } from "./helpers/auth";
 import { getE2EEnv } from "./helpers/env";
 import {
@@ -24,6 +24,42 @@ function wallClockTomorrow(hour: number, minute: number) {
   const endHour = hour + Math.floor(endMinute / 60);
   const end = `${yyyy}-${mm}-${dd}T${String(endHour).padStart(2, "0")}:${String(endMinute % 60).padStart(2, "0")}`;
   return { startsLocal: start, endsLocal: end };
+}
+
+/** Drive the custom AppointmentDateTimeField picker (button + panel). */
+async function fillDateTimeField(
+  page: Page,
+  fieldId: "startsLocal" | "endsLocal",
+  localValue: string,
+) {
+  const [datePart, timePart] = localValue.split("T");
+  if (!datePart || !timePart) {
+    throw new Error(`invalid local datetime: ${localValue}`);
+  }
+  const targetMonth = datePart.slice(0, 7); // yyyy-MM
+
+  await page.locator(`#${fieldId}`).click();
+  const panel = page.locator(`#${fieldId}-panel`);
+  await expect(panel).toBeVisible();
+
+  for (let i = 0; i < 14; i++) {
+    const month = await panel.getByTestId(`${fieldId}-month`).getAttribute("data-month");
+    if (month === targetMonth) break;
+    if (month && month < targetMonth) {
+      await panel.getByTestId(`${fieldId}-next-month`).click();
+    } else {
+      await panel.getByTestId(`${fieldId}-prev-month`).click();
+    }
+  }
+
+  await expect(panel.getByTestId(`${fieldId}-month`)).toHaveAttribute(
+    "data-month",
+    targetMonth,
+  );
+  await panel.locator(`[data-testid="${fieldId}-day"][data-date="${datePart}"]`).click();
+  await panel.locator(`[data-testid="${fieldId}-time"][data-time="${timePart}"]`).click();
+  await panel.getByRole("button", { name: "Gotovo" }).click();
+  await expect(panel).toBeHidden();
 }
 
 test.describe("Appointment scheduling", () => {
@@ -65,8 +101,8 @@ test.describe("Appointment scheduling", () => {
     });
 
     await page.getByTestId("appointment-patient").selectOption(patientId);
-    await page.locator("#startsLocal").fill(slot.startsLocal);
-    await page.locator("#endsLocal").fill(slot.endsLocal);
+    await fillDateTimeField(page, "startsLocal", slot.startsLocal);
+    await fillDateTimeField(page, "endsLocal", slot.endsLocal);
     await page.getByRole("button", { name: "Kreiraj" }).click();
 
     await expect(page.getByRole("status")).toContainText("Termin je kreiran.", {
@@ -76,8 +112,8 @@ test.describe("Appointment scheduling", () => {
     await page.getByTestId("calendar-new-appointment").click();
     await expect(page.getByTestId("appointment-patient")).toBeVisible();
     await page.getByTestId("appointment-patient").selectOption(patientBId);
-    await page.locator("#startsLocal").fill(slot.startsLocal);
-    await page.locator("#endsLocal").fill(slot.endsLocal);
+    await fillDateTimeField(page, "startsLocal", slot.startsLocal);
+    await fillDateTimeField(page, "endsLocal", slot.endsLocal);
     await page.getByRole("button", { name: "Kreiraj" }).click();
 
     await expect(

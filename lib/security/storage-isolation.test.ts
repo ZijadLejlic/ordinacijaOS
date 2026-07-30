@@ -38,7 +38,7 @@ import {
  *   - `patient-files` invoice-scoped policies
  *     (20260713240000_phase2d_invoices.sql, `foldername[3] = 'invoices'`):
  *     gated by `can_access_invoices()` / `can_write_invoices()`
- *     (owner/accountant only).
+ *     (owner/accountant/doctor — D53).
  *   - Both buckets are the *only* two buckets in this schema (grepped every
  *     `insert into storage.buckets` across `supabase/migrations/**`) and
  *     both are private — there is no bucket that is intentionally public by
@@ -136,7 +136,13 @@ describeSecurity("storage isolation & invoice PDF API (release blocker)", () => 
   // Clinic A: one signed-in user per role needed to legitimately write each
   // folder type under test (owner→branding, doctor→consents, accountant→
   // invoices), so a denial can only be explained by cross-tenant isolation.
-  let clinicA: { clinicId: string; owner: TestUser; doctor: TestUser; accountant: TestUser };
+  let clinicA: {
+    clinicId: string;
+    owner: TestUser;
+    doctor: TestUser;
+    accountant: TestUser;
+    reception: TestUser;
+  };
   // Clinic B: service-role only (never signed in) — the target tenant whose
   // objects Clinic A must never reach.
   let clinicB: { clinicId: string; owner: TestUser };
@@ -153,7 +159,7 @@ describeSecurity("storage isolation & invoice PDF API (release blocker)", () => 
     service = createSupabaseClient(url, serviceKey);
 
     const a = await createClinicWithRoles(service, {
-      roles: ["owner", "doctor", "accountant"],
+      roles: ["owner", "doctor", "accountant", "reception"],
       clinicName: `Storage A ${randomTag()}`,
       emailPrefix: "file-a",
     });
@@ -162,6 +168,7 @@ describeSecurity("storage isolation & invoice PDF API (release blocker)", () => 
       owner: a.byRole.owner!,
       doctor: a.byRole.doctor!,
       accountant: a.byRole.accountant!,
+      reception: a.byRole.reception!,
     };
     created.push(...a.users);
 
@@ -403,8 +410,30 @@ describeSecurity("storage isolation & invoice PDF API (release blocker)", () => 
     expect(buffer.equals(Buffer.from(PDF_BYTES))).toBe(true);
   });
 
-  it("FILE-SEC-003: returns 403 for a role without invoice access (owner+accountant only)", async () => {
-    activeRouteClient = await signInAs(url, anonKey, clinicA.doctor.email, clinicA.doctor.password);
+  it("FILE-SEC-003: doctor may download own-clinic invoice PDF (D53)", async () => {
+    activeRouteClient = await signInAs(
+      url,
+      anonKey,
+      clinicA.doctor.email,
+      clinicA.doctor.password,
+    );
+
+    const response = await getInvoicePdfRoute(
+      new Request(`http://localhost/api/invoices/${invoiceA.id}/pdf`),
+      { params: Promise.resolve({ invoiceId: invoiceA.id }) },
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toBe("application/pdf");
+  });
+
+  it("FILE-SEC-003: returns 403 for a role without invoice access (reception)", async () => {
+    activeRouteClient = await signInAs(
+      url,
+      anonKey,
+      clinicA.reception.email,
+      clinicA.reception.password,
+    );
 
     const response = await getInvoicePdfRoute(
       new Request(`http://localhost/api/invoices/${invoiceA.id}/pdf`),

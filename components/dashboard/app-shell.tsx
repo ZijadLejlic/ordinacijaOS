@@ -106,6 +106,11 @@ export function AppShell({
   const t = useTranslations("Nav");
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [navPath, setNavPath] = useState(pathname);
+  if (navPath !== pathname) {
+    setNavPath(pathname);
+    setMobileOpen(false);
+  }
 
   const navItems: NavItem[] = [
     { href: "/dashboard", labelKey: "dashboard" },
@@ -181,10 +186,6 @@ export function AppShell({
       document.body.style.overflow = prev;
     };
   }, [mobileOpen]);
-
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [pathname]);
 
   const brandStyle = shellBrandStyle(branding?.colors ?? null);
   const logoUrl = branding?.logoUrl ?? null;

@@ -52,6 +52,10 @@ vi.mock("@/lib/supabase/server", () => ({
   createClient: async () => activeRouteClient,
 }));
 
+vi.mock("next-intl/server", () => ({
+  getLocale: async () => "bs",
+}));
+
 import { GET as getInvoicePdfRoute } from "@/app/api/invoices/[invoiceId]/pdf/route";
 import { GET as getExcelReportRoute } from "@/app/api/reports/excel/route";
 
