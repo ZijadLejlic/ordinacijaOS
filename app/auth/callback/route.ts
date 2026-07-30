@@ -1,3 +1,4 @@
+import { type EmailOtpType } from "@supabase/supabase-js";
 import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { ensureOwnerClinic } from "@/lib/auth/ensure-clinic";
@@ -23,20 +24,37 @@ function redirectBase(request: NextRequest): string {
   return request.nextUrl.origin;
 }
 
+const OTP_TYPES = new Set<EmailOtpType>([
+  "signup",
+  "invite",
+  "magiclink",
+  "recovery",
+  "email_change",
+  "email",
+]);
+
+function asEmailOtpType(raw: string | null): EmailOtpType | null {
+  if (!raw || !OTP_TYPES.has(raw as EmailOtpType)) return null;
+  return raw as EmailOtpType;
+}
+
 /**
- * PKCE email-confirm / recovery landing.
- * Exchanges `?code=` for a session, ensures owner clinic from signup metadata,
- * then redirects to `next` (defaults to locale login — middleware sends
- * authenticated owners to MFA/onboarding/dashboard).
+ * Auth email landing:
+ * - PKCE signup/confirm: `?code=` → exchangeCodeForSession
+ * - Recovery / invite (Resend + generateLink): `?token_hash=&type=` → verifyOtp
  */
 export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get("code");
+  const tokenHash = request.nextUrl.searchParams.get("token_hash");
+  const otpType = asEmailOtpType(request.nextUrl.searchParams.get("type"));
   const next = safeNextPath(request.nextUrl.searchParams.get("next"));
   const base = redirectBase(request);
   const loginFallback = `${base}${publicLocalePath(routing.defaultLocale, "/login")}`;
 
-  if (!code) {
-    return NextResponse.redirect(loginFallback);
+  if (!code && !(tokenHash && otpType)) {
+    return NextResponse.redirect(
+      `${loginFallback}?error=${encodeURIComponent("confirmFailed")}`,
+    );
   }
 
   const response = NextResponse.redirect(`${base}${next}`);
@@ -58,7 +76,13 @@ export async function GET(request: NextRequest) {
     },
   );
 
-  const { error } = await supabase.auth.exchangeCodeForSession(code);
+  const { error } = code
+    ? await supabase.auth.exchangeCodeForSession(code)
+    : await supabase.auth.verifyOtp({
+        token_hash: tokenHash!,
+        type: otpType!,
+      });
+
   if (error) {
     return NextResponse.redirect(
       `${loginFallback}?error=${encodeURIComponent("confirmFailed")}`,

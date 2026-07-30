@@ -4,7 +4,10 @@ import { getLocale } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "@/i18n/navigation";
 import { publicLocalePath } from "@/i18n/path";
-import { authEmailRedirectUrl } from "@/lib/auth/app-url";
+import {
+  authEmailRedirectUrl,
+  authRecoveryConfirmUrl,
+} from "@/lib/auth/app-url";
 import { assertCanInviteStaff } from "@/lib/entitlements/limits";
 import {
   sendPasswordResetEmail,
@@ -432,7 +435,14 @@ export async function resetUserPasswordAction(
       },
     });
 
-  if (linkError || !linkData.properties?.action_link) {
+  const resetUrl = linkData?.properties?.hashed_token
+    ? authRecoveryConfirmUrl(
+        linkData.properties.hashed_token,
+        publicLocalePath(locale, "/reset-password"),
+      )
+    : null;
+
+  if (linkError || !resetUrl) {
     return { error: linkError?.message ?? "resetFailed" };
   }
 
@@ -453,7 +463,7 @@ export async function resetUserPasswordAction(
       to: authUser.user.email,
       fullName: target.full_name,
       clinicName,
-      resetUrl: linkData.properties.action_link,
+      resetUrl,
     });
   } catch (err) {
     await supabase.from("audit_events").insert({

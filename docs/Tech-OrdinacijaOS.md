@@ -268,3 +268,4 @@ Prati PRD §11. Tech doc se širi po fazama; ne specifikovati Enterprise module 
 | 2026-07-21 | D37 locales: add `hr`/`sr` (Latin) with BS catalog fallback; language dropdown; hreflang/sitemap |
 | 2026-07-30 | Auth: self-service forgot/reset password (`/forgot-password`, `/reset-password`); owner staff reset lands on reset form |
 | 2026-07-30 | Forgot-password sends via Auth Admin `generateLink` + Resend (Supabase built-in mailer hit Free rate limits) |
+| 2026-07-30 | Recovery emails use `/auth/confirm` + `token_hash`/`verifyOtp` (not Supabase `action_link` hash redirect) |

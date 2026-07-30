@@ -15,3 +15,23 @@ export function authEmailRedirectUrl(nextPath: string): string | null {
   const next = nextPath.startsWith("/") ? nextPath : `/${nextPath}`;
   return `${appUrl}/auth/callback?next=${encodeURIComponent(next)}`;
 }
+
+/**
+ * SSR-safe recovery link for Resend emails.
+ * Uses `/auth/confirm` (button click) so Gmail/Safe Links prefetch does not
+ * consume the token, then `/auth/callback` verifies via `token_hash`.
+ */
+export function authRecoveryConfirmUrl(
+  tokenHash: string,
+  nextPath: string,
+): string | null {
+  const appUrl = getAppUrl();
+  if (!appUrl || !tokenHash) return null;
+  const next = nextPath.startsWith("/") ? nextPath : `/${nextPath}`;
+  const params = new URLSearchParams({
+    token_hash: tokenHash,
+    type: "recovery",
+    next,
+  });
+  return `${appUrl}/auth/confirm?${params.toString()}`;
+}

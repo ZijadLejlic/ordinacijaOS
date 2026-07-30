@@ -7,7 +7,10 @@ import { PRODUCT_NAME } from "@/lib/brand/constants";
 import { sendPasswordResetEmail } from "@/lib/email/resend";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
-import { authEmailRedirectUrl } from "@/lib/auth/app-url";
+import {
+  authEmailRedirectUrl,
+  authRecoveryConfirmUrl,
+} from "@/lib/auth/app-url";
 import { ensureOwnerClinic } from "@/lib/auth/ensure-clinic";
 import { mfaPath, resolveOwnerMfaGate } from "@/lib/auth/mfa";
 import { resolveOnboardingGate } from "@/lib/onboarding/gate";
@@ -211,7 +214,7 @@ export async function forgotPasswordAction(
   }
 
   // Bypass Supabase built-in mailer (Free tier rate-limits auth emails).
-  // Same path as owner staff reset: Auth Admin generateLink + Resend.
+  // Auth Admin generateLink + Resend with SSR-safe token_hash confirm URL.
   const service = createServiceClient();
   const { data: linkData, error: linkError } =
     await service.auth.admin.generateLink({
@@ -220,8 +223,16 @@ export async function forgotPasswordAction(
       options: { redirectTo },
     });
 
+  const tokenHash = linkData?.properties?.hashed_token;
+  const resetUrl = tokenHash
+    ? authRecoveryConfirmUrl(
+        tokenHash,
+        publicLocalePath(locale, "/reset-password"),
+      )
+    : null;
+
   // Unknown email → same success copy (do not leak account existence).
-  if (linkError || !linkData.properties?.action_link) {
+  if (linkError || !resetUrl) {
     return { message: "resetEmailSent" };
   }
 
@@ -263,7 +274,7 @@ export async function forgotPasswordAction(
       to: parsed.data.email,
       fullName,
       clinicName,
-      resetUrl: linkData.properties.action_link,
+      resetUrl,
       source: "self",
     });
   } catch {
