@@ -44,6 +44,8 @@ export const routing = defineRouting({
     // Auth / app (same slug all locales)
     "/login": "/login",
     "/signup": "/signup",
+    "/forgot-password": "/forgot-password",
+    "/reset-password": "/reset-password",
     "/pin": "/pin",
     "/onboarding": "/onboarding",
     "/mfa/enroll": "/mfa/enroll",

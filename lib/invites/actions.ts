@@ -417,7 +417,7 @@ export async function resetUserPasswordAction(
   }
 
   const redirectTo = authEmailRedirectUrl(
-    publicLocalePath(locale, "/login"),
+    publicLocalePath(locale, "/reset-password"),
   );
   if (!redirectTo) {
     return { error: "missingAppUrl" };

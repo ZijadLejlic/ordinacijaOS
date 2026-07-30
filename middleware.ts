@@ -99,7 +99,12 @@ export async function middleware(request: NextRequest) {
   // so pathname rewrites stay internal (Next.js #94342).
   const response = session.response;
 
-  const isAuthPage = path === "/login" || path === "/signup";
+  // `/reset-password` is intentionally not an auth page: recovery sessions must
+  // set a new password before MFA/dashboard redirects kick in.
+  const isAuthPage =
+    path === "/login" ||
+    path === "/signup" ||
+    path === "/forgot-password";
   const isInvitePage = path === "/invite" || path.startsWith("/invite/");
   const isMfaPage = path === "/mfa/enroll" || path === "/mfa/verify";
   const isPinPage = path === "/pin";

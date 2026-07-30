@@ -12,7 +12,12 @@ import { clearOperatorCookie } from "@/lib/operators/session";
 import { isPlatformAdmin } from "@/lib/platform/admin";
 import { clearImpersonationCookie } from "@/lib/platform/session";
 import { clearSentryAuthContext } from "@/lib/observability/sentry";
-import { loginSchema, signupSchema } from "@/lib/validations/auth";
+import {
+  forgotPasswordSchema,
+  loginSchema,
+  resetPasswordSchema,
+  signupSchema,
+} from "@/lib/validations/auth";
 
 async function redirectAfterAuth(locale: string) {
   const supabase = await createClient();
@@ -178,6 +183,76 @@ export async function loginAction(
     }
   }
 
+  await redirectAfterAuth(locale);
+  return null;
+}
+
+export async function forgotPasswordAction(
+  _prev: AuthActionState,
+  formData: FormData,
+): Promise<AuthActionState> {
+  const parsed = forgotPasswordSchema.safeParse({
+    email: formData.get("email"),
+  });
+
+  if (!parsed.success) {
+    return { error: "invalid" };
+  }
+
+  const locale = await getLocale();
+  const redirectTo = authEmailRedirectUrl(
+    publicLocalePath(locale, "/reset-password"),
+  );
+  if (!redirectTo) {
+    return { error: "missingAppUrl" };
+  }
+
+  const supabase = await createClient();
+  // Always show the same success copy — do not leak whether the email exists.
+  await supabase.auth.resetPasswordForEmail(parsed.data.email, {
+    redirectTo,
+  });
+
+  return { message: "resetEmailSent" };
+}
+
+export async function updatePasswordAction(
+  _prev: AuthActionState,
+  formData: FormData,
+): Promise<AuthActionState> {
+  const parsed = resetPasswordSchema.safeParse({
+    password: formData.get("password"),
+    confirmPassword: formData.get("confirmPassword"),
+  });
+
+  if (!parsed.success) {
+    const mismatch = parsed.error.issues.some(
+      (issue) => issue.message === "mismatch",
+    );
+    return { error: mismatch ? "passwordMismatch" : "invalid" };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "resetSessionExpired" };
+  }
+
+  const { error } = await supabase.auth.updateUser({
+    password: parsed.data.password,
+  });
+  if (error) {
+    const raw = error.message.toLowerCase();
+    if (raw.includes("same password") || raw.includes("different from")) {
+      return { error: "passwordSameAsOld" };
+    }
+    return { error: error.message };
+  }
+
+  const locale = await getLocale();
   await redirectAfterAuth(locale);
   return null;
 }

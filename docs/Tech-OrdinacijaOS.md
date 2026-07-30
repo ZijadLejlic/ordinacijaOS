@@ -45,7 +45,7 @@ Zaključati **kako** gradimo DentOrd (stack, patterni, granice), da agent/develo
 | Supabase clients | `@supabase/ssr` + `@supabase/supabase-js` u `lib/supabase/` |
 | Validacija | Zod |
 | Deploy target | Vercel — `dentord.com` / `www.dentord.com` (ops: `docs/Production-Ops.md`) |
-| Auth (Faza 1) | Email/password signup+login; `emailRedirectTo` → `/auth/callback` (PKCE); `create_clinic_for_owner` RPC; owner TOTP MFA (D11); staff invites D9 (`/settings/users`, `/invite/[token]`); PIN operators D10 (`/pin`, bcrypt via pgcrypto RPCs); Resend; plan limit hard-block via `lib/entitlements/`. Hosted Supabase Site URL must be production (`docs/Production-Ops.md`) |
+| Auth (Faza 1) | Email/password signup+login; forgot/reset password (`/forgot-password` → recovery email → `/auth/callback` → `/reset-password`); `emailRedirectTo` → `/auth/callback` (PKCE); `create_clinic_for_owner` RPC; owner TOTP MFA (D11); staff invites D9 (`/settings/users`, `/invite/[token]`); PIN operators D10 (`/pin`, bcrypt via pgcrypto RPCs); Resend; plan limit hard-block via `lib/entitlements/`. Hosted Supabase Site URL must be production (`docs/Production-Ops.md`) |
 | Entitlements (Faza 1) | `lib/entitlements/` — `getClinicEntitlements` / `assertFeature` from `plan_entitlements`; free-2026 override (SMS/AI/portal off); `assertCanInviteStaff`, `assertCanCreateLocation`, `assertCanAddPatientImage` |
 | Platform admin (Faza 1) | `(platform)/platform` — gate via `app_metadata.is_platform_admin` (never `user_metadata`); service-role clinic list/detail; plan + clinic/subscription status updates; owner impersonation with `audit_events` (D41) |
 | Clinic app shell (Faza 2A) | `(dashboard)/layout.tsx` + `components/dashboard/app-shell.tsx` — sidebar/mobile nav (RBAC: patients/services/settings), logout + PIN operator switch, impersonation banner |
@@ -64,7 +64,7 @@ Zaključati **kako** gradimo DentOrd (stack, patterni, granice), da agent/develo
 | Audit log (Faza 3C) | `/settings/audit` — owner-only; `audit_events` SELECT RLS owner; filter + pagination; payload old/new when present |
 | GDPR (Faza 3C) | `/settings/privacy` + patient chart export/request; `gdpr_erasure_requests`; owner approve → `approve_gdpr_patient_erasure` hard delete + storage cleanup; JSON export `GET /api/privacy/patients/[id]/export` |
 | Clinic ZIP backup (Faza 3C / §8.3) | Owner on-demand ZIP: `GET /api/privacy/clinic/export` — patients, invoices(+lines/payments), documents/images meta; audit `clinic.backup_exported` |
-| Clinic lifecycle (Faza 3C / D6 / D45) | Trial/unpaid → `readonly` (7d grace) → `pending_delete` → hard delete; owner close via `/settings/privacy`; cron `GET /api/cron/clinic-lifecycle`; RLS `clinic_is_writable()` |
+| Clinic lifecycle (Faza 3C / D6 / D45) | Trial/unpaid → `readonly` (7d grace) → `pending_delete` → hard delete; owner close via `/settings/privacy`; cron `GET /api/cron/clinic-lifecycle`; Storage API cleanup then `hard_delete_clinic` (`lib/clinic/hard-delete.ts`); RLS `clinic_is_writable()` |
 | E2E + tenant isolation CI (item 23) | Playwright `e2e/` — signup→MFA→onboarding step 1, termin+overlap, faktura+PDF, UI isolation; Vitest `lib/security/tenant-isolation.test.ts` — patients/appointments/storage; workflows `e2e.yml` + `security.yml` |
 | Consent draw-sign (Faza 3D / D20) | `/settings/consent` — BS/EN predlošci (`general_treatment`, `data_processing`, `radiography`); karton draw-sign → PDF + PNG u `patient-files`; `consent_forms` / `consent_signatures`; feature `consent_draw_sign` (Pro+) |
 | Inventar basic (Faza 3E / §6.12) | `/inventory` — materijali (qty + unit + low-stock prag); ±1 adjust; nav badge; `inventory_items` + RLS; feature `inventory_basic` (Pro+); bez auto-skidanja/barkoda/roka |
@@ -266,3 +266,4 @@ Prati PRD §11. Tech doc se širi po fazama; ne specifikovati Enterprise module 
 | 2026-07-21 | D40 mobile: calendar day/week/month, odontogram, invoice search, chart/invoice headers (PRD §12.1) |
 | 2026-07-21 | UAT partner checklist `docs/UAT-Partner.md`; Production-Ops MX ✅ |
 | 2026-07-21 | D37 locales: add `hr`/`sr` (Latin) with BS catalog fallback; language dropdown; hreflang/sitemap |
+| 2026-07-30 | Auth: self-service forgot/reset password (`/forgot-password`, `/reset-password`); owner staff reset lands on reset form |
