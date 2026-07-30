@@ -1,3 +1,4 @@
+import { hardDeleteClinic } from "@/lib/clinic/hard-delete";
 import { createServiceClient } from "@/lib/supabase/service";
 import type { Json } from "@/lib/supabase/database.types";
 
@@ -16,7 +17,7 @@ function asStringArray(value: unknown): string[] {
  * Service-role lifecycle job (D6 / D45):
  * 1) trial/unpaid → readonly (7d grace)
  * 2) grace expired → pending_delete
- * 3) hard delete pending_delete clinics (+ storage + auth users)
+ * 3) hard delete pending_delete clinics (Storage API + DB cascade + auth users)
  */
 export async function runClinicLifecycleJob(): Promise<LifecycleJobResult> {
   const service = createServiceClient();
@@ -48,23 +49,18 @@ export async function runClinicLifecycleJob(): Promise<LifecycleJobResult> {
   const deleted: LifecycleJobResult["deleted"] = [];
 
   for (const row of pending ?? []) {
-    const { data, error } = await service.rpc("hard_delete_clinic", {
-      p_clinic_id: row.id,
-    });
+    const result = await hardDeleteClinic(service, row.id);
 
-    if (error) {
-      deleted.push({ clinicId: row.id, ok: false, error: error.message });
+    if (!result.ok) {
+      deleted.push({
+        clinicId: row.id,
+        ok: false,
+        error: result.error,
+      });
       continue;
     }
 
-    deleted.push({
-      clinicId: row.id,
-      ok: true,
-      error:
-        data && typeof data === "object" && !Array.isArray(data)
-          ? undefined
-          : undefined,
-    });
+    deleted.push({ clinicId: row.id, ok: true });
   }
 
   return {

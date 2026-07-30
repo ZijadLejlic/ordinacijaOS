@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { hardDeleteClinic } from "../lib/clinic/hard-delete";
 import { completeMfaEnroll } from "./helpers/mfa";
 import { getE2EEnv } from "./helpers/env";
 import {
@@ -223,13 +224,12 @@ test.describe("Signup → MFA → onboarding steps 1–3", { tag: "@blocker" }, 
           .from("clinics")
           .update({ status: "pending_delete" })
           .eq("id", clinicId);
-        const { error } = await service.rpc("hard_delete_clinic", {
-          p_clinic_id: clinicId,
-        });
-        if (error && userId) {
-          await service.from("profiles").delete().eq("clinic_id", clinicId);
+        const result = await hardDeleteClinic(service, clinicId);
+        if (!result.ok) {
           await service.from("clinics").delete().eq("id", clinicId);
-          await service.auth.admin.deleteUser(userId);
+          if (userId) {
+            await service.auth.admin.deleteUser(userId).catch(() => undefined);
+          }
         }
       } else if (userId) {
         const service = createServiceClient();

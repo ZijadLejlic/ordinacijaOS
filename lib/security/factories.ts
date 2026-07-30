@@ -1,5 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import ws from "ws";
+import { hardDeleteClinic } from "../clinic/hard-delete";
 import type { Database } from "../supabase/database.types";
 
 /**
@@ -249,11 +250,11 @@ export async function createServiceRow(
 }
 
 /**
- * Best-effort teardown: mark each distinct clinic `pending_delete`, try the
- * `hard_delete_clinic` RPC (which should cascade everything), and fall back
- * to manual deletes across every table any of these tests write to
- * directly if the RPC errors. Always deletes the auth users last, and
- * never throws — callers run this from `afterAll`.
+ * Best-effort teardown: mark each distinct clinic `pending_delete`, Storage
+ * API cleanup + `hard_delete_clinic` (clinic cascade + auth users). If the
+ * RPC still fails, delete the clinic row only — child tables CASCADE; do not
+ * delete patients/profiles first (invoices FK NO ACTION). Always deletes any
+ * leftover auth users last. Never throws — callers run this from `afterAll`.
  */
 export async function cleanupClinics(
   service: DbClient,
@@ -267,18 +268,10 @@ export async function cleanupClinics(
       .update({ status: "pending_delete" })
       .eq("id", clinicId);
 
-    const { error } = await service.rpc("hard_delete_clinic", {
-      p_clinic_id: clinicId,
-    });
-    if (error) {
-      await service.from("gdpr_erasure_requests").delete().eq("clinic_id", clinicId);
-      await service.from("clinic_operators").delete().eq("clinic_id", clinicId);
-      await service.from("clinic_invites").delete().eq("clinic_id", clinicId);
-      await service.from("clinic_locations").delete().eq("clinic_id", clinicId);
-      await service.from("patients").delete().eq("clinic_id", clinicId);
-      await service.from("audit_events").delete().eq("clinic_id", clinicId);
-      await service.from("clinic_subscriptions").delete().eq("clinic_id", clinicId);
-      await service.from("profiles").delete().eq("clinic_id", clinicId);
+    const result = await hardDeleteClinic(service, clinicId);
+    if (!result.ok) {
+      // CASCADE from clinics covers invoices/patients/profiles; never delete
+      // those children first (issued_by / patient_id are ON DELETE NO ACTION).
       await service.from("clinics").delete().eq("id", clinicId);
     }
   }

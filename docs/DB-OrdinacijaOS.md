@@ -246,7 +246,7 @@ Distinct from single-patient GDPR JSON. Audit: `clinic.backup_exported` (counts 
 | `clinic_is_writable()` | Restrictive RLS on business-table writes while `status <> active` |
 | `request_clinic_closure()` | Owner + MFA → `readonly` + `grace_ends_at = now()+7d` |
 | `run_clinic_lifecycle_transitions()` | service_role: trial/unpaid → readonly; grace expired → `pending_delete`; **skips `is_demo`** |
-| `hard_delete_clinic(id)` | service_role: storage + clinic cascade + auth users; **refuses `is_demo`** |
+| `hard_delete_clinic(id)` | service_role: clinic cascade + auth users; **refuses `is_demo`**. Storage objects must be removed via Storage API *before* the RPC (`lib/clinic/hard-delete.ts`) — direct SQL `DELETE` on `storage.objects` is blocked by Supabase. |
 
 #### Marketing demo clinic (W8)
 
@@ -545,6 +545,7 @@ Location create must call `assertCanCreateLocation`; image upload must call `ass
 | `phase3c_audit_log_ui` | `audit_events` SELECT owner-only; `(clinic_id, created_at desc)` index |
 | `phase3c_gdpr_erasure` | `gdpr_erasure_requests` + RLS; `approve_gdpr_patient_erasure` hard delete RPC (D35) |
 | `phase3c_clinic_lifecycle` | grace columns; `clinic_is_writable` RLS; closure + lifecycle + hard_delete RPCs (D6/D45) |
+| `hard_delete_clinic_storage_api` | Remove SQL `DELETE` on `storage.objects` from `hard_delete_clinic` (Storage API in app layer) |
 | `phase3d_consent_draw_sign` | `consent_forms` / `consent_signatures` + RLS + seed (D20) |
 | `phase3d_consent_hooks` | clinic create seed + GDPR erase consents |
 | `phase3e_inventory_basic` | `inventory_items` + RLS + `can_access/write_inventory` (§6.12) |
@@ -586,3 +587,4 @@ Location create must call `assertCanCreateLocation`; image upload must call `ass
 | 2026-07-14 | Marketing `leads` (W13): platform tabela, RLS deny-all, service_role only |
 | 2026-07-14 | Marketing demo clinic (W8): `clinics.is_demo`, lifecycle/hard_delete skip, seed script |
 | 2026-07-28 | P3.4/D-22: `revoke_user_sessions(uuid)` — service_role deletes `auth.sessions` for owner force-logout/deactivate |
+| 2026-07-30 | `hard_delete_clinic`: no SQL DELETE on `storage.objects` (Supabase protect_delete); Storage API via `lib/clinic/hard-delete.ts` |

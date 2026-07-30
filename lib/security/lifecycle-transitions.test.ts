@@ -24,10 +24,11 @@ import {
  *     `clinic.marked_pending_delete`. Demo rows are excluded by the
  *     `is_demo = false` predicate (same migration also skips demos in the
  *     active→readonly loop).
- *   - `public.hard_delete_clinic(p_clinic_id)` — same migration. service_role
+ *   - `public.hard_delete_clinic(p_clinic_id)` — final body in
+ *     `20260730120000_hard_delete_clinic_storage_api.sql`. service_role
  *     only; raises `demo_clinic` if `is_demo`; raises `not_pending_delete`
- *     unless status is `pending_delete`; then storage + clinic cascade +
- *     auth users.
+ *     unless status is `pending_delete`; then clinic cascade + auth users.
+ *     Storage cleanup is app-layer Storage API (`lib/clinic/hard-delete.ts`).
  *   - App wiring (`lib/clinic/lifecycle-job.ts` + cron route) already
  *     gated by P1.10 (`LIFE-API-001`). This file asserts the **DB**
  *     transitions / demo guard the job calls — pattern **P1.4** (RPC via

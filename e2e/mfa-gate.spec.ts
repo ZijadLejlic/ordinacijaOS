@@ -1,4 +1,5 @@
 import { test } from "@playwright/test";
+import { hardDeleteClinic } from "../lib/clinic/hard-delete";
 import { getE2EEnv } from "./helpers/env";
 import { createServiceClient, randomTag } from "./helpers/supabase";
 
@@ -64,10 +65,12 @@ test.describe("Owner MFA gate (D11)", () => {
   test.afterAll(async () => {
     if (!clinicId) return;
     const service = createServiceClient();
-    await service.from("clinics").update({ status: "pending_delete" }).eq("id", clinicId);
-    const { error } = await service.rpc("hard_delete_clinic", { p_clinic_id: clinicId });
-    if (error) {
-      await service.from("profiles").delete().eq("clinic_id", clinicId);
+    await service
+      .from("clinics")
+      .update({ status: "pending_delete" })
+      .eq("id", clinicId);
+    const result = await hardDeleteClinic(service, clinicId);
+    if (!result.ok) {
       await service.from("clinics").delete().eq("id", clinicId);
       if (userId) {
         await service.auth.admin.deleteUser(userId).catch(() => undefined);

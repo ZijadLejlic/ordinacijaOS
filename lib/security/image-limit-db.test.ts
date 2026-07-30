@@ -153,8 +153,7 @@ describeSecurity("image limit DB hard gate + SA-level block (D22 / D-02)", () =>
   }, 60_000);
 
   afterAll(async () => {
-    // hard_delete_clinic() cascades patient_images + every storage.objects
-    // row under `{clinic_id}/...`, so no separate image/storage cleanup.
+    // cleanupClinics → Storage API + hard_delete_clinic (clinic cascade).
     await cleanupClinics(service, created);
   }, 60_000);
 

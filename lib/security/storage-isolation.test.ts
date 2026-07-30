@@ -197,10 +197,8 @@ describeSecurity("storage isolation & invoice PDF API (release blocker)", () => 
   }, 60_000);
 
   afterAll(async () => {
-    // hard_delete_clinic() (phase3c_clinic_lifecycle.sql) deletes every
-    // storage.objects row under `{clinic_id}/...` across every bucket, so
-    // no separate storage cleanup is needed for the branding/patient-files
-    // objects uploaded below.
+    // cleanupClinics removes Storage objects via API, then hard_delete_clinic
+    // cascades the clinic row (branding/patient-files uploads below included).
     await cleanupClinics(service, created);
   }, 60_000);
 
