@@ -62,6 +62,36 @@ describe("Sentry privacy / expected-error filters (D33)", () => {
     ).toBeNull();
   });
 
+  it("drops intentional Sentry smoke tests and undefined rejection noise", () => {
+    expect(
+      sanitizeSentryEvent(
+        {
+          type: undefined,
+          message: "DentOrd Sentry client test throw (REMOVE page)",
+        } as never,
+        {} as never,
+      ),
+    ).toBeNull();
+
+    expect(
+      sanitizeSentryEvent(
+        {
+          type: undefined,
+          exception: {
+            values: [
+              {
+                type: "UnhandledRejection",
+                value:
+                  "Non-Error promise rejection captured with value: undefined",
+              },
+            ],
+          },
+        } as never,
+        {} as never,
+      ),
+    ).toBeNull();
+  });
+
   it("captureUnexpectedError skips expected errors", () => {
     const id = captureUnexpectedError(new Error("invalidCredentials"), {
       feature: "auth",

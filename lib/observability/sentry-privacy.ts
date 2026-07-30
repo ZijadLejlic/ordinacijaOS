@@ -15,6 +15,10 @@ const SENSITIVE_KEY_PARTIAL =
 const EXPECTED_MESSAGE =
   /invalid\s*credentials|invalidCredentials|emailTaken|missingClinic|locked|required.?field|validation(?:\s*error)?|appointment.?overlap|slot.?taken|overlap|unauthorized|forbidden|\b401\b|\b403\b|not\s*authenticated|permission\s*denied|featureDisabled|userLimit|planLimit|readonly/i;
 
+/** Intentional smoke / browser noise — never report as product bugs. */
+const DROP_MESSAGE =
+  /DentOrd Sentry (?:client|server)?\s*test|REMOVE (?:page|endpoint)|Non-Error promise rejection captured with value: undefined/i;
+
 export function isExpectedBusinessError(error: unknown): boolean {
   if (!error) return false;
 
@@ -119,6 +123,18 @@ function scrubUser(event: ErrorEvent): void {
  * Shared beforeSend for client / server / edge.
  * Returns null to drop expected business errors.
  */
+function eventTextBlob(event: ErrorEvent, original: unknown): string {
+  const parts: string[] = [];
+  if (typeof event.message === "string") parts.push(event.message);
+  if (original instanceof Error) parts.push(original.message);
+  else if (typeof original === "string") parts.push(original);
+  for (const ex of event.exception?.values ?? []) {
+    if (ex.type) parts.push(ex.type);
+    if (ex.value) parts.push(ex.value);
+  }
+  return parts.join("\n");
+}
+
 export function sanitizeSentryEvent(
   event: ErrorEvent,
   hint: EventHint,
@@ -129,6 +145,11 @@ export function sanitizeSentryEvent(
     return null;
   }
   if (event.message && EXPECTED_MESSAGE.test(event.message)) {
+    return null;
+  }
+
+  const blob = eventTextBlob(event, original);
+  if (blob && DROP_MESSAGE.test(blob)) {
     return null;
   }
 
