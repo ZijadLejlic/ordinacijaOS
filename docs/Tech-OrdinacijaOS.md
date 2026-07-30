@@ -45,7 +45,7 @@ Zaključati **kako** gradimo DentOrd (stack, patterni, granice), da agent/develo
 | Supabase clients | `@supabase/ssr` + `@supabase/supabase-js` u `lib/supabase/` |
 | Validacija | Zod |
 | Deploy target | Vercel — `dentord.com` / `www.dentord.com` (ops: `docs/Production-Ops.md`) |
-| Auth (Faza 1) | Email/password signup+login; forgot/reset password (`/forgot-password` → recovery email → `/auth/callback` → `/reset-password`); `emailRedirectTo` → `/auth/callback` (PKCE); `create_clinic_for_owner` RPC; owner TOTP MFA (D11); staff invites D9 (`/settings/users`, `/invite/[token]`); PIN operators D10 (`/pin`, bcrypt via pgcrypto RPCs); Resend; plan limit hard-block via `lib/entitlements/`. Hosted Supabase Site URL must be production (`docs/Production-Ops.md`) |
+| Auth (Faza 1) | Email/password signup+login; forgot/reset password (`/forgot-password` → Auth Admin `generateLink` + Resend → `/auth/callback` → `/reset-password`; bypasses Supabase built-in mailer rate limits); `emailRedirectTo` → `/auth/callback` (PKCE); `create_clinic_for_owner` RPC; owner TOTP MFA (D11); staff invites D9 (`/settings/users`, `/invite/[token]`); PIN operators D10 (`/pin`, bcrypt via pgcrypto RPCs); Resend; plan limit hard-block via `lib/entitlements/`. Hosted Supabase Site URL must be production (`docs/Production-Ops.md`) |
 | Entitlements (Faza 1) | `lib/entitlements/` — `getClinicEntitlements` / `assertFeature` from `plan_entitlements`; free-2026 override (SMS/AI/portal off); `assertCanInviteStaff`, `assertCanCreateLocation`, `assertCanAddPatientImage` |
 | Platform admin (Faza 1) | `(platform)/platform` — gate via `app_metadata.is_platform_admin` (never `user_metadata`); service-role clinic list/detail; plan + clinic/subscription status updates; owner impersonation with `audit_events` (D41) |
 | Clinic app shell (Faza 2A) | `(dashboard)/layout.tsx` + `components/dashboard/app-shell.tsx` — sidebar/mobile nav (RBAC: patients/services/settings), logout + PIN operator switch, impersonation banner |
@@ -267,3 +267,4 @@ Prati PRD §11. Tech doc se širi po fazama; ne specifikovati Enterprise module 
 | 2026-07-21 | UAT partner checklist `docs/UAT-Partner.md`; Production-Ops MX ✅ |
 | 2026-07-21 | D37 locales: add `hr`/`sr` (Latin) with BS catalog fallback; language dropdown; hreflang/sitemap |
 | 2026-07-30 | Auth: self-service forgot/reset password (`/forgot-password`, `/reset-password`); owner staff reset lands on reset form |
+| 2026-07-30 | Forgot-password sends via Auth Admin `generateLink` + Resend (Supabase built-in mailer hit Free rate limits) |

@@ -35,6 +35,7 @@ function mapAuthError(
   if (state.error === "passwordMismatch") return t("passwordMismatch");
   if (state.error === "resetSessionExpired") return t("resetSessionExpired");
   if (state.error === "passwordSameAsOld") return t("passwordSameAsOld");
+  if (state.error === "emailSendFailed") return t("emailSendFailed");
   if (state.error) return state.error;
   return null;
 }

@@ -3,7 +3,10 @@
 import { getLocale } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { publicLocalePath } from "@/i18n/path";
+import { PRODUCT_NAME } from "@/lib/brand/constants";
+import { sendPasswordResetEmail } from "@/lib/email/resend";
 import { createClient } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/service";
 import { authEmailRedirectUrl } from "@/lib/auth/app-url";
 import { ensureOwnerClinic } from "@/lib/auth/ensure-clinic";
 import { mfaPath, resolveOwnerMfaGate } from "@/lib/auth/mfa";
@@ -207,11 +210,65 @@ export async function forgotPasswordAction(
     return { error: "missingAppUrl" };
   }
 
-  const supabase = await createClient();
-  // Always show the same success copy — do not leak whether the email exists.
-  await supabase.auth.resetPasswordForEmail(parsed.data.email, {
-    redirectTo,
-  });
+  // Bypass Supabase built-in mailer (Free tier rate-limits auth emails).
+  // Same path as owner staff reset: Auth Admin generateLink + Resend.
+  const service = createServiceClient();
+  const { data: linkData, error: linkError } =
+    await service.auth.admin.generateLink({
+      type: "recovery",
+      email: parsed.data.email,
+      options: { redirectTo },
+    });
+
+  // Unknown email → same success copy (do not leak account existence).
+  if (linkError || !linkData.properties?.action_link) {
+    return { message: "resetEmailSent" };
+  }
+
+  const meta = linkData.user?.user_metadata ?? {};
+  let fullName =
+    typeof meta.full_name === "string" && meta.full_name.trim()
+      ? meta.full_name
+      : (linkData.user?.email ?? parsed.data.email);
+  let clinicName =
+    typeof meta.clinic_name === "string" && meta.clinic_name.trim()
+      ? meta.clinic_name
+      : PRODUCT_NAME;
+
+  if (linkData.user?.id) {
+    const { data: profile } = await service
+      .from("profiles")
+      .select("full_name, clinics(name)")
+      .eq("id", linkData.user.id)
+      .maybeSingle();
+
+    if (profile?.full_name?.trim()) {
+      fullName = profile.full_name;
+    }
+
+    const clinic = profile?.clinics;
+    const name =
+      clinic && typeof clinic === "object" && !Array.isArray(clinic)
+        ? (clinic as { name?: string }).name
+        : Array.isArray(clinic)
+          ? clinic[0]?.name
+          : undefined;
+    if (typeof name === "string" && name.trim()) {
+      clinicName = name;
+    }
+  }
+
+  try {
+    await sendPasswordResetEmail({
+      to: parsed.data.email,
+      fullName,
+      clinicName,
+      resetUrl: linkData.properties.action_link,
+      source: "self",
+    });
+  } catch {
+    return { error: "emailSendFailed" };
+  }
 
   return { message: "resetEmailSent" };
 }

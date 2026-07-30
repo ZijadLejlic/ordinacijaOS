@@ -88,15 +88,23 @@ export type PasswordResetEmailInput = {
   fullName: string;
   clinicName: string;
   resetUrl: string;
+  /** Owner-initiated staff reset vs self-service forgot-password. */
+  source?: "owner" | "self";
 };
 
 export async function sendPasswordResetEmail(input: PasswordResetEmailInput) {
   const subject = `Reset lozinke — ${input.clinicName}`;
+  const intro =
+    input.source === "self"
+      ? `<p>Zatražen je reset lozinke za tvoj <strong>${escapeHtml(PRODUCT_NAME)}</strong> nalog
+    (${escapeHtml(input.clinicName)}).</p>`
+      : `<p>Vlasnik ordinacije <strong>${escapeHtml(input.clinicName)}</strong>
+    je zatražio reset lozinke.</p>`;
   const html = `
     <p>Pozdrav ${escapeHtml(input.fullName)},</p>
-    <p>Vlasnik ordinacije <strong>${escapeHtml(input.clinicName)}</strong>
-    je zatražio reset lozinke.</p>
+    ${intro}
     <p><a href="${escapeHtml(input.resetUrl)}">Postavi novu lozinku</a></p>
+    <p>Ako nisi tražio/la reset, ignoriši ovaj email.</p>
   `;
 
   const apiKey = process.env.RESEND_API_KEY;
