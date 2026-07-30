@@ -18,6 +18,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { canAccessPatients, canWritePatients } from "@/lib/patients/rbac";
+import { getAuthUser } from "@/lib/supabase/auth-user";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -32,9 +33,7 @@ export default async function PatientsPage({ params, searchParams }: Props) {
   const t = await getTranslations("Patients");
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
   if (!user) {
     redirect({ href: "/login", locale });

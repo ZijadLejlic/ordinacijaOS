@@ -1,3 +1,4 @@
+import { cache } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
 
@@ -57,6 +58,11 @@ export type ClinicEntitlements = {
   freePeriodOverride: boolean;
 };
 
+/** Per-request memo of entitlement loads (keyed by clinicId). */
+const getEntitlementsRequestCache = cache(
+  () => new Map<string, Promise<ClinicEntitlements>>(),
+);
+
 export function isFreePeriod2026(now: Date = new Date()): boolean {
   return now < BILLING_START;
 }
@@ -90,13 +96,10 @@ function emptyFeatures(): Record<FeatureKey, FeatureFlag> {
   ) as Record<FeatureKey, FeatureFlag>;
 }
 
-/**
- * Load clinic plan feature matrix + free-period overrides (D42 / §4.3).
- */
-export async function getClinicEntitlements(
+async function fetchClinicEntitlements(
   supabase: Client,
   clinicId: string,
-  now: Date = new Date(),
+  now: Date,
 ): Promise<ClinicEntitlements> {
   const { data: clinic, error: clinicError } = await supabase
     .from("clinics")
@@ -141,6 +144,30 @@ export async function getClinicEntitlements(
     features: applied.features,
     freePeriodOverride: applied.freePeriodOverride,
   };
+}
+
+/**
+ * Load clinic plan feature matrix + free-period overrides (D42 / §4.3).
+ * Dedupes within a single RSC request so layout + page feature checks
+ * share one clinics/plan_entitlements round-trip.
+ */
+export async function getClinicEntitlements(
+  supabase: Client,
+  clinicId: string,
+  now: Date = new Date(),
+): Promise<ClinicEntitlements> {
+  const store = getEntitlementsRequestCache();
+  const cached = store.get(clinicId);
+  if (cached) return cached;
+
+  const pending = fetchClinicEntitlements(supabase, clinicId, now);
+  store.set(clinicId, pending);
+  try {
+    return await pending;
+  } catch (error) {
+    store.delete(clinicId);
+    throw error;
+  }
 }
 
 export async function clinicHasFeature(

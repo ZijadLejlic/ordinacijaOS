@@ -14,6 +14,7 @@ import {
 } from "@/components/services/service-forms";
 import { canReadServices, canWriteServices } from "@/lib/patients/rbac";
 import { currencyLabel } from "@/lib/money/format";
+import { getAuthUser } from "@/lib/supabase/auth-user";
 import { createClient } from "@/lib/supabase/server";
 import type { Json } from "@/lib/supabase/database.types";
 
@@ -29,9 +30,7 @@ export default async function ServicesPage({ params, searchParams }: Props) {
   const t = await getTranslations("Services");
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
   if (!user) {
     redirect({ href: "/login", locale });

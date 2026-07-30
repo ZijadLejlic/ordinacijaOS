@@ -11,6 +11,7 @@ import { CrmInboxList } from "@/components/crm/crm-inbox";
 import { canAccessCrm } from "@/lib/crm/rbac";
 import { loadOpenCrmNotifications } from "@/lib/crm/load";
 import { clinicHasFeature } from "@/lib/entitlements";
+import { getAuthUser } from "@/lib/supabase/auth-user";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -23,9 +24,7 @@ export default async function CrmPage({ params }: Props) {
   const t = await getTranslations("Crm");
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
   if (!user) {
     redirect({ href: "/login", locale });

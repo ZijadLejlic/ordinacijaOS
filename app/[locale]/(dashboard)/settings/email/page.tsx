@@ -17,6 +17,7 @@ import {
   type EmailTemplateKey,
 } from "@/lib/email/templates";
 import { clinicHasFeature } from "@/lib/entitlements";
+import { getAuthUser } from "@/lib/supabase/auth-user";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -64,9 +65,7 @@ export default async function SettingsEmailPage({ params }: Props) {
   const t = await getTranslations("EmailTemplates");
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
   if (!user) {
     redirect({ href: "/login", locale });

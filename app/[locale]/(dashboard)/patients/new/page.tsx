@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import { PatientForm } from "@/components/patients/patient-forms";
 import { canWritePatients } from "@/lib/patients/rbac";
+import { getAuthUser } from "@/lib/supabase/auth-user";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -21,9 +22,7 @@ export default async function NewPatientPage({ params }: Props) {
   const t = await getTranslations("Patients");
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
   if (!user) {
     redirect({ href: "/login", locale });

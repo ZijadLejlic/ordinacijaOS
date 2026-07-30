@@ -26,6 +26,7 @@ import { clinicHasFeature } from "@/lib/entitlements";
 import { canAccessInvoices, canWriteInvoices } from "@/lib/invoices/rbac";
 import { formatInvoiceNumber, roundMoney } from "@/lib/invoices/money";
 import { formatMoney } from "@/lib/money/format";
+import { getAuthUser } from "@/lib/supabase/auth-user";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -38,9 +39,7 @@ export default async function InvoiceDetailPage({ params }: Props) {
   const t = await getTranslations("Invoices");
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
   if (!user) {
     redirect({ href: "/login", locale });

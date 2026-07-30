@@ -20,6 +20,7 @@ import { clinicHasFeature } from "@/lib/entitlements";
 import { canAccessExpenses, canWriteExpenses } from "@/lib/expenses/rbac";
 import { roundMoney } from "@/lib/invoices/money";
 import { formatMoney, currencyLabel } from "@/lib/money/format";
+import { getAuthUser } from "@/lib/supabase/auth-user";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "@/i18n/navigation";
 import {
@@ -39,9 +40,7 @@ export default async function ExpensesPage({ params, searchParams }: Props) {
   const t = await getTranslations("Expenses");
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
   if (!user) {
     redirect({ href: "/login", locale });

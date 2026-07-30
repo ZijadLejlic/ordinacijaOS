@@ -47,6 +47,7 @@ import {
   canExportPatientData,
   canRequestPatientErasure,
 } from "@/lib/privacy/rbac";
+import { getAuthUser } from "@/lib/supabase/auth-user";
 import { createClient } from "@/lib/supabase/server";
 import {
   PATIENT_FILES_BUCKET,
@@ -66,9 +67,7 @@ export default async function PatientDetailPage({ params }: Props) {
   const tConsent = await getTranslations("Consent");
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
   if (!user) {
     redirect({ href: "/login", locale });

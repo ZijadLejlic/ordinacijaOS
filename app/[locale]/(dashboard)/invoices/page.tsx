@@ -15,6 +15,7 @@ import {
 } from "@/components/invoices/invoice-forms";
 import { canAccessInvoices, canWriteInvoices } from "@/lib/invoices/rbac";
 import { formatInvoiceNumber, roundMoney } from "@/lib/invoices/money";
+import { getAuthUser } from "@/lib/supabase/auth-user";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -29,9 +30,7 @@ export default async function InvoicesPage({ params, searchParams }: Props) {
   const t = await getTranslations("Invoices");
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
   if (!user) {
     redirect({ href: "/login", locale });

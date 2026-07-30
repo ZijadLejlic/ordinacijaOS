@@ -11,6 +11,7 @@ import {
 import { AuditLogTable } from "@/components/audit/audit-log-table";
 import { AUDIT_EVENT_FILTERS, loadAuditEvents } from "@/lib/audit/load";
 import { canViewAuditLog } from "@/lib/audit/rbac";
+import { getAuthUser } from "@/lib/supabase/auth-user";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -28,9 +29,7 @@ export default async function SettingsAuditPage({
   const t = await getTranslations("AuditLog");
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
   if (!user) {
     redirect({ href: "/login", locale });

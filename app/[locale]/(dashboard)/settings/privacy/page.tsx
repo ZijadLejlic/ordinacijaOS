@@ -14,6 +14,7 @@ import {
   ExportClinicZipLink,
 } from "@/components/privacy/privacy-forms";
 import { canManagePrivacy } from "@/lib/privacy/rbac";
+import { getAuthUser } from "@/lib/supabase/auth-user";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/supabase/database.types";
 
@@ -30,9 +31,7 @@ export default async function SettingsPrivacyPage({ params }: Props) {
   const tLife = await getTranslations("ClinicLifecycle");
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
   if (!user) {
     redirect({ href: "/login", locale });

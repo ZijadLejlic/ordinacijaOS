@@ -14,6 +14,7 @@ import {
 } from "@/components/locations/location-forms";
 import { getClinicLimits } from "@/lib/entitlements";
 import { canManageLocations } from "@/lib/locations/rbac";
+import { getAuthUser } from "@/lib/supabase/auth-user";
 import { createClient } from "@/lib/supabase/server";
 import type { Json } from "@/lib/supabase/database.types";
 
@@ -27,9 +28,7 @@ export default async function SettingsLocationsPage({ params }: Props) {
   const t = await getTranslations("Locations");
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
   if (!user) {
     redirect({ href: "/login", locale });

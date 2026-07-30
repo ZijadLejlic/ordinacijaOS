@@ -14,7 +14,7 @@ import {
   BRANDING_SIGNED_URL_TTL_SECONDS,
   CLINIC_BRANDING_BUCKET,
 } from "@/lib/branding/storage";
-import { clinicHasFeature } from "@/lib/entitlements";
+import { getClinicEntitlements } from "@/lib/entitlements";
 import { canAccessCrm } from "@/lib/crm/rbac";
 import { canReadConsentForms } from "@/lib/consent/rbac";
 import { countOpenCrmNotifications } from "@/lib/crm/load";
@@ -22,6 +22,7 @@ import { canAccessExpenses } from "@/lib/expenses/rbac";
 import { canAccessInventory } from "@/lib/inventory/rbac";
 import { countLowStockItems } from "@/lib/inventory/load";
 import { getOperatorIdFromCookie } from "@/lib/operators/session";
+import { getAuthUser } from "@/lib/supabase/auth-user";
 import { createClient } from "@/lib/supabase/server";
 import type { Database } from "@/lib/supabase/database.types";
 
@@ -39,9 +40,7 @@ export default async function DashboardLayout({ children, params }: Props) {
   const t = await getTranslations("Nav");
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
   if (!user) {
     redirect({ href: "/login", locale });
@@ -75,46 +74,45 @@ export default async function DashboardLayout({ children, params }: Props) {
   } | null;
 
   const operatorId = await getOperatorIdFromCookie();
-  let operatorName: string | null = null;
-  if (operatorId) {
-    const { data: op } = await supabase
-      .from("clinic_operators")
-      .select("display_name")
-      .eq("id", operatorId)
-      .maybeSingle();
-    operatorName = op?.display_name ?? null;
-  }
+  const entitlementsPromise = getClinicEntitlements(
+    supabase,
+    profile!.clinic_id,
+  );
 
-  const [showExpenses, brandingEnabled, showCrm, showConsent, showInventory] =
-    await Promise.all([
-      canAccessExpenses(profile!.role)
-        ? clinicHasFeature(
-            supabase,
-            profile!.clinic_id,
-            "expenses_reports_excel",
-          )
-        : Promise.resolve(false),
-      clinicHasFeature(supabase, profile!.clinic_id, "branding_custom"),
-      canAccessCrm(profile!.role)
-        ? clinicHasFeature(supabase, profile!.clinic_id, "crm_light")
-        : Promise.resolve(false),
-      canReadConsentForms(profile!.role)
-        ? clinicHasFeature(supabase, profile!.clinic_id, "consent_draw_sign")
-        : Promise.resolve(false),
-      canAccessInventory(profile!.role)
-        ? clinicHasFeature(supabase, profile!.clinic_id, "inventory_basic")
-        : Promise.resolve(false),
-    ]);
+  const [operatorResult, entitlements] = await Promise.all([
+    operatorId
+      ? supabase
+          .from("clinic_operators")
+          .select("display_name")
+          .eq("id", operatorId)
+          .maybeSingle()
+      : Promise.resolve({ data: null as { display_name: string } | null }),
+    entitlementsPromise,
+  ]);
 
-  let crmOpenCount = 0;
-  if (showCrm) {
-    crmOpenCount = await countOpenCrmNotifications(profile!.clinic_id);
-  }
+  const operatorName = operatorResult.data?.display_name ?? null;
 
-  let inventoryLowCount = 0;
-  if (showInventory) {
-    inventoryLowCount = await countLowStockItems(profile!.clinic_id);
-  }
+  const showExpenses =
+    canAccessExpenses(profile!.role) &&
+    entitlements.features.expenses_reports_excel.enabled;
+  const brandingEnabled = entitlements.features.branding_custom.enabled;
+  const showCrm =
+    canAccessCrm(profile!.role) && entitlements.features.crm_light.enabled;
+  const showConsent =
+    canReadConsentForms(profile!.role) &&
+    entitlements.features.consent_draw_sign.enabled;
+  const showInventory =
+    canAccessInventory(profile!.role) &&
+    entitlements.features.inventory_basic.enabled;
+
+  const [crmOpenCount, inventoryLowCount] = await Promise.all([
+    showCrm
+      ? countOpenCrmNotifications(profile!.clinic_id)
+      : Promise.resolve(0),
+    showInventory
+      ? countLowStockItems(profile!.clinic_id)
+      : Promise.resolve(0),
+  ]);
 
   let shellBranding: {
     logoUrl: string | null;

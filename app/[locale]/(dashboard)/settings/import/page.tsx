@@ -18,6 +18,7 @@ import {
 } from "@/lib/import/rbac";
 import { currencyLabel } from "@/lib/money/format";
 import { needsOnboarding } from "@/lib/onboarding/parse";
+import { getAuthUser } from "@/lib/supabase/auth-user";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -30,9 +31,7 @@ export default async function SettingsImportPage({ params }: Props) {
   const t = await getTranslations("Import");
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
   if (!user) {
     redirect({ href: "/login", locale });

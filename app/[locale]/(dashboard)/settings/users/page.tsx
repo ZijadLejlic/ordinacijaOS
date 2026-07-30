@@ -16,6 +16,7 @@ import {
   CreateOperatorForm,
   OperatorsTable,
 } from "@/components/operators/operators-forms";
+import { getAuthUser } from "@/lib/supabase/auth-user";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -28,9 +29,7 @@ export default async function SettingsUsersPage({ params }: Props) {
   const t = await getTranslations("Users");
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
   if (!user) {
     redirect({ href: "/login", locale });

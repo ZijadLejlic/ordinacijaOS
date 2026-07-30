@@ -16,7 +16,8 @@ import {
   parseView,
   rangeForView,
 } from "@/lib/calendar/time";
-import { clinicHasFeature } from "@/lib/entitlements";
+import { getClinicEntitlements } from "@/lib/entitlements";
+import { getAuthUser } from "@/lib/supabase/auth-user";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -35,10 +36,7 @@ export default async function CalendarPage({ params, searchParams }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations("Calendar");
   const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
   if (!user) {
     redirect({ href: "/login", locale });
@@ -56,12 +54,12 @@ export default async function CalendarPage({ params, searchParams }: Props) {
 
   const clinicProfile = profile!;
 
-  const hasBasic = await clinicHasFeature(
+  // Shares request cache with dashboard layout (one entitlements load).
+  const entitlements = await getClinicEntitlements(
     supabase,
     clinicProfile.clinic_id,
-    "calendar_basic",
   );
-  if (!hasBasic) {
+  if (!entitlements.features.calendar_basic.enabled) {
     return (
       <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-4 px-4 py-6 sm:py-10">
         <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
@@ -95,21 +93,13 @@ export default async function CalendarPage({ params, searchParams }: Props) {
 
   const showWaitlistUi =
     canAccessWaitlist(clinicProfile.role) &&
-    (await clinicHasFeature(supabase, clinicProfile.clinic_id, "waitlist_auto"));
+    entitlements.features.waitlist_auto.enabled;
 
-  const canDrag = await clinicHasFeature(
-    supabase,
-    clinicProfile.clinic_id,
-    "calendar_advanced",
-  );
+  const canDrag = entitlements.features.calendar_advanced.enabled;
 
   const canSendReminder =
     canSendEmailReminders(clinicProfile.role) &&
-    (await clinicHasFeature(
-      supabase,
-      clinicProfile.clinic_id,
-      "email_reminders",
-    ));
+    entitlements.features.email_reminders.enabled;
 
   const [
     { data: appointments },

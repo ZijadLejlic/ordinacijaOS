@@ -19,6 +19,7 @@ import {
   canWriteInventory,
 } from "@/lib/inventory/rbac";
 import { isLowStock } from "@/lib/inventory/stock";
+import { getAuthUser } from "@/lib/supabase/auth-user";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -33,9 +34,7 @@ export default async function InventoryPage({ params, searchParams }: Props) {
   const t = await getTranslations("Inventory");
   const supabase = await createClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
   if (!user) {
     redirect({ href: "/login", locale });

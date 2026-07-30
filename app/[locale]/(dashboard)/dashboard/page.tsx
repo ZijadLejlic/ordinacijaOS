@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
-import { clinicHasFeature, getClinicEntitlements } from "@/lib/entitlements";
+import { getClinicEntitlements } from "@/lib/entitlements";
 import { canAccessCalendar } from "@/lib/calendar/rbac";
 import {
   canSeeDashboardKpis,
@@ -24,6 +24,7 @@ import {
   canReadServices,
 } from "@/lib/patients/rbac";
 import { formatMoney } from "@/lib/money/format";
+import { getAuthUser } from "@/lib/supabase/auth-user";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -34,10 +35,7 @@ export default async function DashboardPage({ params }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations("Dashboard");
   const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getAuthUser();
 
   if (!user) {
     redirect({ href: "/login", locale });
@@ -72,13 +70,9 @@ export default async function DashboardPage({ params }: Props) {
   const showCalendar = role ? canAccessCalendar(role) : false;
   const showInvoices = role ? canAccessInvoices(role) : false;
   const showExpenses =
-    role && profile?.clinic_id
+    role && entitlements
       ? canAccessExpenses(role) &&
-        (await clinicHasFeature(
-          supabase,
-          profile.clinic_id,
-          "expenses_reports_excel",
-        ))
+        entitlements.features.expenses_reports_excel.enabled
       : false;
   const isOwner = role === "owner";
 
