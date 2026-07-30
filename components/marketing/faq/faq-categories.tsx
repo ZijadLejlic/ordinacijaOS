@@ -35,11 +35,23 @@ export async function FaqCategories() {
 
       <div className="mx-auto flex max-w-3xl flex-col gap-16 md:gap-20">
         {FAQ_CATEGORIES.map((category, categoryIndex) => {
-          const items = category.items.map((itemKey) => ({
-            id: `${category.key}-${itemKey}`,
-            question: t(`categories.${category.key}.items.${itemKey}.q`),
-            answer: t(`categories.${category.key}.items.${itemKey}.a`),
-          }));
+          const items = category.items.map((itemKey) => {
+            const base = {
+              id: `${category.key}-${itemKey}`,
+              question: t(`categories.${category.key}.items.${itemKey}.q`),
+              answer: t(`categories.${category.key}.items.${itemKey}.a`),
+            };
+            if (category.key === "usage" && itemKey === "mobile") {
+              return {
+                ...base,
+                link: {
+                  href: "/install" as const,
+                  label: t("categories.usage.items.mobile.linkLabel"),
+                },
+              };
+            }
+            return base;
+          });
 
           return (
             <Reveal key={category.key} delayMs={categoryIndex * 40}>

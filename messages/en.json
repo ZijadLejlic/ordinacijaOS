@@ -6,6 +6,7 @@
       "tour": "Tour",
       "whyDentord": "Why DentOrd",
       "faq": "FAQ",
+      "install": "Install",
       "demo": "Demo",
       "contact": "Contact",
       "blog": "Blog",
@@ -233,6 +234,11 @@
           "setup": {
             "q": "How long does setup take?",
             "a": "Onboarding has three steps: clinic details, services, and inviting your team. Most clinics are ready in about 5 minutes."
+          },
+          "install": {
+            "q": "Can I install DentOrd on my phone or computer?",
+            "a": "Yes. Add DentOrd to your phone or tablet home screen, or your desktop — open it like an app, without searching in the browser. Updates arrive automatically.",
+            "linkLabel": "Install guide"
           },
           "data": {
             "q": "Where is data stored?",
@@ -594,7 +600,8 @@
           "items": {
             "mobile": {
               "q": "Does it work on phone/tablet?",
-              "a": "Yes. DentOrd is fully responsive — it works in the browser on phone, tablet and desktop."
+              "a": "Yes. DentOrd is fully responsive — it works in the browser on phone, tablet and desktop. You can also add an icon to your home screen or desktop — see the Install guide.",
+              "linkLabel": "Install guide"
             },
             "users": {
               "q": "How many users can I add?",
@@ -609,6 +616,139 @@
               "a": "The owner sends an invite by email from user settings. Your colleague sets a password and joins. Plan limits are checked before the invite is sent."
             }
           }
+        }
+      }
+    },
+    "install": {
+      "eyebrow": "Install",
+      "title": "Add DentOrd to your home screen",
+      "subtitle": "Open it like an app — one tap, no searching in the browser. Same DentOrd; updates arrive automatically when you open it.",
+      "benefit1": "Faster access from phone or tablet",
+      "benefit2": "Icon on your home screen or desktop",
+      "benefit3": "New versions without reinstalling",
+      "platformsEyebrow": "Devices",
+      "platformsTitle": "Choose your device",
+      "platformsDescription": "Steps differ slightly by system. Illustrations are simplified — Chrome or Safari menus may look similar.",
+      "platformsAria": "Install platforms",
+      "platforms": {
+        "android": {
+          "label": "Android",
+          "intro": "On Android, use Chrome. Open DentOrd (app.dentord.com or dentord.com), then follow the steps.",
+          "steps": {
+            "step1": {
+              "title": "Open the Chrome menu",
+              "body": "Tap the three dots (⋮) in the top-right corner.",
+              "caption": "Chrome menu — three dots"
+            },
+            "step2": {
+              "title": "Choose Install app",
+              "body": "In the menu, find “Install app” or “Add to Home screen”.",
+              "caption": "Install option in the menu"
+            },
+            "step3": {
+              "title": "Confirm install",
+              "body": "A confirmation appears with the DentOrd icon. Tap Install or Add.",
+              "caption": "Install confirmation"
+            },
+            "step4": {
+              "title": "Open from the home screen",
+              "body": "The DentOrd icon is now with your apps. Open it like any other app — same account.",
+              "caption": "Icon on the home screen"
+            }
+          }
+        },
+        "ios": {
+          "label": "iPhone / iPad",
+          "intro": "On iPhone and iPad, use Safari (not Chrome for this step — Apple allows “Add to Home Screen” from Safari).",
+          "steps": {
+            "step1": {
+              "title": "Open the Share menu",
+              "body": "In Safari, open DentOrd, then tap the Share button (square with an up arrow) at the bottom or top of the screen.",
+              "caption": "Safari — Share button"
+            },
+            "step2": {
+              "title": "Add to Home Screen",
+              "body": "In the list of options, scroll and tap “Add to Home Screen”.",
+              "caption": "Option in the Share sheet"
+            },
+            "step3": {
+              "title": "Confirm Add",
+              "body": "Optionally edit the name (leave DentOrd), then tap “Add” in the top-right.",
+              "caption": "Home Screen confirmation"
+            },
+            "step4": {
+              "title": "Launch as an app",
+              "body": "Find the DentOrd icon on your Home Screen and open it. It runs in its own window without the Safari bar.",
+              "caption": "Icon on the Home Screen"
+            }
+          }
+        },
+        "windows": {
+          "label": "Windows",
+          "intro": "On Windows, use Google Chrome or Microsoft Edge. Open DentOrd in that browser.",
+          "steps": {
+            "step1": {
+              "title": "Find the Install button",
+              "body": "In the address bar (right side), look for the install icon, or open the ⋮ menu → “Install DentOrd…” / “Apps” → “Install this site as an app”.",
+              "caption": "Install icon in the address bar"
+            },
+            "step2": {
+              "title": "Confirm install",
+              "body": "In the dialog, click Install. Windows adds DentOrd to the Start menu and optionally the taskbar.",
+              "caption": "Confirmation dialog"
+            },
+            "step3": {
+              "title": "Launch from the desktop",
+              "body": "Open DentOrd from the Start menu or shortcut — same account, automatic updates next time you open it.",
+              "caption": "Shortcut after install"
+            }
+          }
+        },
+        "mac": {
+          "label": "Mac",
+          "intro": "On Mac, install from Google Chrome or Microsoft Edge. Safari does not currently offer the same “Install app” flow as Chrome/Edge.",
+          "steps": {
+            "step1": {
+              "title": "Open in Chrome or Edge",
+              "body": "Go to DentOrd. In the address bar on the right, look for the install icon, or use the menu → “Install DentOrd…”.",
+              "caption": "Install in Chrome/Edge on Mac"
+            },
+            "step2": {
+              "title": "Confirm Install",
+              "body": "Click Install. The app appears in Launchpad / the Applications folder for that browser.",
+              "caption": "Install confirmation"
+            },
+            "step3": {
+              "title": "Keep in Dock if you like",
+              "body": "Launch DentOrd, then optionally keep the icon in the Dock (Options → Keep in Dock). Updates arrive when you open the app.",
+              "caption": "Icon in the Dock"
+            }
+          }
+        }
+      },
+      "notesEyebrow": "Good to know",
+      "notesTitle": "Before you install",
+      "notesDescription": "Short notes so install goes smoothly — and you know what to expect.",
+      "notes": {
+        "browsers": {
+          "title": "Browsers",
+          "body": "Android and desktop: Chrome or Edge. iPhone/iPad: Safari for “Add to Home Screen”."
+        },
+        "login": {
+          "title": "Same account",
+          "body": "Installing does not create a new account. Sign in with the same email and password as in the browser."
+        },
+        "updates": {
+          "title": "Updates",
+          "body": "You do not need to reinstall. When we ship a new version, you get it the next time you open the app."
+        },
+        "offline": {
+          "title": "Internet required",
+          "body": "DentOrd is not an offline app. You need an internet connection for charts and appointments."
+        },
+        "tablet": {
+          "title": "Tablet",
+          "body": "On Android and iPad tablets, use the same steps as on phone (Android or iOS section above)."
         }
       }
     },
@@ -680,6 +820,10 @@
       "faq": {
         "title": "FAQ — DentOrd",
         "description": "Answers about signup, pricing, security and day-to-day use of DentOrd."
+      },
+      "install": {
+        "title": "Install — DentOrd on phone, tablet and desktop",
+        "description": "How to add DentOrd to your home screen: Android, iPhone, Windows and Mac. Step by step."
       },
       "contact": {
         "title": "Contact — DentOrd",

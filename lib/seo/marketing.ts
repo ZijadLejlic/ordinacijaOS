@@ -12,6 +12,7 @@ export const MARKETING_SEO_PAGES = {
   tour: "/tour",
   demo: "/demo",
   faq: "/faq",
+  install: "/install",
   contact: "/contact",
   blog: "/blog",
   privacy: "/privacy",

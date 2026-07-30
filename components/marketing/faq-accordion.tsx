@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { MinusIcon, PlusIcon } from "lucide-react";
+import { Link } from "@/i18n/navigation";
 import { trackEvent } from "@/lib/analytics/posthog";
 import { cn } from "@/lib/utils";
 
@@ -9,6 +10,7 @@ export type FaqAccordionItem = {
   id: string;
   question: string;
   answer: string;
+  link?: { href: "/install"; label: string };
 };
 
 type FaqAccordionProps = {
@@ -97,15 +99,28 @@ export function FaqAccordion({ items, source, className }: FaqAccordionProps) {
                 )}
               >
                 <div className="overflow-hidden">
-                  <p
+                  <div
                     className={cn(
                       "px-5 pb-5 text-base leading-relaxed text-[color-mix(in_oklab,var(--marketing-ink)_72%,transparent)] md:px-6 md:pb-6 md:pl-[4.25rem] md:text-[17px] md:leading-[1.65]",
                       "motion-safe:transition-opacity motion-safe:duration-300",
                       open ? "opacity-100" : "opacity-0",
                     )}
                   >
-                    {item.answer}
-                  </p>
+                    <p>{item.answer}</p>
+                    {item.link ? (
+                      <p className="mt-3">
+                        <Link
+                          href={item.link.href}
+                          className="font-medium text-[var(--marketing-accent)] underline-offset-4 hover:underline"
+                        >
+                          {item.link.label}
+                          <span aria-hidden className="ml-1">
+                            →
+                          </span>
+                        </Link>
+                      </p>
+                    ) : null}
+                  </div>
                 </div>
               </div>
             </div>

@@ -193,6 +193,7 @@ Public route group u istom projektu: `app/[locale]/(marketing)/`. Locales: **`bs
 | `/bs/tour`, … | `/en/tour` | Product tour (W6/W7) |
 | `/bs/demo`, … | `/en/demo` | Demo (screenshots + live demo pristup, W8) |
 | `/bs/faq`, … | `/en/faq` | FAQ |
+| `/bs/instalacija`, `/hr/instalacija`, `/sr/instalacija` | `/en/install` | Vodič za instalaciju (PWA / Add to Home Screen) |
 | `/bs/kontakt`, `/hr/kontakt`, `/sr/kontakt` | `/en/contact` | Kontakt + "Pozovite me" forma |
 | `/bs/blog`, … | `/en/blog` | Blog (struktura sad, sadržaj kasnije — W11) |
 | `/bs/privacy`, … | `/en/privacy` | Privacy Policy (PRD §13.1) |
@@ -212,7 +213,7 @@ Public route group u istom projektu: `app/[locale]/(marketing)/`. Locales: **`bs
 **Footer** (`navy` pozadina, svijetli tekst):
 
 - Kolona 1: logo (svijetla varijanta ili mark), tagline "Smarter clinic. Better care.", kratki opis (1 rečenica).
-- Kolona 2 "Proizvod": Funkcije, Cijene, Tour, Demo, FAQ.
+- Kolona 2 "Proizvod": Funkcije, Cijene, Tour, Demo, FAQ, Instalacija.
 - Kolona 3 "Kompanija": Zašto DentOrd, Blog, Kontakt.
 - Kolona 4 "Pravno": Privacy Policy, Terms of Service, DPA (obavezno na svim public stranicama — PRD §13.4).
 - Dno: © 2026 DentOrd · support@dentord.com · badge red: `ShieldCheck` "GDPR" · `Server` "EU hosting" · jezik switcher.
@@ -264,7 +265,7 @@ Redoslijed sekcija:
 
 8. **Recenzije** (W10 — komponenta `TestimonialsSection` dizajnirana, renderuje se **samo ako ima sadržaja**; v1 = sakrivena). Dizajn: 3 kartice sa citatom, imenom, nazivom ordinacije, gradom.
 
-9. **FAQ teaser**: 4 najvažnija pitanja (accordion) + link "Sva pitanja →" (`/faq`).
+9. **FAQ teaser**: 5 najvažnijih pitanja (accordion; uključujući instalaciju na uređaj + link na `/instalacija`) + link "Sva pitanja →" (`/faq`).
 
 10. **FinalCta** — H2 BS: **"Registrujte ordinaciju danas — besplatno do kraja 2026."** / CTA par + microcopy.
 
@@ -339,9 +340,17 @@ Redoslijed sekcija:
   - **Početak**: Kako se registrujem? · Koliko traje postavka? · Mogu li prebaciti postojeće pacijente? (CSV import, D30) · Treba li mi edukacija?
   - **Cijene**: Šta znači "besplatno do 31.12.2026"? · Treba li kreditna kartica? · Šta se dešava kad počne naplata? · Mogu li otkazati bilo kad? (D45 — export + grace)
   - **Sigurnost i podaci**: Gdje se čuvaju podaci? (EU, D34) · Ko sve vidi podatke moje ordinacije? (RLS, samo vaša klinika) · Kako izgleda backup? · Kako brišem podatke pacijenta? (GDPR, D35) · Mogu li izvesti sve svoje podatke? (ZIP export)
-  - **Korištenje**: Radi li na mobitelu/tabletu? (D40) · Koliko korisnika mogu dodati? (po paketu) · Mogu li imati dvije lokacije? · Kako pozivam doktora/recepciju? (invite flow)
+  - **Korištenje**: Radi li na mobitelu/tabletu? (D40 + link na `/instalacija`) · Koliko korisnika mogu dodati? (po paketu) · Mogu li imati dvije lokacije? · Kako pozivam doktora/recepciju? (invite flow)
 - Svaki odgovor 2–4 rečenice, bez žargona. Structured data: `FAQPage` JSON-LD.
 - **FinalCta**.
+
+### 4.7b Instalacija (`/instalacija` · EN `/install`)
+
+- Hero + tabovi po platformi: Android (Chrome), iPhone/iPad (Safari), Windows (Chrome/Edge), Mac (Chrome/Edge; Safari napomena).
+- Koraci s stilizovanim UI ilustracijama (ne pravi OS screenshoti).
+- Napomene: preglednici, isti nalog, automatska ažuriranja, bez offline moda, tablet = isti koraci.
+- **PWA scope**: `app/manifest.ts` + `public/sw.js` (pass-through `fetch` only — **bez** offline cache / PHI). Ikone u `public/icons/`. Registracija SW u `app/[locale]/layout.tsx`.
+- Footer Product link; nije u header navu.
 
 ### 4.8 Kontakt (`/kontakt`) — W13
 

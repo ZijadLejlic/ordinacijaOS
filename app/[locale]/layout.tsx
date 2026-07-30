@@ -2,6 +2,7 @@ import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { PosthogProvider } from "@/components/analytics/posthog-provider";
+import { RegisterServiceWorker } from "@/components/pwa/register-sw";
 import { routing } from "@/i18n/routing";
 import { marketingMessages } from "@/lib/i18n/client-messages";
 
@@ -39,6 +40,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   return (
     <NextIntlClientProvider messages={marketingMessages(messages)}>
       <PosthogProvider>
+        <RegisterServiceWorker />
         <div className="flex min-h-full flex-1 flex-col">{children}</div>
       </PosthogProvider>
     </NextIntlClientProvider>

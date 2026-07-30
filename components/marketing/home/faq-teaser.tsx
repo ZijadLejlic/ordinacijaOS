@@ -7,16 +7,28 @@ import { SectionShell } from "@/components/marketing/section-shell";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const FAQ_KEYS = ["free", "card", "setup", "data"] as const;
+const FAQ_KEYS = ["free", "card", "setup", "install", "data"] as const;
 
 export async function FaqTeaser() {
   const t = await getTranslations("Marketing.home.faq");
 
-  const items = FAQ_KEYS.map((key) => ({
-    id: `home-${key}`,
-    question: t(`items.${key}.q`),
-    answer: t(`items.${key}.a`),
-  }));
+  const items = FAQ_KEYS.map((key) => {
+    const base = {
+      id: `home-${key}`,
+      question: t(`items.${key}.q`),
+      answer: t(`items.${key}.a`),
+    };
+    if (key === "install") {
+      return {
+        ...base,
+        link: {
+          href: "/install" as const,
+          label: t("items.install.linkLabel"),
+        },
+      };
+    }
+    return base;
+  });
 
   return (
     <SectionShell tone="white" eyebrow={t("eyebrow")} title={t("title")}>

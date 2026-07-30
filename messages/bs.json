@@ -6,6 +6,7 @@
       "tour": "Tour",
       "whyDentord": "Zašto DentOrd",
       "faq": "FAQ",
+      "install": "Instalacija",
       "demo": "Demo",
       "contact": "Kontakt",
       "blog": "Blog",
@@ -233,6 +234,11 @@
           "setup": {
             "q": "Koliko traje postavka?",
             "a": "Onboarding ima tri koraka: podaci ordinacije, usluge i poziv tima. Većina ordinacija krene raditi za oko 5 minuta."
+          },
+          "install": {
+            "q": "Mogu li instalirati DentOrd na telefon ili računar?",
+            "a": "Da. Dodajte DentOrd na početni ekran telefona, tableta ili radnu površinu — otvarate ga kao aplikaciju, bez traženja u pregledniku. Ažuriranja stižu automatski.",
+            "linkLabel": "Vodič za instalaciju"
           },
           "data": {
             "q": "Gdje se čuvaju podaci?",
@@ -594,7 +600,8 @@
           "items": {
             "mobile": {
               "q": "Radi li na mobitelu/tabletu?",
-              "a": "Da. DentOrd je potpuno responzivan — radi u pregledniku na telefonu, tabletu i računaru."
+              "a": "Da. DentOrd je potpuno responzivan — radi u pregledniku na telefonu, tabletu i računaru. Možete i dodati ikonu na početni ekran ili radnu površinu — vodič je na stranici Instalacija.",
+              "linkLabel": "Vodič za instalaciju"
             },
             "users": {
               "q": "Koliko korisnika mogu dodati?",
@@ -609,6 +616,139 @@
               "a": "Vlasnik šalje invite na email iz postavki korisnika. Kolega postavi lozinku i pridruži se. Limiti paketa se provjeravaju prije slanja pozivnice."
             }
           }
+        }
+      }
+    },
+    "install": {
+      "eyebrow": "Instalacija",
+      "title": "Dodajte DentOrd na početni ekran",
+      "subtitle": "Otvorite ga kao aplikaciju — jednim dodirom, bez traženja u pregledniku. Ista DentOrd app; ažuriranja stižu automatski kad otvorite.",
+      "benefit1": "Brži ulaz s telefona ili tableta",
+      "benefit2": "Ikona na početnom ekranu ili radnoj površini",
+      "benefit3": "Nove verzije bez reinstalacije",
+      "platformsEyebrow": "Uređaji",
+      "platformsTitle": "Odaberite svoj uređaj",
+      "platformsDescription": "Koraci se malo razlikuju po sistemu. Ilustracije su pojednostavljene — meniji u Chromeu ili Safariju mogu izgledati slično.",
+      "platformsAria": "Platforme za instalaciju",
+      "platforms": {
+        "android": {
+          "label": "Android",
+          "intro": "Na Androidu koristite Chrome. Otvorite DentOrd (app.dentord.com ili dentord.com), pa pratite korake.",
+          "steps": {
+            "step1": {
+              "title": "Otvorite meni Chromea",
+              "body": "U gornjem desnom uglu pritisnite tri tačke (⋮).",
+              "caption": "Chrome meni — tri tačke"
+            },
+            "step2": {
+              "title": "Izaberite Instaliraj aplikaciju",
+              "body": "U meniju pronađite „Install app“, „Instaliraj aplikaciju“ ili „Add to Home screen“ / „Dodaj na početni ekran“.",
+              "caption": "Opcija za instalaciju u meniju"
+            },
+            "step3": {
+              "title": "Potvrdite instalaciju",
+              "body": "Pojavi se potvrda s ikonom DentOrd. Pritisnite Instaliraj / Dodaj.",
+              "caption": "Potvrda instalacije"
+            },
+            "step4": {
+              "title": "Otvorite s početnog ekrana",
+              "body": "Ikona DentOrd sada je među aplikacijama. Otvorite je kao svaku drugu app — ulazite istim nalogom.",
+              "caption": "Ikona na početnom ekranu"
+            }
+          }
+        },
+        "ios": {
+          "label": "iPhone / iPad",
+          "intro": "Na iPhoneu i iPadu koristite Safari (ne Chrome u ovom koraku — Apple dozvoljava „Dodaj na početni ekran“ iz Safarija).",
+          "steps": {
+            "step1": {
+              "title": "Otvorite Share meni",
+              "body": "U Safariju otvorite DentOrd, zatim pritisnite dugme za dijeljenje (kvadrat sa strelicom gore) na dnu ili na vrhu ekrana.",
+              "caption": "Safari — dugme za dijeljenje"
+            },
+            "step2": {
+              "title": "Dodaj na početni ekran",
+              "body": "U listi opcija skrolujte i pritisnite „Add to Home Screen“ / „Dodaj na početni ekran“.",
+              "caption": "Opcija u Share sheetu"
+            },
+            "step3": {
+              "title": "Potvrdite Dodaj",
+              "body": "Po želji uredite naziv (ostavite DentOrd), zatim pritisnite „Add“ / „Dodaj“ gore desno.",
+              "caption": "Potvrda na početnom ekranu"
+            },
+            "step4": {
+              "title": "Pokrenite kao app",
+              "body": "Na početnom ekranu pronađite ikonu DentOrd i otvorite je. Radi u vlastitom prozoru, bez Safari trake.",
+              "caption": "Ikona na Home Screenu"
+            }
+          }
+        },
+        "windows": {
+          "label": "Windows",
+          "intro": "Na Windowsu koristite Google Chrome ili Microsoft Edge. Otvorite DentOrd u tom pregledniku.",
+          "steps": {
+            "step1": {
+              "title": "Pronađite dugme Install",
+              "body": "U address baru (desno) potražite ikonu računara/plusa za instalaciju, ili otvorite meni ⋮ → „Install DentOrd…“ / „Apps“ → „Install this site as an app“.",
+              "caption": "Install ikona u address baru"
+            },
+            "step2": {
+              "title": "Potvrdite instalaciju",
+              "body": "U dijalogu pritisnite Instaliraj. Windows će dodati DentOrd u Start meni i po želji na taskbar.",
+              "caption": "Dijalog za potvrdu"
+            },
+            "step3": {
+              "title": "Pokrenite s radne površine",
+              "body": "Otvorite DentOrd iz Start menija ili prečice — isti nalog, automatska ažuriranja pri sljedećem otvaranju.",
+              "caption": "Prečica nakon instalacije"
+            }
+          }
+        },
+        "mac": {
+          "label": "Mac",
+          "intro": "Na Macu instalirajte iz Google Chromea ili Microsoft Edgea. Safari trenutno nema isti „Install app“ tok kao Chrome/Edge.",
+          "steps": {
+            "step1": {
+              "title": "Otvorite u Chromeu ili Edgeu",
+              "body": "Idite na DentOrd. U address baru desno potražite ikonu za instalaciju, ili meni → „Install DentOrd…“.",
+              "caption": "Install u Chrome/Edge na Macu"
+            },
+            "step2": {
+              "title": "Potvrdite Install",
+              "body": "Pritisnite Instaliraj. Aplikacija se pojavi u Launchpadu / Applications folderu za taj preglednik.",
+              "caption": "Potvrda instalacije"
+            },
+            "step3": {
+              "title": "Dodajte u Dock po želji",
+              "body": "Pokrenite DentOrd, pa po želji zadržite ikonu u Docku (Options → Keep in Dock). Ažuriranja stižu kad otvorite app.",
+              "caption": "Ikona u Docku"
+            }
+          }
+        }
+      },
+      "notesEyebrow": "Važno",
+      "notesTitle": "Prije nego što instalirate",
+      "notesDescription": "Kratke napomene da instalacija ide glatko — i da znate šta očekivati.",
+      "notes": {
+        "browsers": {
+          "title": "Preglednici",
+          "body": "Android i desktop: Chrome ili Edge. iPhone/iPad: Safari za „Dodaj na početni ekran“."
+        },
+        "login": {
+          "title": "Isti nalog",
+          "body": "Instalacija ne pravi novi nalog. Prijavljujete se emailom i lozinkom kao u pregledniku."
+        },
+        "updates": {
+          "title": "Ažuriranja",
+          "body": "Ne morate ponovo instalirati. Kad objavimo novu verziju, dobijate je pri sljedećem otvaranju."
+        },
+        "offline": {
+          "title": "Internet potreban",
+          "body": "DentOrd nije offline app. Za rad s kartonima i terminima treba veza s internetom."
+        },
+        "tablet": {
+          "title": "Tablet",
+          "body": "Na Android i iPad tabletu koristite iste korake kao na telefonu (Android ili iOS sekcija iznad)."
         }
       }
     },
@@ -680,6 +820,10 @@
       "faq": {
         "title": "FAQ — DentOrd",
         "description": "Česta pitanja o registraciji, cijenama, sigurnosti i svakodnevnom korištenju DentOrda."
+      },
+      "install": {
+        "title": "Instalacija — DentOrd na telefon, tablet i računar",
+        "description": "Kako dodati DentOrd na početni ekran: Android, iPhone, Windows i Mac. Korak po korak."
       },
       "contact": {
         "title": "Kontakt — DentOrd",

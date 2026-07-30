@@ -13,6 +13,7 @@ export const MARKETING_FOOTER_PRODUCT = [
   { href: "/tour", labelKey: "tour" },
   { href: "/demo", labelKey: "demo" },
   { href: "/faq", labelKey: "faq" },
+  { href: "/install", labelKey: "install" },
 ] as const;
 
 export const MARKETING_FOOTER_COMPANY = [

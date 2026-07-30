@@ -34,6 +34,7 @@ export const routing = defineRouting({
     "/tour": "/tour",
     "/demo": "/demo",
     "/faq": "/faq",
+    "/install": balkan("/instalacija"),
     "/contact": balkan("/kontakt"),
     "/blog": "/blog",
     "/blog/[slug]": "/blog/[slug]",

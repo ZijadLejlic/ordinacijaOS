@@ -30,6 +30,13 @@ export const metadata: Metadata = {
   },
   description: "Cloud softver za stomatološke ordinacije",
   metadataBase: new URL("https://dentord.com"),
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "DentOrd",
+    statusBarStyle: "default",
+  },
+  themeColor: "#0B6EF5",
 };
 
 export default async function RootLayout({

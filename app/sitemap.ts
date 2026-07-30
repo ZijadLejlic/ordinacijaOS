@@ -13,6 +13,7 @@ const PRIORITY: Partial<Record<keyof typeof MARKETING_SEO_PAGES, number>> = {
   tour: 0.8,
   demo: 0.8,
   faq: 0.7,
+  install: 0.6,
   contact: 0.7,
   blog: 0.5,
   privacy: 0.3,
