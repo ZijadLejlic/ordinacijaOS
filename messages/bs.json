@@ -1248,6 +1248,7 @@
     "resetSessionExpired": "Reset link je istekao ili nije važeći. Zatraži novi.",
     "passwordSameAsOld": "Nova lozinka mora biti drugačija od stare.",
     "emailSendFailed": "Email trenutno nije poslan. Pokušaj ponovo za par minuta.",
+    "mfaRequiredForPassword": "Prvo potvrdi 2FA kod, zatim postavi novu lozinku.",
     "invalid": "Provjeri unesene podatke.",
     "invalidCredentials": "Pogrešan email ili lozinka.",
     "locked": "Previše neuspjelih pokušaja. Pokušaj ponovo za 15 minuta.",

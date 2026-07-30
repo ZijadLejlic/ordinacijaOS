@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import {
   Card,
@@ -25,7 +26,9 @@ export default async function MfaVerifyPage({ params }: Props) {
           <CardDescription>{t("verifyDescription")}</CardDescription>
         </CardHeader>
         <CardContent>
-          <MfaVerifyForm />
+          <Suspense fallback={<p className="text-muted-foreground text-sm">{t("loading")}</p>}>
+            <MfaVerifyForm />
+          </Suspense>
         </CardContent>
       </Card>
     </main>

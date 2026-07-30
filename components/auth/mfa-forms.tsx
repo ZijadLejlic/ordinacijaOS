@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useTransition } from "react";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
@@ -13,6 +14,7 @@ import {
   FieldDescription,
 } from "@/components/ui/field";
 import { PRODUCT_NAME } from "@/lib/brand/constants";
+import { safeMfaNextPath } from "@/lib/auth/mfa";
 import { createClient } from "@/lib/supabase/client";
 import { totpCodeSchema } from "@/lib/validations/auth";
 import { logoutAction } from "@/lib/auth/actions";
@@ -263,6 +265,8 @@ export function MfaEnrollForm() {
 export function MfaVerifyForm() {
   const t = useTranslations("Mfa");
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextPath = safeMfaNextPath(searchParams.get("next")) ?? "/dashboard";
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -310,7 +314,8 @@ export function MfaVerifyForm() {
         return;
       }
 
-      router.replace("/dashboard");
+      // Allowlisted in safeMfaNextPath (typed next-intl pathnames).
+      router.replace(nextPath as "/reset-password");
       router.refresh();
     });
   }

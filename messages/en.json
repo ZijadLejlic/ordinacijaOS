@@ -1248,6 +1248,7 @@
     "resetSessionExpired": "This reset link is invalid or expired. Request a new one.",
     "passwordSameAsOld": "New password must be different from the old one.",
     "emailSendFailed": "We couldn’t send the email right now. Try again in a few minutes.",
+    "mfaRequiredForPassword": "Confirm your 2FA code first, then set a new password.",
     "invalid": "Check the form fields.",
     "invalidCredentials": "Incorrect email or password.",
     "locked": "Too many failed attempts. Try again in 15 minutes.",

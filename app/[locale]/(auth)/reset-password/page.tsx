@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import {
   Card,
@@ -7,7 +8,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
+import { publicLocalePath } from "@/i18n/path";
 import { ResetPasswordForm } from "@/components/auth/auth-forms";
+import { needsMfaStepUpForSensitiveAuth } from "@/lib/auth/mfa";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -23,6 +26,12 @@ export default async function ResetPasswordPage({ params }: Props) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  if (user && (await needsMfaStepUpForSensitiveAuth(supabase))) {
+    redirect(
+      `${publicLocalePath(locale, "/mfa/verify")}?next=${encodeURIComponent("/reset-password")}`,
+    );
+  }
 
   return (
     <main className="flex flex-1 items-center justify-center px-4 py-12">

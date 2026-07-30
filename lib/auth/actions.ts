@@ -317,6 +317,9 @@ export async function updatePasswordAction(
     if (raw.includes("same password") || raw.includes("different from")) {
       return { error: "passwordSameAsOld" };
     }
+    if (raw.includes("aal2") || raw.includes("mfa")) {
+      return { error: "mfaRequiredForPassword" };
+    }
     return { error: error.message };
   }
 

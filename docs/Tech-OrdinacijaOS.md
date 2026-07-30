@@ -269,3 +269,4 @@ Prati PRD §11. Tech doc se širi po fazama; ne specifikovati Enterprise module 
 | 2026-07-30 | Auth: self-service forgot/reset password (`/forgot-password`, `/reset-password`); owner staff reset lands on reset form |
 | 2026-07-30 | Forgot-password sends via Auth Admin `generateLink` + Resend (Supabase built-in mailer hit Free rate limits) |
 | 2026-07-30 | Recovery emails use `/auth/confirm` + `token_hash`/`verifyOtp` (not Supabase `action_link` hash redirect) |
+| 2026-07-30 | Password reset with MFA: AAL1 recovery → `/mfa/verify?next=/reset-password` → AAL2 → update password |
