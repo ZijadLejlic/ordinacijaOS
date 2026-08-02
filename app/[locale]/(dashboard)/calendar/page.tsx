@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { CalendarShell } from "@/components/calendar/calendar-shell";
+import type { CalendarFormOptions } from "@/components/calendar/calendar-form-options";
 import {
   canAccessCalendar,
   canAccessWaitlist,
@@ -50,22 +51,6 @@ export default async function CalendarPage({ params, searchParams }: Props) {
 
   const clinicProfile = profile;
 
-  // Shares request cache with dashboard layout (one entitlements load).
-  const entitlements = await getClinicEntitlements(
-    supabase,
-    clinicProfile.clinic_id,
-  );
-  if (!entitlements.features.calendar_basic.enabled) {
-    return (
-      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-4 px-4 py-6 sm:py-10">
-        <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
-        <p className="text-muted-foreground text-sm">
-          {t("errors.featureDisabled")}
-        </p>
-      </main>
-    );
-  }
-
   const view = parseView(viewParam);
   const anchor = parseAnchorDate(dateParam);
   const { rangeStart, rangeEnd } = rangeForView(view, anchor, CLINIC_TIMEZONE);
@@ -87,6 +72,31 @@ export default async function CalendarPage({ params, searchParams }: Props) {
     appointmentsQuery = appointmentsQuery.eq("doctor_id", doctorFilter);
   }
 
+  // Grid-critical data + entitlements in one round; form dropdowns deferred.
+  const [entitlements, { data: appointments }, { data: doctors }] =
+    await Promise.all([
+      getClinicEntitlements(supabase, clinicProfile.clinic_id),
+      appointmentsQuery,
+      supabase
+        .from("profiles")
+        .select("id, full_name")
+        .eq("clinic_id", clinicProfile.clinic_id)
+        .eq("role", "doctor")
+        .eq("is_active", true)
+        .order("full_name", { ascending: true }),
+    ]);
+
+  if (!entitlements.features.calendar_basic.enabled) {
+    return (
+      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-4 px-4 py-6 sm:py-10">
+        <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
+        <p className="text-muted-foreground text-sm">
+          {t("errors.featureDisabled")}
+        </p>
+      </main>
+    );
+  }
+
   const showWaitlistUi =
     canAccessWaitlist(clinicProfile.role) &&
     entitlements.features.waitlist_auto.enabled;
@@ -97,22 +107,18 @@ export default async function CalendarPage({ params, searchParams }: Props) {
     canSendEmailReminders(clinicProfile.role) &&
     entitlements.features.email_reminders.enabled;
 
-  const [
-    { data: appointments },
-    { data: doctors },
-    { data: patients },
-    { data: services },
-    { data: locations },
-    waitlistResult,
-  ] = await Promise.all([
-    appointmentsQuery,
-    supabase
-      .from("profiles")
-      .select("id, full_name")
-      .eq("clinic_id", clinicProfile.clinic_id)
-      .eq("role", "doctor")
-      .eq("is_active", true)
-      .order("full_name", { ascending: true }),
+  const waitlistPromise = showWaitlistUi
+    ? supabase
+        .from("appointment_waitlist")
+        .select(
+          "id, patient_id, doctor_id, service_id, location_id, preferred_from, preferred_to, notes, status, created_at, patients(first_name, last_name)",
+        )
+        .eq("clinic_id", clinicProfile.clinic_id)
+        .eq("status", "waiting")
+        .order("created_at", { ascending: true })
+    : Promise.resolve({ data: null });
+
+  const formOptionsPromise: Promise<CalendarFormOptions> = Promise.all([
     supabase
       .from("patients")
       .select("id, first_name, last_name, is_active")
@@ -131,17 +137,24 @@ export default async function CalendarPage({ params, searchParams }: Props) {
       .eq("clinic_id", clinicProfile.clinic_id)
       .eq("is_active", true)
       .order("name", { ascending: true }),
-    showWaitlistUi
-      ? supabase
-          .from("appointment_waitlist")
-          .select(
-            "id, patient_id, doctor_id, service_id, location_id, preferred_from, preferred_to, notes, status, created_at, patients(first_name, last_name)",
-          )
-          .eq("clinic_id", clinicProfile.clinic_id)
-          .eq("status", "waiting")
-          .order("created_at", { ascending: true })
-      : Promise.resolve({ data: null }),
-  ]);
+  ]).then(([patientsResult, servicesResult, locationsResult]) => ({
+    patients: (patientsResult.data ?? []).map((p) => ({
+      id: p.id,
+      fullName: `${p.first_name} ${p.last_name}`.trim(),
+      isActive: p.is_active,
+    })),
+    services: (servicesResult.data ?? []).map((s) => ({
+      id: s.id,
+      name: s.name,
+      durationMinutes: s.duration_minutes,
+    })),
+    locations: (locationsResult.data ?? []).map((l) => ({
+      id: l.id,
+      name: l.name,
+    })),
+  }));
+
+  const { data: waitlistRows } = await waitlistPromise;
 
   const doctorNameById = new Map(
     (doctors ?? []).map((d) => [d.id, d.full_name]),
@@ -168,7 +181,7 @@ export default async function CalendarPage({ params, searchParams }: Props) {
     };
   });
 
-  const mappedWaitlist = (waitlistResult.data ?? []).map((row) => {
+  const mappedWaitlist = (waitlistRows ?? []).map((row) => {
     const patient = Array.isArray(row.patients) ? row.patients[0] : row.patients;
     return {
       id: row.id,
@@ -199,20 +212,7 @@ export default async function CalendarPage({ params, searchParams }: Props) {
           id: d.id,
           fullName: d.full_name,
         }))}
-        patients={(patients ?? []).map((p) => ({
-          id: p.id,
-          fullName: `${p.first_name} ${p.last_name}`.trim(),
-          isActive: p.is_active,
-        }))}
-        services={(services ?? []).map((s) => ({
-          id: s.id,
-          name: s.name,
-          durationMinutes: s.duration_minutes,
-        }))}
-        locations={(locations ?? []).map((l) => ({
-          id: l.id,
-          name: l.name,
-        }))}
+        formOptionsPromise={formOptionsPromise}
         canWrite={canWriteCalendar(clinicProfile.role)}
         canPickDoctor={canPickDoctor}
         canDrag={canDrag}

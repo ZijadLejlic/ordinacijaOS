@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { redirect } from "@/i18n/navigation";
@@ -23,18 +24,15 @@ import {
 import {
   DocumentUploadForm,
   DocumentsList,
-  ImageUploadForm,
-  ImagesList,
 } from "@/components/patients/patient-files";
-import { PatientConsentPanel } from "@/components/consent/patient-consent-panel";
-import { Odontogram } from "@/components/odontogram/odontogram";
-import { TreatmentPlansPanel } from "@/components/treatment-plans/treatment-plans-panel";
 import {
-  loadConsentFormsForClinic,
-  loadPatientConsentSignatures,
-} from "@/lib/consent/load";
+  PatientChartPanelFallback,
+  PatientConsentSection,
+  PatientImagesSection,
+  PatientOdontogramSection,
+  PatientTreatmentPlansSection,
+} from "@/components/patients/patient-chart-panels";
 import { canSignConsents } from "@/lib/consent/rbac";
-import { clinicHasFeature } from "@/lib/entitlements";
 import {
   canAccessOdontogram,
   canAccessPatients,
@@ -49,12 +47,6 @@ import {
 } from "@/lib/privacy/rbac";
 import { getClinicContext } from "@/lib/supabase/clinic-context";
 import { createClient } from "@/lib/supabase/server";
-import {
-  PATIENT_FILES_BUCKET,
-  SIGNED_URL_TTL_SECONDS,
-} from "@/lib/patients/storage";
-import { formatInTimeZone } from "date-fns-tz";
-import { CLINIC_TIMEZONE } from "@/lib/calendar/time";
 
 type Props = {
   params: Promise<{ locale: string; patientId: string }>;
@@ -64,7 +56,6 @@ export default async function PatientDetailPage({ params }: Props) {
   const { locale, patientId } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("Patients");
-  const tConsent = await getTranslations("Consent");
   const supabase = await createClient();
 
   const ctx = await getClinicContext();
@@ -103,21 +94,7 @@ export default async function PatientDetailPage({ params }: Props) {
     canWriteTreatmentPlan(profile.role) && patient.is_active;
   const canSign = canSignConsents(profile.role) && patient.is_active;
 
-  const consentFeatureOk = await clinicHasFeature(
-    supabase,
-    profile.clinic_id,
-    "consent_draw_sign",
-  );
-
-  const [
-    { data: allergies },
-    { data: documents },
-    { data: images },
-    odontogramData,
-    treatmentPlanData,
-    consentForms,
-    consentSignatures,
-  ] = await Promise.all([
+  const [{ data: allergies }, { data: documents }] = await Promise.all([
     supabase
       .from("patient_allergies")
       .select("id, allergen, severity, notes")
@@ -128,92 +105,9 @@ export default async function PatientDetailPage({ params }: Props) {
       .select("id, title, storage_path, size_bytes, created_at")
       .eq("patient_id", patientId)
       .order("created_at", { ascending: false }),
-    supabase
-      .from("patient_images")
-      .select("id, title, storage_path, size_bytes, created_at")
-      .eq("patient_id", patientId)
-      .order("created_at", { ascending: false }),
-    canViewOdontogram
-      ? Promise.all([
-          supabase
-            .from("odontogram_teeth")
-            .select("fdi_number, status, notes")
-            .eq("patient_id", patientId),
-          supabase
-            .from("odontogram_events")
-            .select(
-              "id, fdi_number, event_type, status_before, status_after, note, created_at",
-            )
-            .eq("patient_id", patientId)
-            .order("created_at", { ascending: false })
-            .limit(15),
-        ])
-      : null,
-    canViewTreatmentPlan
-      ? (async () => {
-          const { data: plans } = await supabase
-            .from("treatment_plans")
-            .select("id, title, notes, is_active, created_at")
-            .eq("patient_id", patientId)
-            .eq("clinic_id", profile.clinic_id)
-            .order("created_at", { ascending: false });
-
-          const planIds = (plans ?? []).map((plan) => plan.id);
-          const [{ data: items }, { data: services }] = await Promise.all([
-            planIds.length > 0
-              ? supabase
-                  .from("treatment_plan_items")
-                  .select(
-                    "id, treatment_plan_id, service_name, fdi_number, status, estimated_price_eur, notes, sort_order",
-                  )
-                  .eq("clinic_id", profile.clinic_id)
-                  .in("treatment_plan_id", planIds)
-                  .order("sort_order", { ascending: true })
-              : Promise.resolve({ data: [] as const }),
-            supabase
-              .from("services")
-              .select("id, name, price_eur")
-              .eq("clinic_id", profile.clinic_id)
-              .eq("is_active", true)
-              .order("name", { ascending: true }),
-          ]);
-
-          return { plans: plans ?? [], items: items ?? [], services: services ?? [] };
-        })()
-      : null,
-    consentFeatureOk
-      ? loadConsentFormsForClinic(profile.clinic_id)
-      : Promise.resolve([]),
-    consentFeatureOk
-      ? loadPatientConsentSignatures(profile.clinic_id, patientId)
-      : Promise.resolve([]),
   ]);
 
-  const consentVars = {
-    ime: `${patient.first_name} ${patient.last_name}`.trim(),
-    datum: formatInTimeZone(
-      new Date(),
-      CLINIC_TIMEZONE,
-      locale === "en" ? "dd MMM yyyy" : "dd.MM.yyyy.",
-    ),
-    ordinacija: clinicName,
-  };
-
-  const imageRows = await Promise.all(
-    (images ?? []).map(async (image) => {
-      const { data } = await supabase.storage
-        .from(PATIENT_FILES_BUCKET)
-        .createSignedUrl(image.storage_path, SIGNED_URL_TTL_SECONDS);
-      return {
-        id: image.id,
-        title: image.title,
-        storagePath: image.storage_path,
-        sizeBytes: image.size_bytes,
-        createdAt: image.created_at,
-        previewUrl: data?.signedUrl ?? null,
-      };
-    }),
-  );
+  const patientName = `${patient.first_name} ${patient.last_name}`.trim();
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-4 py-6 sm:py-10">
@@ -304,102 +198,43 @@ export default async function PatientDetailPage({ params }: Props) {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{tConsent("title")}</CardTitle>
-          <CardDescription>{tConsent("description")}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <PatientConsentPanel
-            patientId={patient.id}
-            forms={consentForms}
-            signatures={consentSignatures}
-            vars={consentVars}
-            canWrite={canSign}
-            featureOk={consentFeatureOk}
-          />
-        </CardContent>
-      </Card>
+      <Suspense fallback={<PatientChartPanelFallback />}>
+        <PatientConsentSection
+          clinicId={profile.clinic_id}
+          patientId={patient.id}
+          patientName={patientName}
+          clinicName={clinicName}
+          locale={locale}
+          canSign={canSign}
+        />
+      </Suspense>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("imagesTitle")}</CardTitle>
-          <CardDescription>{t("imagesDescription")}</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <ImagesList
-            patientId={patient.id}
-            canWrite={canWrite}
-            images={imageRows}
-          />
-          {canWrite ? <ImageUploadForm patientId={patient.id} /> : null}
-        </CardContent>
-      </Card>
+      <Suspense fallback={<PatientChartPanelFallback />}>
+        <PatientImagesSection
+          clinicId={profile.clinic_id}
+          patientId={patient.id}
+          canWrite={canWrite}
+        />
+      </Suspense>
 
-      {odontogramData ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("odontogramTitle")}</CardTitle>
-            <CardDescription>{t("odontogramDescription")}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Odontogram
-              patientId={patient.id}
-              canWrite={canEditOdontogram}
-              teeth={(odontogramData[0].data ?? []).map((tooth) => ({
-                fdiNumber: tooth.fdi_number,
-                status: tooth.status,
-                notes: tooth.notes,
-              }))}
-              events={(odontogramData[1].data ?? []).map((event) => ({
-                id: event.id,
-                fdiNumber: event.fdi_number,
-                eventType: event.event_type,
-                statusBefore: event.status_before,
-                statusAfter: event.status_after,
-                note: event.note,
-                createdAt: event.created_at,
-              }))}
-            />
-          </CardContent>
-        </Card>
+      {canViewOdontogram ? (
+        <Suspense fallback={<PatientChartPanelFallback />}>
+          <PatientOdontogramSection
+            clinicId={profile.clinic_id}
+            patientId={patient.id}
+            canWrite={canEditOdontogram}
+          />
+        </Suspense>
       ) : null}
 
-      {treatmentPlanData ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>{t("treatmentPlanTitle")}</CardTitle>
-            <CardDescription>{t("treatmentPlanDescription")}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <TreatmentPlansPanel
-              patientId={patient.id}
-              canWrite={canEditTreatmentPlan}
-              services={treatmentPlanData.services.map((service) => ({
-                id: service.id,
-                name: service.name,
-                priceEur: Number(service.price_eur),
-              }))}
-              plans={treatmentPlanData.plans.map((plan) => ({
-                id: plan.id,
-                title: plan.title,
-                notes: plan.notes,
-                isActive: plan.is_active,
-                createdAt: plan.created_at,
-                items: treatmentPlanData.items
-                  .filter((item) => item.treatment_plan_id === plan.id)
-                  .map((item) => ({
-                    id: item.id,
-                    serviceName: item.service_name,
-                    fdiNumber: item.fdi_number,
-                    status: item.status,
-                    estimatedPriceEur: Number(item.estimated_price_eur),
-                    notes: item.notes,
-                  })),
-              }))}
-            />
-          </CardContent>
-        </Card>
+      {canViewTreatmentPlan ? (
+        <Suspense fallback={<PatientChartPanelFallback />}>
+          <PatientTreatmentPlansSection
+            clinicId={profile.clinic_id}
+            patientId={patient.id}
+            canWrite={canEditTreatmentPlan}
+          />
+        </Suspense>
       ) : null}
     </main>
   );

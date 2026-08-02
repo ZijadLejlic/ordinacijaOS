@@ -2400,6 +2400,7 @@
     "title": "Kalendar",
     "subtitle": "Termini po doktoru (Europe/Sarajevo).",
     "timezoneHint": "Vremena su prikazana u Europe/Sarajevo.",
+    "loadingFormOptions": "Učitavam pacijente i usluge…",
     "new": "Novi termin",
     "newTitle": "Novi termin",
     "editTitle": "Uredi termin",
