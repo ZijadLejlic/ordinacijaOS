@@ -48,11 +48,13 @@ export default async function PatientsPage({ params, searchParams }: Props) {
   const canWrite = canWritePatients(profile.role);
 
   const query = q?.trim() ?? "";
+  const LIST_LIMIT = 100;
   let patientsQuery = supabase
     .from("patients")
     .select("id, first_name, last_name, phone, email, is_active")
     .eq("clinic_id", profile.clinic_id)
-    .order("last_name", { ascending: true });
+    .order("last_name", { ascending: true })
+    .limit(LIST_LIMIT);
 
   if (query) {
     const escaped = query.replace(/[%_]/g, "\\$&");
@@ -62,6 +64,7 @@ export default async function PatientsPage({ params, searchParams }: Props) {
   }
 
   const { data: patients } = await patientsQuery;
+  const truncated = (patients?.length ?? 0) >= LIST_LIMIT;
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-4 py-6 sm:py-10">
@@ -86,47 +89,52 @@ export default async function PatientsPage({ params, searchParams }: Props) {
         </CardContent>
       </Card>
 
-      <div className="bg-background rounded-lg border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>{t("columns.name")}</TableHead>
-              <TableHead>{t("columns.phone")}</TableHead>
-              <TableHead>{t("columns.email")}</TableHead>
-              <TableHead>{t("columns.status")}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {!patients || patients.length === 0 ? (
+      <div className="space-y-2">
+        <div className="bg-background rounded-lg border">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={4} className="text-muted-foreground">
-                  {t("empty")}
-                </TableCell>
+                <TableHead>{t("columns.name")}</TableHead>
+                <TableHead>{t("columns.phone")}</TableHead>
+                <TableHead>{t("columns.email")}</TableHead>
+                <TableHead>{t("columns.status")}</TableHead>
               </TableRow>
-            ) : (
-              patients.map((patient) => (
-                <TableRow key={patient.id}>
-                  <TableCell>
-                    <Link
-                      href={{
-                        pathname: "/patients/[patientId]",
-                        params: { patientId: patient.id },
-                      }}
-                      className="font-medium underline-offset-4 hover:underline"
-                    >
-                      {patient.last_name} {patient.first_name}
-                    </Link>
-                  </TableCell>
-                  <TableCell>{patient.phone ?? "—"}</TableCell>
-                  <TableCell>{patient.email ?? "—"}</TableCell>
-                  <TableCell>
-                    {patient.is_active ? t("active") : t("inactive")}
+            </TableHeader>
+            <TableBody>
+              {!patients || patients.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-muted-foreground">
+                    {t("empty")}
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ) : (
+                patients.map((patient) => (
+                  <TableRow key={patient.id}>
+                    <TableCell>
+                      <Link
+                        href={{
+                          pathname: "/patients/[patientId]",
+                          params: { patientId: patient.id },
+                        }}
+                        className="font-medium underline-offset-4 hover:underline"
+                      >
+                        {patient.last_name} {patient.first_name}
+                      </Link>
+                    </TableCell>
+                    <TableCell>{patient.phone ?? "—"}</TableCell>
+                    <TableCell>{patient.email ?? "—"}</TableCell>
+                    <TableCell>
+                      {patient.is_active ? t("active") : t("inactive")}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+        {truncated ? (
+          <p className="text-muted-foreground text-sm">{t("listTruncatedHint")}</p>
+        ) : null}
       </div>
     </main>
   );

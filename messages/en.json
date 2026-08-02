@@ -2164,6 +2164,7 @@
     "chartTitle": "Chart",
     "searchPlaceholder": "Search name, phone, or email…",
     "search": "Search",
+    "listTruncatedHint": "Showing up to 100 patients. Use search to find others.",
     "empty": "No patients yet.",
     "backList": "← Patients",
     "save": "Save",
