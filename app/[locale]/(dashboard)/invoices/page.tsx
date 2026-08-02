@@ -71,17 +71,12 @@ export default async function InvoicesPage({ params, searchParams }: Props) {
 
   const [
     { data: invoices },
-    { data: payments },
     { data: patients },
     { data: services },
     { data: doctors },
     { data: locations },
   ] = await Promise.all([
     invoicesQuery,
-    supabase
-      .from("payments")
-      .select("invoice_id, amount")
-      .eq("clinic_id", profile.clinic_id),
     canWrite
       ? supabase.rpc("list_patients_for_invoices")
       : Promise.resolve({ data: [] as { id: string; first_name: string; last_name: string }[] }),
@@ -110,13 +105,24 @@ export default async function InvoicesPage({ params, searchParams }: Props) {
       : Promise.resolve({ data: [] as { id: string; name: string }[] }),
   ]);
 
+  const invoiceIds = (invoices ?? []).map((i) => i.id);
   const patientIds = [...new Set((invoices ?? []).map((i) => i.patient_id))];
-  const { data: patientNames } =
+  const [{ data: payments }, { data: patientNames }] = await Promise.all([
+    invoiceIds.length > 0
+      ? supabase
+          .from("payments")
+          .select("invoice_id, amount")
+          .eq("clinic_id", profile.clinic_id)
+          .in("invoice_id", invoiceIds)
+      : Promise.resolve({ data: [] as { invoice_id: string; amount: number }[] }),
     patientIds.length > 0
-      ? await supabase.rpc("get_invoice_patient_names", {
+      ? supabase.rpc("get_invoice_patient_names", {
           p_patient_ids: patientIds,
         })
-      : { data: [] as { id: string; first_name: string; last_name: string }[] };
+      : Promise.resolve({
+          data: [] as { id: string; first_name: string; last_name: string }[],
+        }),
+  ]);
 
   const nameById = new Map(
     (patientNames ?? []).map((p) => [

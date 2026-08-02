@@ -2164,6 +2164,7 @@
     "chartTitle": "Karton",
     "searchPlaceholder": "Pretraži ime, telefon ili email…",
     "search": "Pretraži",
+    "listTruncatedHint": "Prikazano je do 100 pacijenata. Koristi pretragu da pronađeš ostale.",
     "empty": "Nema pacijenata.",
     "backList": "← Pacijenti",
     "save": "Sačuvaj",
