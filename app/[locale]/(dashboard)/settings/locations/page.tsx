@@ -14,7 +14,7 @@ import {
 } from "@/components/locations/location-forms";
 import { getClinicLimits } from "@/lib/entitlements";
 import { canManageLocations } from "@/lib/locations/rbac";
-import { getAuthUser } from "@/lib/supabase/auth-user";
+import { getClinicContext } from "@/lib/supabase/clinic-context";
 import { createClient } from "@/lib/supabase/server";
 import type { Json } from "@/lib/supabase/database.types";
 
@@ -28,34 +28,25 @@ export default async function SettingsLocationsPage({ params }: Props) {
   const t = await getTranslations("Locations");
   const supabase = await createClient();
 
-  const user = await getAuthUser();
+  const ctx = await getClinicContext();
 
-  if (!user) {
+  if (!ctx) {
     redirect({ href: "/login", locale });
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role, clinic_id")
-    .eq("id", user!.id)
-    .maybeSingle();
+  const { profile, clinic } = ctx!;
 
-  if (!profile || !canManageLocations(profile.role)) {
+  if (!canManageLocations(profile.role)) {
     redirect({ href: "/dashboard", locale });
   }
 
-  const [{ data: locations }, { data: clinic }, limits] = await Promise.all([
+  const [{ data: locations }, limits] = await Promise.all([
     supabase
       .from("clinic_locations")
       .select("id, name, address, is_active")
-      .eq("clinic_id", profile!.clinic_id)
+      .eq("clinic_id", profile.clinic_id)
       .order("created_at", { ascending: true }),
-    supabase
-      .from("clinics")
-      .select("settings_json")
-      .eq("id", profile!.clinic_id)
-      .maybeSingle(),
-    getClinicLimits(supabase, profile!.clinic_id),
+    getClinicLimits(supabase, profile.clinic_id),
   ]);
 
   const settings = (clinic?.settings_json ?? {}) as Record<string, Json>;

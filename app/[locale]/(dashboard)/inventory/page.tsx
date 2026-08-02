@@ -19,7 +19,7 @@ import {
   canWriteInventory,
 } from "@/lib/inventory/rbac";
 import { isLowStock } from "@/lib/inventory/stock";
-import { getAuthUser } from "@/lib/supabase/auth-user";
+import { getClinicContext } from "@/lib/supabase/clinic-context";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -34,32 +34,28 @@ export default async function InventoryPage({ params, searchParams }: Props) {
   const t = await getTranslations("Inventory");
   const supabase = await createClient();
 
-  const user = await getAuthUser();
+  const ctx = await getClinicContext();
 
-  if (!user) {
+  if (!ctx) {
     redirect({ href: "/login", locale });
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role, clinic_id")
-    .eq("id", user!.id)
-    .maybeSingle();
+  const { profile } = ctx!;
 
-  if (!profile || !canAccessInventory(profile.role)) {
+  if (!canAccessInventory(profile.role)) {
     redirect({ href: "/dashboard", locale });
   }
 
   const featureOk = await clinicHasFeature(
     supabase,
-    profile!.clinic_id,
+    profile.clinic_id,
     "inventory_basic",
   );
   if (!featureOk) {
     redirect({ href: "/dashboard", locale });
   }
 
-  const canWrite = canWriteInventory(profile!.role);
+  const canWrite = canWriteInventory(profile.role);
   const query = q?.trim() ?? "";
   const status =
     statusParam === "active" || statusParam === "inactive"
@@ -72,7 +68,7 @@ export default async function InventoryPage({ params, searchParams }: Props) {
     .select(
       "id, name, unit, quantity, low_stock_threshold, notes, is_active",
     )
-    .eq("clinic_id", profile!.clinic_id)
+    .eq("clinic_id", profile.clinic_id)
     .order("name", { ascending: true });
 
   if (query) {

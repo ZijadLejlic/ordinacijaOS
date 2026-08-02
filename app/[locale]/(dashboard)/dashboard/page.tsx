@@ -24,7 +24,7 @@ import {
   canReadServices,
 } from "@/lib/patients/rbac";
 import { formatMoney } from "@/lib/money/format";
-import { getAuthUser } from "@/lib/supabase/auth-user";
+import { getClinicContext } from "@/lib/supabase/clinic-context";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -35,36 +35,19 @@ export default async function DashboardPage({ params }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations("Dashboard");
   const supabase = await createClient();
-  const user = await getAuthUser();
+  const ctx = await getClinicContext();
 
-  if (!user) {
+  if (!ctx) {
     redirect({ href: "/login", locale });
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select(
-      "role, clinic_id, clinics(name, trial_ends_at, status, timezone, is_demo)",
-    )
-    .eq("id", user!.id)
-    .maybeSingle();
+  const { user, profile, clinic } = ctx!;
 
-  const clinic = profile?.clinics as
-    | {
-        name: string;
-        trial_ends_at: string | null;
-        status: string;
-        timezone: string;
-        is_demo: boolean;
-      }
-    | null
-    | undefined;
-
-  const entitlements = profile?.clinic_id
+  const entitlements = profile.clinic_id
     ? await getClinicEntitlements(supabase, profile.clinic_id)
     : null;
 
-  const role = profile?.role;
+  const role = profile.role;
   const showPatients = role ? canAccessPatients(role) : false;
   const showServices = role ? canReadServices(role) : false;
   const showCalendar = role ? canAccessCalendar(role) : false;
@@ -84,11 +67,11 @@ export default async function DashboardPage({ params }: Props) {
   const includeExpenses = Boolean(showExpenses && canSeeFinancialKpis(role!));
 
   const kpis =
-    profile?.clinic_id && role && canSeeDashboardKpis(role)
+    profile.clinic_id && role && canSeeDashboardKpis(role)
       ? await loadDashboardKpis(supabase, {
           clinicId: profile.clinic_id,
           role,
-          userId: user!.id,
+          userId: user.id,
           timeZone: clinic?.timezone,
           includeFinance,
           includeOperational,

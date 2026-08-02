@@ -15,7 +15,7 @@ import {
 } from "@/lib/consent/rbac";
 import type { ConsentTemplateKey } from "@/lib/consent/templates";
 import { clinicHasFeature } from "@/lib/entitlements";
-import { getAuthUser } from "@/lib/supabase/auth-user";
+import { getClinicContext } from "@/lib/supabase/clinic-context";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -56,33 +56,29 @@ export default async function SettingsConsentPage({ params }: Props) {
   const t = await getTranslations("ConsentTemplates");
   const supabase = await createClient();
 
-  const user = await getAuthUser();
+  const ctx = await getClinicContext();
 
-  if (!user) {
+  if (!ctx) {
     redirect({ href: "/login", locale });
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role, clinic_id")
-    .eq("id", user!.id)
-    .maybeSingle();
+  const { profile } = ctx!;
 
-  if (!profile || !canReadConsentForms(profile.role)) {
+  if (!canReadConsentForms(profile.role)) {
     redirect({ href: "/dashboard", locale });
   }
 
   const featureOk = await clinicHasFeature(
     supabase,
-    profile!.clinic_id,
+    profile.clinic_id,
     "consent_draw_sign",
   );
 
   const templates = featureOk
-    ? await loadConsentFormsForClinic(profile!.clinic_id)
+    ? await loadConsentFormsForClinic(profile.clinic_id)
     : [];
 
-  const canEdit = canWriteConsentForms(profile!.role);
+  const canEdit = canWriteConsentForms(profile.role);
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 px-4 py-10">

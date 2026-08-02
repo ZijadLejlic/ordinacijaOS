@@ -17,7 +17,7 @@ import {
   rangeForView,
 } from "@/lib/calendar/time";
 import { getClinicEntitlements } from "@/lib/entitlements";
-import { getAuthUser } from "@/lib/supabase/auth-user";
+import { getClinicContext } from "@/lib/supabase/clinic-context";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -36,23 +36,19 @@ export default async function CalendarPage({ params, searchParams }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations("Calendar");
   const supabase = await createClient();
-  const user = await getAuthUser();
+  const ctx = await getClinicContext();
 
-  if (!user) {
+  if (!ctx) {
     redirect({ href: "/login", locale });
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id, role, clinic_id, is_active")
-    .eq("id", user!.id)
-    .maybeSingle();
+  const { profile } = ctx!;
 
-  if (!profile?.is_active || !canAccessCalendar(profile.role)) {
+  if (!profile.is_active || !canAccessCalendar(profile.role)) {
     redirect({ href: "/dashboard", locale });
   }
 
-  const clinicProfile = profile!;
+  const clinicProfile = profile;
 
   // Shares request cache with dashboard layout (one entitlements load).
   const entitlements = await getClinicEntitlements(

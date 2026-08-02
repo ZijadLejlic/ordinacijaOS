@@ -1,6 +1,11 @@
 "use client";
 
-import { useEffect, useState, type CSSProperties } from "react";
+import {
+  useEffect,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import { useTranslations } from "next-intl";
 import { MenuIcon, XIcon } from "lucide-react";
 import { Link, usePathname } from "@/i18n/navigation";
@@ -59,12 +64,13 @@ type NavItem = {
     | "import"
     | "audit"
     | "privacy";
-  badge?: number;
+  badge?: ReactNode;
 };
 
 export type AppShellBranding = {
-  logoUrl: string | null;
+  /** Colors apply sync; logo may stream via Suspense. */
   colors: BrandingColors;
+  logo?: ReactNode;
 };
 
 type AppShellProps = {
@@ -75,9 +81,9 @@ type AppShellProps = {
   isOwner: boolean;
   showExpenses?: boolean;
   showInventory?: boolean;
-  inventoryLowCount?: number;
+  inventoryBadge?: ReactNode;
   showCrm?: boolean;
-  crmOpenCount?: number;
+  crmBadge?: ReactNode;
   showConsent?: boolean;
   branding?: AppShellBranding | null;
   children: React.ReactNode;
@@ -91,9 +97,9 @@ export function AppShell({
   isOwner,
   showExpenses = false,
   showInventory = false,
-  inventoryLowCount = 0,
+  inventoryBadge = null,
   showCrm = false,
-  crmOpenCount = 0,
+  crmBadge = null,
   showConsent = false,
   branding = null,
   children,
@@ -134,7 +140,7 @@ export function AppShell({
           {
             href: "/inventory",
             labelKey: "inventory",
-            badge: inventoryLowCount > 0 ? inventoryLowCount : undefined,
+            badge: inventoryBadge,
           },
         ] as const)
       : []),
@@ -143,7 +149,7 @@ export function AppShell({
           {
             href: "/crm",
             labelKey: "crm",
-            badge: crmOpenCount > 0 ? crmOpenCount : undefined,
+            badge: crmBadge,
           },
         ] as const)
       : []),
@@ -188,7 +194,7 @@ export function AppShell({
   }, [mobileOpen]);
 
   const brandStyle = shellBrandStyle(branding?.colors ?? null);
-  const logoUrl = branding?.logoUrl ?? null;
+  const logo = branding?.logo ?? null;
 
   const navLinks = (
     <nav className="flex flex-col gap-1" aria-label={t("menu")}>
@@ -196,9 +202,10 @@ export function AppShell({
         <Link
           key={item.href}
           href={item.href}
+          data-active={isActive(item.href) ? "true" : undefined}
           onClick={() => setMobileOpen(false)}
           className={cn(
-            "flex items-center justify-between gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+            "group/navitem flex items-center justify-between gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
             isActive(item.href)
               ? brandStyle
                 ? "bg-[var(--clinic-brand-accent)] text-white"
@@ -209,18 +216,7 @@ export function AppShell({
           )}
         >
           <span>{t(item.labelKey)}</span>
-          {item.badge ? (
-            <span
-              className={cn(
-                "inline-flex min-w-5 items-center justify-center rounded-md px-1.5 text-xs font-semibold",
-                isActive(item.href)
-                  ? "bg-white/20 text-inherit"
-                  : "bg-primary/10 text-primary",
-              )}
-            >
-              {item.badge > 99 ? "99+" : item.badge}
-            </span>
-          ) : null}
+          {item.badge}
         </Link>
       ))}
     </nav>
@@ -249,7 +245,7 @@ export function AppShell({
       style={brandStyle}
     >
       <header className="bg-background sticky top-0 z-30 flex items-center justify-between gap-3 border-b px-4 py-3 md:hidden">
-        <BrandMark clinicName={clinicName} logoUrl={logoUrl} compact />
+        <BrandMark clinicName={clinicName} logo={logo} compact />
         <Button
           type="button"
           variant="ghost"
@@ -273,7 +269,7 @@ export function AppShell({
             : "bg-muted/30",
         )}
       >
-        <BrandMark clinicName={clinicName} logoUrl={logoUrl} />
+        <BrandMark clinicName={clinicName} logo={logo} />
         <div className="text-sm">
           <p className="font-medium">{clinicName}</p>
           <p
@@ -345,22 +341,17 @@ export function AppShell({
 
 function BrandMark({
   clinicName,
-  logoUrl,
+  logo = null,
   compact = false,
 }: {
   clinicName: string;
-  logoUrl: string | null;
+  logo?: ReactNode;
   compact?: boolean;
 }) {
-  if (logoUrl) {
+  if (logo) {
     return (
       <Link href="/dashboard" className="inline-flex min-w-0 items-center gap-2">
-        {/* eslint-disable-next-line @next/next/no-img-element -- signed URL from private bucket */}
-        <img
-          src={logoUrl}
-          alt={clinicName}
-          className="h-8 w-8 shrink-0 rounded object-contain"
-        />
+        {logo}
         <span
           className={cn(
             "font-semibold tracking-tight",

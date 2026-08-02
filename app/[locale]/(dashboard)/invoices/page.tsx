@@ -15,7 +15,7 @@ import {
 } from "@/components/invoices/invoice-forms";
 import { canAccessInvoices, canWriteInvoices } from "@/lib/invoices/rbac";
 import { formatInvoiceNumber, roundMoney } from "@/lib/invoices/money";
-import { getAuthUser } from "@/lib/supabase/auth-user";
+import { getClinicContext } from "@/lib/supabase/clinic-context";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -30,24 +30,20 @@ export default async function InvoicesPage({ params, searchParams }: Props) {
   const t = await getTranslations("Invoices");
   const supabase = await createClient();
 
-  const user = await getAuthUser();
+  const ctx = await getClinicContext();
 
-  if (!user) {
+  if (!ctx) {
     redirect({ href: "/login", locale });
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role, clinic_id")
-    .eq("id", user!.id)
-    .maybeSingle();
+  const { profile, clinic } = ctx!;
 
-  if (!profile || !canAccessInvoices(profile.role)) {
+  if (!canAccessInvoices(profile.role)) {
     redirect({ href: "/dashboard", locale });
   }
 
-  const canWrite = canWriteInvoices(profile!.role);
-  const isOwner = profile!.role === "owner";
+  const canWrite = canWriteInvoices(profile.role);
+  const isOwner = profile.role === "owner";
   const query = q?.trim() ?? "";
   const status =
     statusParam === "unpaid" ||
@@ -63,7 +59,7 @@ export default async function InvoicesPage({ params, searchParams }: Props) {
     .select(
       "id, series_year, series_number, status, total_amount, issued_at, patient_id",
     )
-    .eq("clinic_id", profile!.clinic_id)
+    .eq("clinic_id", profile.clinic_id)
     .order("issued_at", { ascending: false })
     .limit(100);
 
@@ -80,13 +76,12 @@ export default async function InvoicesPage({ params, searchParams }: Props) {
     { data: services },
     { data: doctors },
     { data: locations },
-    { data: clinic },
   ] = await Promise.all([
     invoicesQuery,
     supabase
       .from("payments")
       .select("invoice_id, amount")
-      .eq("clinic_id", profile!.clinic_id),
+      .eq("clinic_id", profile.clinic_id),
     canWrite
       ? supabase.rpc("list_patients_for_invoices")
       : Promise.resolve({ data: [] as { id: string; first_name: string; last_name: string }[] }),
@@ -94,7 +89,7 @@ export default async function InvoicesPage({ params, searchParams }: Props) {
       ? supabase
           .from("services")
           .select("id, name, price_eur, vat_rate")
-          .eq("clinic_id", profile!.clinic_id)
+          .eq("clinic_id", profile.clinic_id)
           .eq("is_active", true)
           .order("name", { ascending: true })
       : Promise.resolve({ data: [] as { id: string; name: string; price_eur: number; vat_rate: number }[] }),
@@ -102,7 +97,7 @@ export default async function InvoicesPage({ params, searchParams }: Props) {
       ? supabase
           .from("profiles")
           .select("id, full_name")
-          .eq("clinic_id", profile!.clinic_id)
+          .eq("clinic_id", profile.clinic_id)
           .eq("role", "doctor")
           .eq("is_active", true)
       : Promise.resolve({ data: [] as { id: string; full_name: string }[] }),
@@ -110,14 +105,9 @@ export default async function InvoicesPage({ params, searchParams }: Props) {
       ? supabase
           .from("clinic_locations")
           .select("id, name")
-          .eq("clinic_id", profile!.clinic_id)
+          .eq("clinic_id", profile.clinic_id)
           .eq("is_active", true)
       : Promise.resolve({ data: [] as { id: string; name: string }[] }),
-    supabase
-      .from("clinics")
-      .select("settings_json")
-      .eq("id", profile!.clinic_id)
-      .maybeSingle(),
   ]);
 
   const patientIds = [...new Set((invoices ?? []).map((i) => i.patient_id))];

@@ -16,7 +16,7 @@ import {
   CreateOperatorForm,
   OperatorsTable,
 } from "@/components/operators/operators-forms";
-import { getAuthUser } from "@/lib/supabase/auth-user";
+import { getClinicContext } from "@/lib/supabase/clinic-context";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -29,23 +29,19 @@ export default async function SettingsUsersPage({ params }: Props) {
   const t = await getTranslations("Users");
   const supabase = await createClient();
 
-  const user = await getAuthUser();
+  const ctx = await getClinicContext();
 
-  if (!user) {
+  if (!ctx) {
     redirect({ href: "/login", locale });
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id, role, clinic_id")
-    .eq("id", user!.id)
-    .maybeSingle();
+  const { profile } = ctx!;
 
-  if (!profile || profile.role !== "owner") {
+  if (profile.role !== "owner") {
     redirect({ href: "/dashboard", locale });
   }
 
-  const clinicId = profile!.clinic_id;
+  const clinicId = profile.clinic_id;
 
   await supabase.rpc("expire_stale_clinic_invites", {
     p_clinic_id: clinicId,

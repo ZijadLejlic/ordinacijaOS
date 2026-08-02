@@ -9,8 +9,7 @@ import {
 } from "@/components/ui/card";
 import { PatientForm } from "@/components/patients/patient-forms";
 import { canWritePatients } from "@/lib/patients/rbac";
-import { getAuthUser } from "@/lib/supabase/auth-user";
-import { createClient } from "@/lib/supabase/server";
+import { getClinicContext } from "@/lib/supabase/clinic-context";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -20,21 +19,16 @@ export default async function NewPatientPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("Patients");
-  const supabase = await createClient();
 
-  const user = await getAuthUser();
+  const ctx = await getClinicContext();
 
-  if (!user) {
+  if (!ctx) {
     redirect({ href: "/login", locale });
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user!.id)
-    .maybeSingle();
+  const { profile } = ctx!;
 
-  if (!profile || !canWritePatients(profile.role)) {
+  if (!canWritePatients(profile.role)) {
     redirect({ href: "/patients", locale });
   }
 

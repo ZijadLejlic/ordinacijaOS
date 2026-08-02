@@ -18,7 +18,7 @@ import {
   CLINIC_BRANDING_BUCKET,
 } from "@/lib/branding/storage";
 import { clinicHasFeature } from "@/lib/entitlements";
-import { getAuthUser } from "@/lib/supabase/auth-user";
+import { getClinicContext } from "@/lib/supabase/clinic-context";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -31,33 +31,23 @@ export default async function SettingsBrandingPage({ params }: Props) {
   const t = await getTranslations("Branding");
   const supabase = await createClient();
 
-  const user = await getAuthUser();
+  const ctx = await getClinicContext();
 
-  if (!user) {
+  if (!ctx) {
     redirect({ href: "/login", locale });
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role, clinic_id")
-    .eq("id", user!.id)
-    .maybeSingle();
+  const { profile, clinic } = ctx!;
 
-  if (!profile || !canManageBranding(profile.role)) {
+  if (!canManageBranding(profile.role)) {
     redirect({ href: "/dashboard", locale });
   }
 
   const featureOk = await clinicHasFeature(
     supabase,
-    profile!.clinic_id,
+    profile.clinic_id,
     "branding_custom",
   );
-
-  const { data: clinic } = await supabase
-    .from("clinics")
-    .select("branding_json")
-    .eq("id", profile!.clinic_id)
-    .maybeSingle();
 
   const branding = parseBrandingJson(clinic?.branding_json);
 

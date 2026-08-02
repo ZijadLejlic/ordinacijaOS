@@ -14,11 +14,8 @@ import {
   ExportClinicZipLink,
 } from "@/components/privacy/privacy-forms";
 import { canManagePrivacy } from "@/lib/privacy/rbac";
-import { getAuthUser } from "@/lib/supabase/auth-user";
+import { getClinicContext } from "@/lib/supabase/clinic-context";
 import { createClient } from "@/lib/supabase/server";
-import type { Database } from "@/lib/supabase/database.types";
-
-type ClinicStatus = Database["public"]["Enums"]["clinic_status"];
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -31,36 +28,24 @@ export default async function SettingsPrivacyPage({ params }: Props) {
   const tLife = await getTranslations("ClinicLifecycle");
   const supabase = await createClient();
 
-  const user = await getAuthUser();
+  const ctx = await getClinicContext();
 
-  if (!user) {
+  if (!ctx) {
     redirect({ href: "/login", locale });
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select(
-      "id, role, clinic_id, clinics(name, status, grace_ends_at)",
-    )
-    .eq("id", user!.id)
-    .maybeSingle();
+  const { profile, clinic } = ctx!;
 
-  if (!profile || !canManagePrivacy(profile.role)) {
+  if (!canManagePrivacy(profile.role)) {
     redirect({ href: "/dashboard", locale });
   }
-
-  const clinic = profile!.clinics as {
-    name: string;
-    status: ClinicStatus;
-    grace_ends_at: string | null;
-  } | null;
 
   const { data: requests } = await supabase
     .from("gdpr_erasure_requests")
     .select(
       "id, status, created_at, patient_id, patient_snapshot, rejection_reason, error_message, completed_at",
     )
-    .eq("clinic_id", profile!.clinic_id)
+    .eq("clinic_id", profile.clinic_id)
     .order("created_at", { ascending: false })
     .limit(100);
 

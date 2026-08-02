@@ -2153,6 +2153,7 @@ export type Database = {
       check_login_lockout: { Args: { p_email: string }; Returns: undefined }
       clear_login_lockout: { Args: never; Returns: undefined }
       clinic_is_writable: { Args: never; Returns: boolean }
+      count_low_stock_items: { Args: { p_clinic_id: string }; Returns: number }
       create_clinic_for_owner: {
         Args: {
           p_clinic_name: string

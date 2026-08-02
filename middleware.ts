@@ -1,5 +1,6 @@
 import createMiddleware from "next-intl/middleware";
 import { type NextRequest, NextResponse } from "next/server";
+import type { User } from "@supabase/supabase-js";
 import { publicLocalePath } from "@/i18n/path";
 import { routing } from "@/i18n/routing";
 import { mfaPath, resolveOwnerMfaGate } from "@/lib/auth/mfa";
@@ -61,9 +62,10 @@ async function appHomePath(
   locale: string,
   supabase: NonNullable<Awaited<ReturnType<typeof updateSession>>["supabase"]>,
   pinOk: boolean,
+  user: User,
 ) {
   if (!pinOk) return publicLocalePath(locale, "/pin");
-  const onboardingGate = await resolveOnboardingGate(supabase);
+  const onboardingGate = await resolveOnboardingGate(supabase, user);
   if (onboardingGate === "needs_onboarding") {
     return publicLocalePath(locale, "/onboarding");
   }
@@ -190,7 +192,14 @@ export async function middleware(request: NextRequest) {
       return copyCookies(response, redirect);
     }
 
-    const mfaGate = await resolveOwnerMfaGate(supabase);
+    // MFA + PIN are independent — fetch in parallel (same redirect decisions).
+    const operatorCookie = readOperatorCookieFromRequest(
+      request.headers.get("cookie"),
+    );
+    const [mfaGate, pinGate] = await Promise.all([
+      resolveOwnerMfaGate(supabase),
+      resolvePinGate(supabase, operatorCookie),
+    ]);
 
     if (isAuthPage) {
       if (mfaGate !== "ok") {
@@ -199,11 +208,7 @@ export async function middleware(request: NextRequest) {
         );
         return copyCookies(response, redirect);
       }
-      const operatorCookie = readOperatorCookieFromRequest(
-        request.headers.get("cookie"),
-      );
-      const pinGate = await resolvePinGate(supabase, operatorCookie);
-      const href = await appHomePath(locale, supabase, pinGate === "ok");
+      const href = await appHomePath(locale, supabase, pinGate === "ok", user);
       const redirect = NextResponse.redirect(new URL(href, request.url));
       return copyCookies(response, redirect);
     }
@@ -226,23 +231,14 @@ export async function middleware(request: NextRequest) {
     }
 
     if (isMfaPage) {
-      const operatorCookie = readOperatorCookieFromRequest(
-        request.headers.get("cookie"),
-      );
-      const pinGate = await resolvePinGate(supabase, operatorCookie);
-      const href = await appHomePath(locale, supabase, pinGate === "ok");
+      const href = await appHomePath(locale, supabase, pinGate === "ok", user);
       const redirect = NextResponse.redirect(new URL(href, request.url));
       return copyCookies(response, redirect);
     }
 
-    const operatorCookie = readOperatorCookieFromRequest(
-      request.headers.get("cookie"),
-    );
-    const pinGate = await resolvePinGate(supabase, operatorCookie);
-
     if (isPinPage) {
       if (pinGate === "ok") {
-        const href = await appHomePath(locale, supabase, true);
+        const href = await appHomePath(locale, supabase, true, user);
         const redirect = NextResponse.redirect(new URL(href, request.url));
         return copyCookies(response, redirect);
       }
@@ -268,7 +264,7 @@ export async function middleware(request: NextRequest) {
 
     // Owner in-app onboarding (PRD §6.1 / D43). Skip while impersonating.
     if (isAppPage && pinGate === "ok" && !impersonation) {
-      const onboardingGate = await resolveOnboardingGate(supabase);
+      const onboardingGate = await resolveOnboardingGate(supabase, user);
       if (onboardingGate === "needs_onboarding" && !isOnboardingAllowedAppPath) {
         const redirect = NextResponse.redirect(
           new URL(localeHref(locale, "/onboarding"), request.url),

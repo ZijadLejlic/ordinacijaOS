@@ -26,7 +26,7 @@ import { clinicHasFeature } from "@/lib/entitlements";
 import { canAccessInvoices, canWriteInvoices } from "@/lib/invoices/rbac";
 import { formatInvoiceNumber, roundMoney } from "@/lib/invoices/money";
 import { formatMoney } from "@/lib/money/format";
-import { getAuthUser } from "@/lib/supabase/auth-user";
+import { getClinicContext } from "@/lib/supabase/clinic-context";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -39,23 +39,19 @@ export default async function InvoiceDetailPage({ params }: Props) {
   const t = await getTranslations("Invoices");
   const supabase = await createClient();
 
-  const user = await getAuthUser();
+  const ctx = await getClinicContext();
 
-  if (!user) {
+  if (!ctx) {
     redirect({ href: "/login", locale });
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role, clinic_id")
-    .eq("id", user!.id)
-    .maybeSingle();
+  const { profile } = ctx!;
 
-  if (!profile || !canAccessInvoices(profile.role)) {
+  if (!canAccessInvoices(profile.role)) {
     redirect({ href: "/dashboard", locale });
   }
 
-  const canWrite = canWriteInvoices(profile!.role);
+  const canWrite = canWriteInvoices(profile.role);
 
   const { data: invoice } = await supabase
     .from("invoices")
@@ -63,7 +59,7 @@ export default async function InvoiceDetailPage({ params }: Props) {
       "id, series_year, series_number, status, subtotal_amount, vat_amount, total_amount, currency, notes, issued_at, voided_at, voided_reason, pdf_storage_path, patient_id",
     )
     .eq("id", invoiceId)
-    .eq("clinic_id", profile!.clinic_id)
+    .eq("clinic_id", profile.clinic_id)
     .maybeSingle();
 
   if (!invoice) {
@@ -83,13 +79,13 @@ export default async function InvoiceDetailPage({ params }: Props) {
         "id, description, quantity, unit_price, vat_rate, line_total, sort_order",
       )
       .eq("invoice_id", invoice!.id)
-      .eq("clinic_id", profile!.clinic_id)
+      .eq("clinic_id", profile.clinic_id)
       .order("sort_order", { ascending: true }),
     supabase
       .from("payments")
       .select("id, amount, method, paid_at, note")
       .eq("invoice_id", invoice!.id)
-      .eq("clinic_id", profile!.clinic_id)
+      .eq("clinic_id", profile.clinic_id)
       .order("paid_at", { ascending: false }),
     supabase
       .from("payment_plans")
@@ -97,14 +93,14 @@ export default async function InvoiceDetailPage({ params }: Props) {
         "id, status, total_amount, installment_count, created_at, payment_plan_installments(id, sequence_number, due_date, amount, status)",
       )
       .eq("invoice_id", invoice!.id)
-      .eq("clinic_id", profile!.clinic_id)
+      .eq("clinic_id", profile.clinic_id)
       .order("created_at", { ascending: false }),
     supabase.rpc("get_invoice_patient_names", {
       p_patient_ids: [invoice!.patient_id],
     }),
     clinicHasFeature(
       supabase,
-      profile!.clinic_id,
+      profile.clinic_id,
       "installments_calculator",
     ),
   ]);

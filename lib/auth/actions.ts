@@ -40,7 +40,7 @@ async function redirectAfterAuth(locale: string) {
     redirect({ href: mfaPath(gate), locale });
   }
 
-  const onboardingGate = await resolveOnboardingGate(supabase);
+  const onboardingGate = await resolveOnboardingGate(supabase, user);
   if (onboardingGate === "needs_onboarding") {
     redirect({ href: "/onboarding", locale });
   }

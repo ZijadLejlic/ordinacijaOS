@@ -1,4 +1,4 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient, User } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
 import { canAccessOnboarding } from "@/lib/onboarding/rbac";
 import { needsOnboarding } from "@/lib/onboarding/parse";
@@ -11,13 +11,13 @@ export type OnboardingGate = "ok" | "needs_onboarding" | "forbidden";
  * Owner with incomplete onboarding → needs_onboarding.
  * Non-owners and grandfathered/completed clinics → ok.
  * Unauthenticated / inactive → forbidden.
+ *
+ * Pass `user` from the already-resolved session — avoid a second getUser().
  */
 export async function resolveOnboardingGate(
   supabase: Client,
+  user: User | null,
 ): Promise<OnboardingGate> {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
   if (!user) return "forbidden";
 
   const { data: profile } = await supabase

@@ -47,7 +47,7 @@ import {
   canExportPatientData,
   canRequestPatientErasure,
 } from "@/lib/privacy/rbac";
-import { getAuthUser } from "@/lib/supabase/auth-user";
+import { getClinicContext } from "@/lib/supabase/clinic-context";
 import { createClient } from "@/lib/supabase/server";
 import {
   PATIENT_FILES_BUCKET,
@@ -67,50 +67,45 @@ export default async function PatientDetailPage({ params }: Props) {
   const tConsent = await getTranslations("Consent");
   const supabase = await createClient();
 
-  const user = await getAuthUser();
+  const ctx = await getClinicContext();
 
-  if (!user) {
+  if (!ctx) {
     redirect({ href: "/login", locale });
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role, clinic_id, clinics(name)")
-    .eq("id", user!.id)
-    .maybeSingle();
+  const { profile, clinic } = ctx!;
 
-  if (!profile || !canAccessPatients(profile.role)) {
+  if (!canAccessPatients(profile.role)) {
     redirect({ href: "/dashboard", locale });
   }
 
-  const clinicName =
-    (profile!.clinics as { name: string } | null)?.name ?? "";
+  const clinicName = clinic?.name ?? "";
 
   const { data: patient } = await supabase
     .from("patients")
     .select("*")
     .eq("id", patientId)
-    .eq("clinic_id", profile!.clinic_id)
+    .eq("clinic_id", profile.clinic_id)
     .maybeSingle();
 
   if (!patient) {
     notFound();
   }
 
-  const canWrite = canWritePatients(profile!.role) && patient.is_active;
-  const canExport = canExportPatientData(profile!.role);
-  const canRequestErasure = canRequestPatientErasure(profile!.role);
-  const canViewOdontogram = canAccessOdontogram(profile!.role);
+  const canWrite = canWritePatients(profile.role) && patient.is_active;
+  const canExport = canExportPatientData(profile.role);
+  const canRequestErasure = canRequestPatientErasure(profile.role);
+  const canViewOdontogram = canAccessOdontogram(profile.role);
   const canEditOdontogram =
-    canWriteOdontogram(profile!.role) && patient.is_active;
-  const canViewTreatmentPlan = canAccessTreatmentPlan(profile!.role);
+    canWriteOdontogram(profile.role) && patient.is_active;
+  const canViewTreatmentPlan = canAccessTreatmentPlan(profile.role);
   const canEditTreatmentPlan =
-    canWriteTreatmentPlan(profile!.role) && patient.is_active;
-  const canSign = canSignConsents(profile!.role) && patient.is_active;
+    canWriteTreatmentPlan(profile.role) && patient.is_active;
+  const canSign = canSignConsents(profile.role) && patient.is_active;
 
   const consentFeatureOk = await clinicHasFeature(
     supabase,
-    profile!.clinic_id,
+    profile.clinic_id,
     "consent_draw_sign",
   );
 
@@ -160,7 +155,7 @@ export default async function PatientDetailPage({ params }: Props) {
             .from("treatment_plans")
             .select("id, title, notes, is_active, created_at")
             .eq("patient_id", patientId)
-            .eq("clinic_id", profile!.clinic_id)
+            .eq("clinic_id", profile.clinic_id)
             .order("created_at", { ascending: false });
 
           const planIds = (plans ?? []).map((plan) => plan.id);
@@ -171,14 +166,14 @@ export default async function PatientDetailPage({ params }: Props) {
                   .select(
                     "id, treatment_plan_id, service_name, fdi_number, status, estimated_price_eur, notes, sort_order",
                   )
-                  .eq("clinic_id", profile!.clinic_id)
+                  .eq("clinic_id", profile.clinic_id)
                   .in("treatment_plan_id", planIds)
                   .order("sort_order", { ascending: true })
               : Promise.resolve({ data: [] as const }),
             supabase
               .from("services")
               .select("id, name, price_eur")
-              .eq("clinic_id", profile!.clinic_id)
+              .eq("clinic_id", profile.clinic_id)
               .eq("is_active", true)
               .order("name", { ascending: true }),
           ]);
@@ -187,10 +182,10 @@ export default async function PatientDetailPage({ params }: Props) {
         })()
       : null,
     consentFeatureOk
-      ? loadConsentFormsForClinic(profile!.clinic_id)
+      ? loadConsentFormsForClinic(profile.clinic_id)
       : Promise.resolve([]),
     consentFeatureOk
-      ? loadPatientConsentSignatures(profile!.clinic_id, patientId)
+      ? loadPatientConsentSignatures(profile.clinic_id, patientId)
       : Promise.resolve([]),
   ]);
 

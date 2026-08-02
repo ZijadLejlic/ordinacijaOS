@@ -18,7 +18,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { canAccessPatients, canWritePatients } from "@/lib/patients/rbac";
-import { getAuthUser } from "@/lib/supabase/auth-user";
+import { getClinicContext } from "@/lib/supabase/clinic-context";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -33,29 +33,25 @@ export default async function PatientsPage({ params, searchParams }: Props) {
   const t = await getTranslations("Patients");
   const supabase = await createClient();
 
-  const user = await getAuthUser();
+  const ctx = await getClinicContext();
 
-  if (!user) {
+  if (!ctx) {
     redirect({ href: "/login", locale });
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id, role, clinic_id")
-    .eq("id", user!.id)
-    .maybeSingle();
+  const { profile } = ctx!;
 
-  if (!profile || !canAccessPatients(profile.role)) {
+  if (!canAccessPatients(profile.role)) {
     redirect({ href: "/dashboard", locale });
   }
 
-  const canWrite = canWritePatients(profile!.role);
+  const canWrite = canWritePatients(profile.role);
 
   const query = q?.trim() ?? "";
   let patientsQuery = supabase
     .from("patients")
     .select("id, first_name, last_name, phone, email, is_active")
-    .eq("clinic_id", profile!.clinic_id)
+    .eq("clinic_id", profile.clinic_id)
     .order("last_name", { ascending: true });
 
   if (query) {

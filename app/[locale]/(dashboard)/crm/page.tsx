@@ -11,7 +11,7 @@ import { CrmInboxList } from "@/components/crm/crm-inbox";
 import { canAccessCrm } from "@/lib/crm/rbac";
 import { loadOpenCrmNotifications } from "@/lib/crm/load";
 import { clinicHasFeature } from "@/lib/entitlements";
-import { getAuthUser } from "@/lib/supabase/auth-user";
+import { getClinicContext } from "@/lib/supabase/clinic-context";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -24,30 +24,26 @@ export default async function CrmPage({ params }: Props) {
   const t = await getTranslations("Crm");
   const supabase = await createClient();
 
-  const user = await getAuthUser();
+  const ctx = await getClinicContext();
 
-  if (!user) {
+  if (!ctx) {
     redirect({ href: "/login", locale });
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role, clinic_id")
-    .eq("id", user!.id)
-    .maybeSingle();
+  const { profile } = ctx!;
 
-  if (!profile || !canAccessCrm(profile.role)) {
+  if (!canAccessCrm(profile.role)) {
     redirect({ href: "/dashboard", locale });
   }
 
   const featureOk = await clinicHasFeature(
     supabase,
-    profile!.clinic_id,
+    profile.clinic_id,
     "crm_light",
   );
 
   const notifications = featureOk
-    ? await loadOpenCrmNotifications(profile!.clinic_id)
+    ? await loadOpenCrmNotifications(profile.clinic_id)
     : [];
 
   return (

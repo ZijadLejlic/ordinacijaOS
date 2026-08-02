@@ -14,7 +14,7 @@ import {
 } from "@/components/services/service-forms";
 import { canReadServices, canWriteServices } from "@/lib/patients/rbac";
 import { currencyLabel } from "@/lib/money/format";
-import { getAuthUser } from "@/lib/supabase/auth-user";
+import { getClinicContext } from "@/lib/supabase/clinic-context";
 import { createClient } from "@/lib/supabase/server";
 import type { Json } from "@/lib/supabase/database.types";
 
@@ -30,23 +30,19 @@ export default async function ServicesPage({ params, searchParams }: Props) {
   const t = await getTranslations("Services");
   const supabase = await createClient();
 
-  const user = await getAuthUser();
+  const ctx = await getClinicContext();
 
-  if (!user) {
+  if (!ctx) {
     redirect({ href: "/login", locale });
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role, clinic_id")
-    .eq("id", user!.id)
-    .maybeSingle();
+  const { profile, clinic } = ctx!;
 
-  if (!profile || !canReadServices(profile.role)) {
+  if (!canReadServices(profile.role)) {
     redirect({ href: "/dashboard", locale });
   }
 
-  const canWrite = canWriteServices(profile!.role);
+  const canWrite = canWriteServices(profile.role);
   const query = q?.trim() ?? "";
   const status =
     statusParam === "active" || statusParam === "inactive"
@@ -58,7 +54,7 @@ export default async function ServicesPage({ params, searchParams }: Props) {
     .select(
       "id, name, code, duration_minutes, price_eur, vat_rate, location_id, is_active",
     )
-    .eq("clinic_id", profile!.clinic_id)
+    .eq("clinic_id", profile.clinic_id)
     .order("name", { ascending: true });
 
   if (query) {
@@ -74,21 +70,15 @@ export default async function ServicesPage({ params, searchParams }: Props) {
     servicesQuery = servicesQuery.eq("is_active", false);
   }
 
-  const [{ data: services }, { data: locations }, { data: clinic }] =
-    await Promise.all([
-      servicesQuery,
-      supabase
-        .from("clinic_locations")
-        .select("id, name")
-        .eq("clinic_id", profile!.clinic_id)
-        .eq("is_active", true)
-        .order("name", { ascending: true }),
-      supabase
-        .from("clinics")
-        .select("settings_json")
-        .eq("id", profile!.clinic_id)
-        .single(),
-    ]);
+  const [{ data: services }, { data: locations }] = await Promise.all([
+    servicesQuery,
+    supabase
+      .from("clinic_locations")
+      .select("id, name")
+      .eq("clinic_id", profile.clinic_id)
+      .eq("is_active", true)
+      .order("name", { ascending: true }),
+  ]);
 
   const settings = (clinic?.settings_json ?? {}) as Record<string, Json>;
   const sharedPricelist = settings.shared_pricelist_across_locations !== false;

@@ -1,8 +1,14 @@
+import { Suspense, type ReactNode } from "react";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { ClinicTelemetry } from "@/components/analytics/clinic-telemetry";
 import { AppShell } from "@/components/dashboard/app-shell";
+import { DeferredClinicLogo } from "@/components/dashboard/deferred-clinic-logo";
+import {
+  CrmNavBadge,
+  InventoryNavBadge,
+} from "@/components/dashboard/deferred-nav-badges";
 import { ClinicReadonlyBanner } from "@/components/clinic/readonly-banner";
 import { ImpersonationBanner } from "@/components/platform/impersonation-banner";
 import { setSentryAuthContext } from "@/lib/observability/sentry";
@@ -10,23 +16,15 @@ import {
   hasCustomColors,
   parseBrandingJson,
 } from "@/lib/branding/parse";
-import {
-  BRANDING_SIGNED_URL_TTL_SECONDS,
-  CLINIC_BRANDING_BUCKET,
-} from "@/lib/branding/storage";
+import { BRAND_LOGO } from "@/lib/brand/constants";
 import { getClinicEntitlements } from "@/lib/entitlements";
 import { canAccessCrm } from "@/lib/crm/rbac";
 import { canReadConsentForms } from "@/lib/consent/rbac";
-import { countOpenCrmNotifications } from "@/lib/crm/load";
 import { canAccessExpenses } from "@/lib/expenses/rbac";
 import { canAccessInventory } from "@/lib/inventory/rbac";
-import { countLowStockItems } from "@/lib/inventory/load";
 import { getOperatorIdFromCookie } from "@/lib/operators/session";
-import { getAuthUser } from "@/lib/supabase/auth-user";
+import { getClinicContext } from "@/lib/supabase/clinic-context";
 import { createClient } from "@/lib/supabase/server";
-import type { Database } from "@/lib/supabase/database.types";
-
-type ClinicStatus = Database["public"]["Enums"]["clinic_status"];
 
 type Props = {
   children: React.ReactNode;
@@ -39,44 +37,26 @@ export default async function DashboardLayout({ children, params }: Props) {
   const messages = await getMessages();
   const t = await getTranslations("Nav");
 
-  const supabase = await createClient();
-  const user = await getAuthUser();
+  const ctx = await getClinicContext();
 
-  if (!user) {
+  if (!ctx) {
     redirect({ href: "/login", locale });
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select(
-      "full_name, role, clinic_id, clinics(name, branding_json, status, grace_ends_at, is_demo)",
-    )
-    .eq("id", user!.id)
-    .maybeSingle();
-
-  if (!profile) {
-    redirect({ href: "/login", locale });
-  }
+  const { user, profile, clinic } = ctx!;
 
   // Server-side Sentry scope for this request (user.id + tags only — D33).
   setSentryAuthContext({
-    userId: user!.id,
-    clinicId: profile!.clinic_id,
-    role: profile!.role,
+    userId: user.id,
+    clinicId: profile.clinic_id,
+    role: profile.role,
   });
 
-  const clinic = profile!.clinics as {
-    name: string;
-    branding_json: unknown;
-    status: ClinicStatus;
-    grace_ends_at: string | null;
-    is_demo: boolean;
-  } | null;
-
+  const supabase = await createClient();
   const operatorId = await getOperatorIdFromCookie();
   const entitlementsPromise = getClinicEntitlements(
     supabase,
-    profile!.clinic_id,
+    profile.clinic_id,
   );
 
   const [operatorResult, entitlements] = await Promise.all([
@@ -93,51 +73,59 @@ export default async function DashboardLayout({ children, params }: Props) {
   const operatorName = operatorResult.data?.display_name ?? null;
 
   const showExpenses =
-    canAccessExpenses(profile!.role) &&
+    canAccessExpenses(profile.role) &&
     entitlements.features.expenses_reports_excel.enabled;
   const brandingEnabled = entitlements.features.branding_custom.enabled;
   const showCrm =
-    canAccessCrm(profile!.role) && entitlements.features.crm_light.enabled;
+    canAccessCrm(profile.role) && entitlements.features.crm_light.enabled;
   const showConsent =
-    canReadConsentForms(profile!.role) &&
+    canReadConsentForms(profile.role) &&
     entitlements.features.consent_draw_sign.enabled;
   const showInventory =
-    canAccessInventory(profile!.role) &&
+    canAccessInventory(profile.role) &&
     entitlements.features.inventory_basic.enabled;
 
-  const [crmOpenCount, inventoryLowCount] = await Promise.all([
-    showCrm
-      ? countOpenCrmNotifications(profile!.clinic_id)
-      : Promise.resolve(0),
-    showInventory
-      ? countLowStockItems(profile!.clinic_id)
-      : Promise.resolve(0),
-  ]);
+  const clinicName = clinic?.name ?? t("clinicFallback");
 
   let shellBranding: {
-    logoUrl: string | null;
     colors: ReturnType<typeof parseBrandingJson>["colors"];
+    logo?: ReactNode;
   } | null = null;
 
   if (brandingEnabled && clinic) {
-    const branding = parseBrandingJson(
-      clinic.branding_json as Parameters<typeof parseBrandingJson>[0],
-    );
-    let logoUrl: string | null = null;
+    const branding = parseBrandingJson(clinic.branding_json);
+    const colors = branding.colors;
+    const hasColors = hasCustomColors(colors);
+
+    let logo: ReactNode = null;
     if (branding.logoPath) {
-      const { data } = await supabase.storage
-        .from(CLINIC_BRANDING_BUCKET)
-        .createSignedUrl(branding.logoPath, BRANDING_SIGNED_URL_TTL_SECONDS);
-      logoUrl = data?.signedUrl ?? null;
+      logo = (
+        <Suspense
+          fallback={
+            // eslint-disable-next-line @next/next/no-img-element -- static public asset
+            <img
+              src={BRAND_LOGO.mark}
+              alt=""
+              className="h-8 w-8 shrink-0 object-contain"
+            />
+          }
+        >
+          <DeferredClinicLogo logoPath={branding.logoPath} alt={clinicName} />
+        </Suspense>
+      );
     } else if (branding.logoUrl) {
-      logoUrl = branding.logoUrl;
+      logo = (
+        // eslint-disable-next-line @next/next/no-img-element -- legacy absolute URL
+        <img
+          src={branding.logoUrl}
+          alt={clinicName}
+          className="h-8 w-8 shrink-0 rounded object-contain"
+        />
+      );
     }
 
-    if (logoUrl || hasCustomColors(branding.colors)) {
-      shellBranding = {
-        logoUrl,
-        colors: branding.colors,
-      };
+    if (logo || hasColors) {
+      shellBranding = { colors, logo: logo ?? undefined };
     }
   }
 
@@ -149,29 +137,41 @@ export default async function DashboardLayout({ children, params }: Props) {
           <ClinicReadonlyBanner
             status={clinic.status}
             graceEndsAt={clinic.grace_ends_at}
-            isOwner={profile!.role === "owner"}
+            isOwner={profile.role === "owner"}
             isDemo={clinic.is_demo}
           />
         ) : null}
         <AppShell
-          clinicName={clinic?.name ?? t("clinicFallback")}
-          role={profile!.role}
-          fullName={profile!.full_name}
+          clinicName={clinicName}
+          role={profile.role}
+          fullName={profile.full_name}
           operatorName={operatorName}
-          isOwner={profile!.role === "owner"}
+          isOwner={profile.role === "owner"}
           showExpenses={showExpenses}
           showInventory={showInventory}
-          inventoryLowCount={inventoryLowCount}
+          inventoryBadge={
+            showInventory ? (
+              <Suspense fallback={null}>
+                <InventoryNavBadge clinicId={profile.clinic_id} />
+              </Suspense>
+            ) : null
+          }
           showCrm={showCrm}
-          crmOpenCount={crmOpenCount}
+          crmBadge={
+            showCrm ? (
+              <Suspense fallback={null}>
+                <CrmNavBadge clinicId={profile.clinic_id} />
+              </Suspense>
+            ) : null
+          }
           showConsent={showConsent}
           branding={shellBranding}
         >
-          {profile!.clinic_id && profile!.role ? (
+          {profile.clinic_id && profile.role ? (
             <ClinicTelemetry
-              userId={user!.id}
-              clinicId={profile!.clinic_id}
-              role={profile!.role}
+              userId={user.id}
+              clinicId={profile.clinic_id}
+              role={profile.role}
               isDemo={clinic?.is_demo === true}
             />
           ) : null}

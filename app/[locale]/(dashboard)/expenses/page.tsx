@@ -20,7 +20,7 @@ import { clinicHasFeature } from "@/lib/entitlements";
 import { canAccessExpenses, canWriteExpenses } from "@/lib/expenses/rbac";
 import { roundMoney } from "@/lib/invoices/money";
 import { formatMoney, currencyLabel } from "@/lib/money/format";
-import { getAuthUser } from "@/lib/supabase/auth-user";
+import { getClinicContext } from "@/lib/supabase/clinic-context";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "@/i18n/navigation";
 import {
@@ -40,32 +40,28 @@ export default async function ExpensesPage({ params, searchParams }: Props) {
   const t = await getTranslations("Expenses");
   const supabase = await createClient();
 
-  const user = await getAuthUser();
+  const ctx = await getClinicContext();
 
-  if (!user) {
+  if (!ctx) {
     redirect({ href: "/login", locale });
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role, clinic_id")
-    .eq("id", user!.id)
-    .maybeSingle();
+  const { profile, clinic } = ctx!;
 
-  if (!profile || !canAccessExpenses(profile.role)) {
+  if (!canAccessExpenses(profile.role)) {
     redirect({ href: "/dashboard", locale });
   }
 
   const featureOk = await clinicHasFeature(
     supabase,
-    profile!.clinic_id,
+    profile.clinic_id,
     "expenses_reports_excel",
   );
   if (!featureOk) {
     redirect({ href: "/dashboard", locale });
   }
 
-  const canWrite = canWriteExpenses(profile!.role);
+  const canWrite = canWriteExpenses(profile.role);
   const query = q?.trim() ?? "";
   const category =
     categoryParam &&
@@ -78,7 +74,7 @@ export default async function ExpensesPage({ params, searchParams }: Props) {
     .select(
       "id, category, description, amount, expense_date, vendor, notes, voided_at",
     )
-    .eq("clinic_id", profile!.clinic_id)
+    .eq("clinic_id", profile.clinic_id)
     .order("expense_date", { ascending: false })
     .limit(200);
 
@@ -86,14 +82,7 @@ export default async function ExpensesPage({ params, searchParams }: Props) {
     expensesQuery = expensesQuery.eq("category", category);
   }
 
-  const [{ data: expenses }, { data: clinic }] = await Promise.all([
-    expensesQuery,
-    supabase
-      .from("clinics")
-      .select("timezone")
-      .eq("id", profile!.clinic_id)
-      .maybeSingle(),
-  ]);
+  const { data: expenses } = await expensesQuery;
 
   let rows: ExpenseRow[] = (expenses ?? []).map((e) => ({
     id: e.id,

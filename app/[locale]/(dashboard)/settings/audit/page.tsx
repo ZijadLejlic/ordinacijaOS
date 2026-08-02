@@ -11,7 +11,7 @@ import {
 import { AuditLogTable } from "@/components/audit/audit-log-table";
 import { AUDIT_EVENT_FILTERS, loadAuditEvents } from "@/lib/audit/load";
 import { canViewAuditLog } from "@/lib/audit/rbac";
-import { getAuthUser } from "@/lib/supabase/auth-user";
+import { getClinicContext } from "@/lib/supabase/clinic-context";
 import { createClient } from "@/lib/supabase/server";
 
 type Props = {
@@ -29,19 +29,15 @@ export default async function SettingsAuditPage({
   const t = await getTranslations("AuditLog");
   const supabase = await createClient();
 
-  const user = await getAuthUser();
+  const ctx = await getClinicContext();
 
-  if (!user) {
+  if (!ctx) {
     redirect({ href: "/login", locale });
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("id, role, clinic_id")
-    .eq("id", user!.id)
-    .maybeSingle();
+  const { profile } = ctx!;
 
-  if (!profile || !canViewAuditLog(profile.role)) {
+  if (!canViewAuditLog(profile.role)) {
     redirect({ href: "/dashboard", locale });
   }
 
@@ -58,7 +54,7 @@ export default async function SettingsAuditPage({
 
   const { rows, total, pageSize } = await loadAuditEvents(
     supabase,
-    profile!.clinic_id,
+    profile.clinic_id,
     { eventName, page },
   );
 
