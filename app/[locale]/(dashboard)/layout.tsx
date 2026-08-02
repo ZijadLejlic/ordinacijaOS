@@ -3,6 +3,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "@/i18n/navigation";
 import { ClinicTelemetry } from "@/components/analytics/clinic-telemetry";
+import { PosthogProvider } from "@/components/analytics/posthog-provider";
 import { AppShell } from "@/components/dashboard/app-shell";
 import { DeferredClinicLogo } from "@/components/dashboard/deferred-clinic-logo";
 import {
@@ -11,6 +12,7 @@ import {
 } from "@/components/dashboard/deferred-nav-badges";
 import { ClinicReadonlyBanner } from "@/components/clinic/readonly-banner";
 import { ImpersonationBanner } from "@/components/platform/impersonation-banner";
+import { RegisterServiceWorker } from "@/components/pwa/register-sw";
 import { setSentryAuthContext } from "@/lib/observability/sentry";
 import {
   hasCustomColors,
@@ -131,53 +133,56 @@ export default async function DashboardLayout({ children, params }: Props) {
 
   return (
     <NextIntlClientProvider messages={messages}>
-      <div className="flex min-h-full flex-1 flex-col">
-        <ImpersonationBanner />
-        {clinic ? (
-          <ClinicReadonlyBanner
-            status={clinic.status}
-            graceEndsAt={clinic.grace_ends_at}
-            isOwner={profile.role === "owner"}
-            isDemo={clinic.is_demo}
-          />
-        ) : null}
-        <AppShell
-          clinicName={clinicName}
-          role={profile.role}
-          fullName={profile.full_name}
-          operatorName={operatorName}
-          isOwner={profile.role === "owner"}
-          showExpenses={showExpenses}
-          showInventory={showInventory}
-          inventoryBadge={
-            showInventory ? (
-              <Suspense fallback={null}>
-                <InventoryNavBadge clinicId={profile.clinic_id} />
-              </Suspense>
-            ) : null
-          }
-          showCrm={showCrm}
-          crmBadge={
-            showCrm ? (
-              <Suspense fallback={null}>
-                <CrmNavBadge clinicId={profile.clinic_id} />
-              </Suspense>
-            ) : null
-          }
-          showConsent={showConsent}
-          branding={shellBranding}
-        >
-          {profile.clinic_id && profile.role ? (
-            <ClinicTelemetry
-              userId={user.id}
-              clinicId={profile.clinic_id}
-              role={profile.role}
-              isDemo={clinic?.is_demo === true}
+      <PosthogProvider>
+        <RegisterServiceWorker />
+        <div className="flex min-h-full flex-1 flex-col">
+          <ImpersonationBanner />
+          {clinic ? (
+            <ClinicReadonlyBanner
+              status={clinic.status}
+              graceEndsAt={clinic.grace_ends_at}
+              isOwner={profile.role === "owner"}
+              isDemo={clinic.is_demo}
             />
           ) : null}
-          {children}
-        </AppShell>
-      </div>
+          <AppShell
+            clinicName={clinicName}
+            role={profile.role}
+            fullName={profile.full_name}
+            operatorName={operatorName}
+            isOwner={profile.role === "owner"}
+            showExpenses={showExpenses}
+            showInventory={showInventory}
+            inventoryBadge={
+              showInventory ? (
+                <Suspense fallback={null}>
+                  <InventoryNavBadge clinicId={profile.clinic_id} />
+                </Suspense>
+              ) : null
+            }
+            showCrm={showCrm}
+            crmBadge={
+              showCrm ? (
+                <Suspense fallback={null}>
+                  <CrmNavBadge clinicId={profile.clinic_id} />
+                </Suspense>
+              ) : null
+            }
+            showConsent={showConsent}
+            branding={shellBranding}
+          >
+            {profile.clinic_id && profile.role ? (
+              <ClinicTelemetry
+                userId={user.id}
+                clinicId={profile.clinic_id}
+                role={profile.role}
+                isDemo={clinic?.is_demo === true}
+              />
+            ) : null}
+            {children}
+          </AppShell>
+        </div>
+      </PosthogProvider>
     </NextIntlClientProvider>
   );
 }
