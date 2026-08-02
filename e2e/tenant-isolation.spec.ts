@@ -59,7 +59,9 @@ test.describe("Tenant isolation (UI)", () => {
     await expect(page.getByText(patientBName)).toHaveCount(0);
 
     const response = await page.goto(`/bs/patients/${patientBId}`);
+    // Must be a real HTTP 404 (not a streamed 200 shell from a parent loading.tsx).
     expect(response?.status()).toBe(404);
     await expect(page.getByText(patientBName)).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "404" })).toBeVisible();
   });
 });
