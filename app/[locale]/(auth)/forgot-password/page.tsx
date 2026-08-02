@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ForgotPasswordForm } from "@/components/auth/auth-forms";
+import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
 
 type Props = {
   params: Promise<{ locale: string }>;

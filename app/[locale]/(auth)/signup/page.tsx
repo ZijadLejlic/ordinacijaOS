@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { SignupForm } from "@/components/auth/auth-forms";
+import { SignupForm } from "@/components/auth/signup-form";
 
 type Props = {
   params: Promise<{ locale: string }>;

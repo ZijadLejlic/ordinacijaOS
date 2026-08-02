@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import { publicLocalePath } from "@/i18n/path";
-import { ResetPasswordForm } from "@/components/auth/auth-forms";
+import { ResetPasswordForm } from "@/components/auth/reset-password-form";
 import { needsMfaStepUpForSensitiveAuth } from "@/lib/auth/mfa";
 import { createClient } from "@/lib/supabase/server";
 

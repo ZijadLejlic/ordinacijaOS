@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Fraunces } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import { getLocale } from "next-intl/server";
 import { VercelAnalytics } from "@/components/analytics/vercel-analytics";
 import { VercelSpeedInsights } from "@/components/analytics/vercel-speed-insights";
@@ -16,13 +16,6 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
   display: "optional",
-});
-
-const marketingDisplay = Fraunces({
-  variable: "--font-marketing-display",
-  subsets: ["latin"],
-  display: "optional",
-  adjustFontFallback: true,
 });
 
 export const metadata: Metadata = {
@@ -51,7 +44,7 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={`${geistSans.variable} ${geistMono.variable} ${marketingDisplay.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         {children}

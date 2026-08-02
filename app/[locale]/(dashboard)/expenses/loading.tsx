@@ -1,0 +1,5 @@
+import { PageLoading } from "@/components/dashboard/page-loading";
+
+export default function ExpensesLoading() {
+  return <PageLoading />;
+}
