@@ -2400,6 +2400,7 @@
     "title": "Calendar",
     "subtitle": "Appointments by doctor (Europe/Sarajevo).",
     "timezoneHint": "Times shown in Europe/Sarajevo.",
+    "loadingFormOptions": "Loading patients and services…",
     "new": "New appointment",
     "newTitle": "New appointment",
     "editTitle": "Edit appointment",

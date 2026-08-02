@@ -19,16 +19,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { FieldError } from "@/components/ui/field";
-import { AppointmentForm } from "@/components/calendar/appointment-form";
-import type {
-  DoctorOption,
-  LocationOption,
-  PatientOption,
-  ServiceOption,
-} from "@/components/calendar/appointment-form";
+import type { DoctorOption } from "@/components/calendar/appointment-form";
+import {
+  DeferredAppointmentForm,
+  DeferredWaitlistPanel,
+  type CalendarFormOptions,
+} from "@/components/calendar/calendar-form-options";
 import { DayWeekGrid } from "@/components/calendar/day-week-grid";
 import { MonthGrid } from "@/components/calendar/month-grid";
-import { WaitlistPanel } from "@/components/calendar/waitlist-panel";
 import type {
   CalendarAppointment,
   WaitlistRow,
@@ -60,9 +58,7 @@ export function CalendarShell({
   appointments,
   waitlist,
   doctors,
-  patients,
-  services,
-  locations,
+  formOptionsPromise,
   canWrite,
   canPickDoctor,
   canDrag,
@@ -77,9 +73,7 @@ export function CalendarShell({
   appointments: CalendarAppointment[];
   waitlist: WaitlistRow[];
   doctors: DoctorOption[];
-  patients: PatientOption[];
-  services: ServiceOption[];
-  locations: LocationOption[];
+  formOptionsPromise: Promise<CalendarFormOptions>;
   canWrite: boolean;
   canPickDoctor: boolean;
   canDrag: boolean;
@@ -203,12 +197,13 @@ export function CalendarShell({
                 </DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
-                <AppointmentForm
+                <DeferredAppointmentForm
                   key={
                     panel.type === "create"
                       ? `create-${panel.startsAt}`
                       : panel.appointment.id
                   }
+                  formOptionsPromise={formOptionsPromise}
                   mode={panel.type === "create" ? "create" : "edit"}
                   initial={
                     panel.type === "create"
@@ -235,9 +230,6 @@ export function CalendarShell({
                         }
                   }
                   doctors={doctors}
-                  patients={patients}
-                  services={services}
-                  locations={locations}
                   canPickDoctor={canPickDoctor}
                   onClose={() => setPanel(null)}
                   onSuccess={(message) => {
@@ -449,12 +441,10 @@ export function CalendarShell({
       {showWaitlist ? (
         <Card>
           <CardContent className="pt-6">
-            <WaitlistPanel
+            <DeferredWaitlistPanel
+              formOptionsPromise={formOptionsPromise}
               rows={waitlist}
               doctors={doctors}
-              patients={patients}
-              services={services}
-              locations={locations}
               canWrite={canWriteWaitlist}
               suggestions={suggestions}
               onClearSuggestions={() => setSuggestions([])}
