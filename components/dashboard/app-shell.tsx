@@ -260,10 +260,10 @@ export function AppShell({
         </Button>
       </header>
 
-      {/* Desktop sidebar */}
+      {/* Desktop sidebar — viewport-height so mt-auto pins logout; scrolls when nav overflows */}
       <aside
         className={cn(
-          "hidden w-64 shrink-0 flex-col gap-6 border-r p-6 md:flex",
+          "sticky top-0 hidden h-dvh w-64 shrink-0 flex-col gap-6 overflow-y-auto border-r p-6 md:flex",
           brandStyle
             ? "bg-[var(--clinic-brand-bg)] text-[var(--clinic-brand-text)]"
             : "bg-muted/30",
