@@ -4,7 +4,7 @@ export const CONSENT_STORAGE_KEY = "dentord_cookie_consent";
 export const CONSENT_CHANGED_EVENT = "dentord:cookie-consent";
 
 export type CookieConsentChoice = {
-  /** Analytics cookies (PostHog). Essential cookies do not need opt-in. */
+  /** Analytics (PostHog + Vercel Web Analytics / Speed Insights). Essential cookies do not need opt-in. */
   analytics: boolean;
   decidedAt: string;
 };

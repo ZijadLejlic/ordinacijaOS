@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import { getLocale } from "next-intl/server";
+import { VercelAnalytics } from "@/components/analytics/vercel-analytics";
+import { VercelSpeedInsights } from "@/components/analytics/vercel-speed-insights";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -51,7 +53,11 @@ export default async function RootLayout({
       lang={locale}
       className={`${geistSans.variable} ${geistMono.variable} ${marketingDisplay.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        {children}
+        <VercelAnalytics />
+        <VercelSpeedInsights />
+      </body>
     </html>
   );
 }

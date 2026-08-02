@@ -107,7 +107,7 @@ function privacyBs(): LegalDocument {
         title: "11. Analitika",
         paragraphs: [
           "Koristimo alate za analitiku proizvoda kako bismo razumjeli korištenje funkcija. Ne šaljemo imena i prezimena pacijenata u analytics alate. Identifikatori događaja vezani su za kliniku i ulogu korisnika, ne za identitet pacijenta.",
-          "Na marketing siteu PostHog se učitava tek nakon što prihvatite analitičke kolačiće.",
+          "Na marketing siteu PostHog, Vercel Web Analytics i Speed Insights učitavaju se tek nakon što prihvatite analitičke kolačiće. ID-evi pacijenata u URL-ovima se redactaju prije slanja događaja.",
         ],
       },
       {
@@ -227,7 +227,7 @@ function privacyEn(): LegalDocument {
         title: "11. Analytics",
         paragraphs: [
           "We use product analytics to understand feature usage. We do not send patient first or last names to analytics tools. Event identifiers relate to clinic and user role, not patient identity.",
-          "On the marketing site, PostHog loads only after you accept analytics cookies.",
+          "On the marketing site, PostHog, Vercel Web Analytics, and Speed Insights load only after you accept analytics cookies. Patient IDs in URLs are redacted before events are sent.",
         ],
       },
       {

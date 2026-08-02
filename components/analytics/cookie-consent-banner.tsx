@@ -26,7 +26,7 @@ function getConsentNeeded() {
 
 /**
  * Minimal cookie banner (PRD §13.4 / W18): essential vs analytics.
- * PostHog loads only after Accept (see PosthogProvider gate).
+ * PostHog + Vercel Web Analytics / Speed Insights load only after Accept.
  */
 export function CookieConsentBanner() {
   const t = useTranslations("Marketing.cookieConsent");

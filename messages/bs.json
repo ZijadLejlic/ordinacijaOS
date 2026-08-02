@@ -848,7 +848,7 @@
     },
     "cookieConsent": {
       "title": "Kolačići",
-      "description": "Koristimo neophodne kolačiće za rad sajta. Analitičke (PostHog) uključujemo samo uz vaš pristanak — bez ličnih podataka pacijenata.",
+      "description": "Koristimo neophodne kolačiće za rad sajta. Analitičke (PostHog, Vercel) uključujemo samo uz vaš pristanak — bez ličnih podataka pacijenata.",
       "accept": "Prihvati",
       "reject": "Samo neophodni",
       "privacyLink": "Politika privatnosti"
