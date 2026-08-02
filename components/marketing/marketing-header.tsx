@@ -64,7 +64,6 @@ export function MarketingHeader({ showBlogNav = false }: MarketingHeaderProps) {
         >
           <BrandLogo
             variant="full"
-            priority
             className="h-8 w-auto max-w-[9.5rem]"
           />
         </Link>

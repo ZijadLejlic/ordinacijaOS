@@ -2,17 +2,17 @@
   "base": "http://localhost:3020",
   "formFactor": "mobile",
   "target": 95,
-  "generatedAt": "2026-07-21T20:53:09.990Z",
+  "generatedAt": "2026-08-02T22:23:16.397Z",
   "results": [
     {
       "id": "home",
-      "performance": 92,
+      "performance": 86,
       "accessibility": 100,
       "seo": 100
     },
     {
       "id": "pricing",
-      "performance": 92,
+      "performance": 88,
       "accessibility": 100,
       "seo": 100
     }

@@ -113,6 +113,7 @@
         "microcopy": "Besplatno do 31.12.2026 · Bez kartice · Postavka za 5 minuta",
         "browserUrl": "app.dentord.com",
         "screenshotAlt": "Pregled DentOrd dashboarda s KPI karticama i današnjim terminima",
+        "phoneScreenshotAlt": "DentOrd kalendar na telefonu — današnji termini",
         "mock": {
           "kpiPatients": "Pacijenti danas",
           "kpiRevenue": "Prihod (danas)",

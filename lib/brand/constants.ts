@@ -15,9 +15,13 @@ export const EMAIL_HELLO = `hello@${PRODUCT_DOMAIN}`;
 
 /** Static assets under `public/brand/` (derived from `brand/logo-source.png`). */
 export const BRAND_LOGO = {
+  /** Full-res / OG / email — prefer `header` in UI chrome. */
   full: "/brand/logo.webp",
   fullPng: "/brand/logo.png",
-  mark: "/brand/logo-mark.png",
+  /** Navbar / compact chrome (~152 CSS px wide @2x). */
+  header: "/brand/logo-header.webp",
+  mark: "/brand/logo-mark.webp",
+  markPng: "/brand/logo-mark.png",
 } as const;
 
 /** Palette extracted from the DentOrd logo. */

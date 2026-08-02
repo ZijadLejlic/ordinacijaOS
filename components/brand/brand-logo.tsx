@@ -21,26 +21,29 @@ export function BrandLogo({
       <Image
         src={BRAND_LOGO.mark}
         alt={alt}
-        width={40}
-        height={40}
+        width={80}
+        height={80}
         className={cn("h-8 w-8 object-contain", className)}
+        // Header mark is always above the fold — never lazy.
         priority={priority}
+        loading="eager"
         fetchPriority={priority ? "high" : "auto"}
+        sizes="40px"
       />
     );
   }
 
+  // Pre-sized header asset — plain img avoids /_next/image hop on the critical path.
   return (
-    <Image
-      src={BRAND_LOGO.full}
+    // eslint-disable-next-line @next/next/no-img-element -- critical-path logo, already resized
+    <img
+      src={BRAND_LOGO.header}
       alt={alt}
-      width={480}
-      height={324}
-      className={cn("h-8 w-auto object-contain", className)}
-      priority={priority}
+      width={304}
+      height={210}
+      decoding="async"
       fetchPriority={priority ? "high" : "auto"}
-      sizes="152px"
-      unoptimized
+      className={cn("h-8 w-auto object-contain", className)}
     />
   );
 }

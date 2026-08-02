@@ -44,9 +44,19 @@ export default withSentryConfig(withIntl, {
   widenClientFileUpload: true,
   // Bypass ad-blockers; excluded from i18n middleware (see middleware.ts matcher)
   tunnelRoute: "/monitoring",
+  disableLogger: true,
+  bundleSizeOptimizations: {
+    excludeDebugStatements: true,
+    excludeReplayIframe: true,
+    excludeReplayShadowDom: true,
+    excludeReplayWorker: true,
+  },
   webpack: {
     treeshake: {
       removeDebugLogging: true,
+      excludeReplayIframe: true,
+      excludeReplayShadowDOM: true,
+      excludeReplayCompressionWorker: true,
     },
   },
   sourcemaps: {
