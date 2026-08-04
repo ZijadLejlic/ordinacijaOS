@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  useTransition,
+} from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
@@ -48,21 +54,19 @@ function StoreLink({ href, children }: { href: string; children: string }) {
   );
 }
 
+function detectStorePlatform(): StorePlatform {
+  const ua = navigator.userAgent ?? "";
+  if (/iPhone|iPad|iPod/i.test(ua)) return "ios";
+  if (/Android/i.test(ua)) return "android";
+  return "both";
+}
+
 function useStorePlatform(): StorePlatform {
-  const [platform, setPlatform] = useState<StorePlatform>("both");
-
-  useEffect(() => {
-    const ua = navigator.userAgent ?? "";
-    if (/iPhone|iPad|iPod/i.test(ua)) {
-      setPlatform("ios");
-      return;
-    }
-    if (/Android/i.test(ua)) {
-      setPlatform("android");
-    }
-  }, []);
-
-  return platform;
+  return useSyncExternalStore(
+    () => () => {},
+    detectStorePlatform,
+    () => "both" as const,
+  );
 }
 
 function StepDots({ step }: { step: EnrollStep }) {

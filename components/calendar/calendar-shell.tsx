@@ -180,11 +180,6 @@ export function CalendarShell({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasViewQuery]);
 
-  // Open waitlist sheet when cancel yields suggestions
-  useEffect(() => {
-    if (suggestions.length > 0) setWaitlistOpen(true);
-  }, [suggestions]);
-
   const title = titleForRange(view, anchor, locale, CLINIC_TIMEZONE);
   const monthKey = formatDateKey(anchor, CLINIC_TIMEZONE);
   const useAgenda = view === "week" && isMobile;
@@ -333,6 +328,7 @@ export function CalendarShell({
                             }
                             if (result?.waitlistSuggestions?.length) {
                               setSuggestions(result.waitlistSuggestions);
+                              setWaitlistOpen(true);
                             }
                             setFlash(result?.message ?? "appointmentUpdated");
                             setPanel(null);
@@ -394,6 +390,7 @@ export function CalendarShell({
                             }
                             if (result?.waitlistSuggestions?.length) {
                               setSuggestions(result.waitlistSuggestions);
+                              setWaitlistOpen(true);
                             }
                             setFlash("appointmentCancelled");
                             setPanel(null);

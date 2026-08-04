@@ -725,8 +725,8 @@ async function main() {
   const busy = new Map<string, Map<number, Array<[number, number]>>>();
 
   function canBook(doctorId: string, day: number, startMin: number, endMin: number) {
-    const byDay = busy.get(doctorId) ?? new Map();
-    const slots = byDay.get(day) ?? [];
+    const byDay = busy.get(doctorId) ?? new Map<number, Array<[number, number]>>();
+    const slots: Array<[number, number]> = byDay.get(day) ?? [];
     return !slots.some(([s, e]) => startMin < e && endMin > s);
   }
   function markBusy(doctorId: string, day: number, startMin: number, endMin: number) {
