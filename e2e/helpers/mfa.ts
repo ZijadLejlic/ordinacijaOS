@@ -12,9 +12,13 @@ export function totpCode(secret: string): string {
   return totp.generate();
 }
 
-/** Complete MFA enroll UI: wait for secret, submit TOTP, land past MFA gate. */
+/** Complete MFA enroll UI wizard: install → scan → confirm TOTP. */
 export async function completeMfaEnroll(page: Page): Promise<string> {
   await page.waitForURL(/\/mfa\/enroll/, { timeout: 60_000 });
+
+  // Step 1 → 2
+  await page.getByRole("button", { name: "Nastavi" }).click();
+
   const secretLocator = page.locator("code").first();
   await secretLocator.waitFor({ state: "visible", timeout: 60_000 });
   const secret = (await secretLocator.innerText()).trim();
@@ -22,8 +26,19 @@ export async function completeMfaEnroll(page: Page): Promise<string> {
     throw new Error(`MFA enroll secret missing or too short: "${secret}"`);
   }
 
-  await page.locator("#code").fill(totpCode(secret));
-  await page.getByRole("button", { name: "Aktiviraj 2FA" }).click();
+  // Step 2 → 3
+  await page.getByRole("button", { name: "Nastavi" }).click();
+
+  const codeInput = page.locator("#code");
+  await codeInput.waitFor({ state: "visible", timeout: 15_000 });
+  await codeInput.fill(totpCode(secret));
+
+  // Auto-submit on 6 digits; keep explicit click as fallback.
+  const activate = page.getByRole("button", { name: "Aktiviraj 2FA" });
+  if (await activate.isEnabled().catch(() => false)) {
+    await activate.click().catch(() => undefined);
+  }
+
   await page.waitForURL((url) => !url.pathname.includes("/mfa/"), {
     timeout: 60_000,
   });
@@ -33,8 +48,14 @@ export async function completeMfaEnroll(page: Page): Promise<string> {
 /** Complete MFA verify UI when owner already has a factor. */
 export async function completeMfaVerify(page: Page, secret: string) {
   await page.waitForURL(/\/mfa\/verify/, { timeout: 60_000 });
-  await page.locator("#code").fill(totpCode(secret));
-  await page.getByRole("button", { name: "Potvrdi" }).click();
+  const codeInput = page.locator("#code");
+  await codeInput.fill(totpCode(secret));
+
+  const confirm = page.getByRole("button", { name: "Potvrdi" });
+  if (await confirm.isEnabled().catch(() => false)) {
+    await confirm.click().catch(() => undefined);
+  }
+
   await page.waitForURL((url) => !url.pathname.includes("/mfa/"), {
     timeout: 60_000,
   });

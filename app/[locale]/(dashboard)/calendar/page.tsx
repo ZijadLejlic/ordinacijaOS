@@ -204,6 +204,7 @@ export default async function CalendarPage({ params, searchParams }: Props) {
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-6 sm:py-10">
       <CalendarShell
         initialView={view}
+        hasViewQuery={Boolean(viewParam)}
         initialDate={formatDateKey(anchor, CLINIC_TIMEZONE)}
         initialDoctorId={doctorFilter}
         appointments={mappedAppointments}

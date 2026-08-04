@@ -1,5 +1,6 @@
-import { test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { hardDeleteClinic } from "../lib/clinic/hard-delete";
+import { OWNER_MFA_ENROLL_ENFORCED } from "../lib/auth/mfa";
 import { getE2EEnv } from "./helpers/env";
 import { createServiceClient, randomTag } from "./helpers/supabase";
 
@@ -78,7 +79,7 @@ test.describe("Owner MFA gate (D11)", () => {
     }
   });
 
-  test("owner without enrolled MFA is redirected to /mfa/enroll after login, and cannot reach /dashboard directly", async ({
+  test("owner without enrolled MFA: enroll gate respects OWNER_MFA_ENROLL_ENFORCED", async ({
     page,
   }) => {
     await page.goto("/bs/login");
@@ -86,9 +87,18 @@ test.describe("Owner MFA gate (D11)", () => {
     await page.locator("#password").fill(password);
     await page.getByRole("button", { name: "Prijavi se" }).click();
 
-    await page.waitForURL(/\/mfa\/enroll/, { timeout: 20_000 });
+    if (OWNER_MFA_ENROLL_ENFORCED) {
+      await page.waitForURL(/\/mfa\/enroll/, { timeout: 20_000 });
+      await page.goto("/bs/dashboard");
+      await page.waitForURL(/\/mfa\/enroll/, { timeout: 20_000 });
+      return;
+    }
 
+    // Free-trial deferral: no enroll redirect; app (onboarding/dashboard) is reachable.
+    await page.waitForURL(/\/(onboarding|dashboard)/, { timeout: 20_000 });
+    expect(page.url()).not.toMatch(/\/mfa\//);
     await page.goto("/bs/dashboard");
-    await page.waitForURL(/\/mfa\/enroll/, { timeout: 20_000 });
+    await page.waitForURL(/\/(onboarding|dashboard)/, { timeout: 20_000 });
+    expect(page.url()).not.toMatch(/\/mfa\//);
   });
 });

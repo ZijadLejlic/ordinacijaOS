@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { hardDeleteClinic } from "../lib/clinic/hard-delete";
+import { OWNER_MFA_ENROLL_ENFORCED } from "../lib/auth/mfa";
 import { completeMfaEnroll } from "./helpers/mfa";
 import { getE2EEnv } from "./helpers/env";
 import {
@@ -13,9 +14,11 @@ const hasEnv = Boolean(getE2EEnv());
 /**
  * Prefer full UI signup. If Supabase Auth rate-limits email (common after
  * many local runs), bootstrap owner via admin + create_clinic_for_owner so
- * MFA enroll + onboarding steps 1–3 still get exercised (PRD §12.2 / J1).
+ * onboarding steps 1–3 still get exercised (PRD §12.2 / J1).
+ *
+ * MFA enroll runs only when OWNER_MFA_ENROLL_ENFORCED is true.
  */
-async function ensureOwnerOnMfaEnroll(
+async function ensureOwnerReadyForOnboarding(
   page: import("@playwright/test").Page,
   input: {
     clinicName: string;
@@ -24,6 +27,11 @@ async function ensureOwnerOnMfaEnroll(
     password: string;
   },
 ) {
+  const postAuth =
+    OWNER_MFA_ENROLL_ENFORCED
+      ? /\/mfa\/enroll/
+      : /\/(onboarding|dashboard|mfa\/enroll)/;
+
   await page.goto("/bs/signup");
   await page.locator("#clinicName").fill(input.clinicName);
   await page.locator("#fullName").fill(input.fullName);
@@ -32,7 +40,7 @@ async function ensureOwnerOnMfaEnroll(
   await page.getByRole("button", { name: "Kreiraj nalog" }).click();
 
   try {
-    await page.waitForURL(/\/mfa\/enroll/, { timeout: 20_000 });
+    await page.waitForURL(postAuth, { timeout: 20_000 });
     return "ui-signup" as const;
   } catch {
     // Fall through to admin bootstrap
@@ -90,11 +98,11 @@ async function ensureOwnerOnMfaEnroll(
   await page.locator("#email").fill(input.email);
   await page.locator("#password").fill(input.password);
   await page.getByRole("button", { name: "Prijavi se" }).click();
-  await page.waitForURL(/\/mfa\/enroll/, { timeout: 60_000 });
+  await page.waitForURL(postAuth, { timeout: 60_000 });
   return "admin-bootstrap" as const;
 }
 
-test.describe("Signup → MFA → onboarding steps 1–3", { tag: "@blocker" }, () => {
+test.describe("Signup → onboarding steps 1–3", { tag: "@blocker" }, () => {
   test.skip(!hasEnv, "Supabase E2E env not configured");
 
   test("owner completes onboarding steps 1–3 (skip invite) → dashboard", async ({
@@ -108,14 +116,16 @@ test.describe("Signup → MFA → onboarding steps 1–3", { tag: "@blocker" }, 
     let userId: string | null = null;
 
     try {
-      await ensureOwnerOnMfaEnroll(page, {
+      await ensureOwnerReadyForOnboarding(page, {
         clinicName,
         fullName: `Owner ${tag}`,
         email,
         password,
       });
 
-      await completeMfaEnroll(page);
+      if (OWNER_MFA_ENROLL_ENFORCED) {
+        await completeMfaEnroll(page);
+      }
 
       // Resolve ids ASAP so finally cleanup runs even if a later step fails
       {

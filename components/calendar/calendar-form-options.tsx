@@ -73,6 +73,7 @@ function WaitlistPanelReady({
   suggestions: WaitlistSuggestion[];
   onClearSuggestions: () => void;
   defaultDoctorId: string;
+  hideHeader?: boolean;
 }) {
   const options = use(formOptionsPromise);
   return (

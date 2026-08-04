@@ -1,16 +1,17 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { addMinutes } from "date-fns";
-import { formatInTimeZone } from "date-fns-tz";
 import { cn } from "@/lib/utils";
+import { appointmentStatusClass } from "@/components/calendar/status-styles";
 import { rescheduleAppointmentAction } from "@/lib/appointments/actions";
 import {
   CLINIC_TIMEZONE,
   DAY_END_HOUR,
   DAY_START_HOUR,
   durationMinutes,
+  formatClinicDate,
   formatDateKey,
   minutesFromDayStart,
   SLOT_MINUTES,
@@ -20,14 +21,6 @@ import type { CalendarAppointment } from "@/components/calendar/types";
 
 const PX_PER_MINUTE_DESKTOP = 1.2;
 const PX_PER_MINUTE_MOBILE = 0.72;
-
-const STATUS_CLASS: Record<string, string> = {
-  pending_confirmation: "bg-amber-100 text-amber-950 ring-amber-200",
-  confirmed: "bg-sky-100 text-sky-950 ring-sky-200",
-  completed: "bg-emerald-100 text-emerald-950 ring-emerald-200",
-  cancelled: "bg-muted text-muted-foreground ring-border line-through",
-  no_show: "bg-rose-100 text-rose-950 ring-rose-200",
-};
 
 function useCompactCalendarScale() {
   const [compact, setCompact] = useState(false);
@@ -39,6 +32,19 @@ function useCompactCalendarScale() {
     return () => mq.removeEventListener("change", sync);
   }, []);
   return compact;
+}
+
+function useNowMinutes() {
+  const [mins, setMins] = useState(() =>
+    minutesFromDayStart(new Date().toISOString()),
+  );
+  useEffect(() => {
+    const tick = () => setMins(minutesFromDayStart(new Date().toISOString()));
+    tick();
+    const id = window.setInterval(tick, 60_000);
+    return () => window.clearInterval(id);
+  }, []);
+  return mins;
 }
 
 export function DayWeekGrid({
@@ -55,11 +61,16 @@ export function DayWeekGrid({
   onCreatedSlot: (startsAt: Date, endsAt: Date) => void;
 }) {
   const t = useTranslations("Calendar");
+  const locale = useLocale();
   const [pending, startTransition] = useTransition();
   const compact = useCompactCalendarScale();
   const pxPerMinute = compact ? PX_PER_MINUTE_MOBILE : PX_PER_MINUTE_DESKTOP;
   const dayHeight = (DAY_END_HOUR - DAY_START_HOUR) * 60 * pxPerMinute;
   const scrollRef = useRef<HTMLDivElement>(null);
+  const todayKey = formatDateKey(new Date(), CLINIC_TIMEZONE);
+  const nowMinutes = useNowMinutes();
+  const showNowLine =
+    nowMinutes >= 0 && nowMinutes <= (DAY_END_HOUR - DAY_START_HOUR) * 60;
 
   function appointmentsForDay(day: Date) {
     const key = formatDateKey(day, CLINIC_TIMEZONE);
@@ -89,13 +100,11 @@ export function DayWeekGrid({
 
   const isSingleDay = days.length === 1;
   const minColPx = isSingleDay ? 0 : 112;
-  const gridMinWidth = isSingleDay
-    ? undefined
-    : 48 + days.length * minColPx;
+  const gridMinWidth = isSingleDay ? undefined : 48 + days.length * minColPx;
 
-  // Mobile day view: keep grid in a capped viewport and jump near "now".
   useEffect(() => {
-    if (!compact || !isSingleDay || !scrollRef.current) return;
+    if (!scrollRef.current) return;
+    if (!compact && !isSingleDay) return;
     const mins = minutesFromDayStart(new Date().toISOString());
     scrollRef.current.scrollTop = Math.max(0, mins * pxPerMinute - 72);
   }, [compact, isSingleDay, pxPerMinute, days]);
@@ -105,7 +114,9 @@ export function DayWeekGrid({
       ref={scrollRef}
       className={cn(
         "overflow-x-auto",
-        compact && "max-h-[min(62dvh,28rem)] overflow-y-auto overscroll-contain rounded-lg border",
+        compact &&
+          "max-h-[min(62dvh,28rem)] overflow-y-auto overscroll-contain rounded-xl border",
+        !compact && "rounded-xl border",
         !isSingleDay && !compact && "-mx-1 px-1",
       )}
     >
@@ -118,25 +129,39 @@ export function DayWeekGrid({
           minWidth: gridMinWidth,
         }}
       >
-        <div />
-        {days.map((day) => (
-          <div
-            key={formatDateKey(day, CLINIC_TIMEZONE)}
-            className="bg-background sticky top-0 z-[1] border-b px-2 py-2 text-center text-sm font-medium"
-          >
-            {formatInTimeZone(
-              day,
-              CLINIC_TIMEZONE,
-              compact ? "EEE d.M." : "EEE d MMM",
-            )}
-          </div>
-        ))}
+        <div className="bg-background sticky top-0 z-[1] border-b" />
+        {days.map((day) => {
+          const key = formatDateKey(day, CLINIC_TIMEZONE);
+          const isToday = key === todayKey;
+          return (
+            <div
+              key={key}
+              className={cn(
+                "bg-background sticky top-0 z-[1] border-b px-2 py-2 text-center text-sm font-medium",
+                isToday && "text-primary",
+              )}
+            >
+              <span className="block">
+                {formatClinicDate(
+                  day,
+                  compact ? "EEE d.M." : "EEE d MMM",
+                  locale,
+                )}
+              </span>
+              {isToday ? (
+                <span className="text-primary/80 text-[10px] font-semibold tracking-wide uppercase">
+                  {t("todayBadge")}
+                </span>
+              ) : null}
+            </div>
+          );
+        })}
 
         <div className="relative" style={{ height: dayHeight }}>
           {hours.map((hour) => (
             <div
               key={hour}
-              className="text-muted-foreground absolute right-1 text-xs"
+              className="text-muted-foreground absolute right-1 text-xs tabular-nums"
               style={{
                 top: (hour - DAY_START_HOUR) * 60 * pxPerMinute - 6,
               }}
@@ -147,18 +172,23 @@ export function DayWeekGrid({
         </div>
 
         {days.map((day) => {
+          const key = formatDateKey(day, CLINIC_TIMEZONE);
+          const isToday = key === todayKey;
           const dayAppts = appointmentsForDay(day);
           const slots = slotStartsForDay(day, CLINIC_TIMEZONE);
           return (
             <div
-              key={formatDateKey(day, CLINIC_TIMEZONE)}
-              className="relative border-l"
+              key={key}
+              className={cn(
+                "relative border-l",
+                isToday && "bg-primary/[0.035]",
+              )}
               style={{ height: dayHeight }}
             >
               {hours.map((hour) => (
                 <div
                   key={hour}
-                  className="border-border/60 absolute inset-x-0 border-t"
+                  className="border-border/50 absolute inset-x-0 border-t"
                   style={{
                     top: (hour - DAY_START_HOUR) * 60 * pxPerMinute,
                   }}
@@ -175,7 +205,7 @@ export function DayWeekGrid({
                     height: SLOT_MINUTES * pxPerMinute,
                   }}
                   aria-label={t("newAt", {
-                    time: formatInTimeZone(slot, CLINIC_TIMEZONE, "HH:mm"),
+                    time: formatClinicDate(slot, "HH:mm", locale),
                   })}
                   disabled={pending}
                   onClick={() =>
@@ -192,9 +222,19 @@ export function DayWeekGrid({
                 />
               ))}
 
+              {isToday && showNowLine ? (
+                <div
+                  className="pointer-events-none absolute inset-x-0 z-20 flex items-center"
+                  style={{ top: nowMinutes * pxPerMinute }}
+                  aria-hidden
+                >
+                  <span className="bg-primary size-2 shrink-0 rounded-full" />
+                  <span className="bg-primary h-px w-full" />
+                </div>
+              ) : null}
+
               {dayAppts.map((appt) => {
-                const top =
-                  minutesFromDayStart(appt.startsAt) * pxPerMinute;
+                const top = minutesFromDayStart(appt.startsAt) * pxPerMinute;
                 const height =
                   durationMinutes(appt.startsAt, appt.endsAt) * pxPerMinute;
                 const cancelled =
@@ -213,24 +253,22 @@ export function DayWeekGrid({
                       onSelect(appt);
                     }}
                     className={cn(
-                      "absolute inset-x-1 z-10 overflow-hidden rounded-md px-1.5 py-1 text-left text-xs ring-1",
-                      STATUS_CLASS[appt.status] ?? STATUS_CLASS.confirmed,
-                      canDrag && !cancelled && "cursor-grab active:cursor-grabbing",
+                      "absolute inset-x-1 z-10 overflow-hidden rounded-lg px-1.5 py-1 text-left text-xs shadow-none transition-[box-shadow,transform] hover:z-30 hover:shadow-sm",
+                      appointmentStatusClass(appt.status),
+                      canDrag &&
+                        !cancelled &&
+                        "cursor-grab active:cursor-grabbing",
                     )}
                     style={{
                       top: Math.max(0, top),
                       height: Math.max(compact ? 22 : 18, height),
                     }}
                   >
-                    <div className="truncate font-medium">
+                    <div className="truncate font-semibold">
                       {appt.patientName}
                     </div>
-                    <div className="truncate opacity-80">
-                      {formatInTimeZone(
-                        new Date(appt.startsAt),
-                        CLINIC_TIMEZONE,
-                        "HH:mm",
-                      )}
+                    <div className="truncate opacity-75">
+                      {formatClinicDate(appt.startsAt, "HH:mm", locale)}
                       {appt.serviceName ? ` · ${appt.serviceName}` : ""}
                     </div>
                   </button>

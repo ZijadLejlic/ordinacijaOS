@@ -8,9 +8,34 @@ import {
   startOfMonth,
   startOfWeek,
 } from "date-fns";
-import { formatInTimeZone, fromZonedTime, toZonedTime } from "date-fns-tz";
+import { bs, enUS, type Locale } from "date-fns/locale";
+import * as dateFnsTz from "date-fns-tz";
+
+const { formatInTimeZone, fromZonedTime, toZonedTime } = dateFnsTz;
 
 export const CLINIC_TIMEZONE = "Europe/Sarajevo";
+
+export function dateFnsLocale(locale: string): Locale {
+  return locale === "en" ? enUS : bs;
+}
+
+function asDate(date: Date | string | number): Date {
+  if (date instanceof Date) return date;
+  if (typeof date === "number") return new Date(date);
+  return parseISO(date);
+}
+
+/** Clinic-timezone date label in the active UI locale (BS default, EN). */
+export function formatClinicDate(
+  date: Date | string | number,
+  pattern: string,
+  locale: string,
+  timeZone = CLINIC_TIMEZONE,
+): string {
+  return formatInTimeZone(asDate(date), timeZone, pattern, {
+    locale: dateFnsLocale(locale),
+  });
+}
 
 export const DAY_START_HOUR = 7;
 export const DAY_END_HOUR = 20;
@@ -18,10 +43,16 @@ export const SLOT_MINUTES = 30;
 
 export type CalendarView = "day" | "week" | "month";
 
-export function parseView(raw: string | undefined): CalendarView {
-  if (raw === "week" || raw === "month" || raw === "day") return raw;
-  return "day";
+export function isCalendarView(raw: string | null | undefined): raw is CalendarView {
+  return raw === "week" || raw === "month" || raw === "day";
 }
+
+export function parseView(raw: string | undefined): CalendarView {
+  if (isCalendarView(raw)) return raw;
+  return "week";
+}
+
+export const CALENDAR_VIEW_STORAGE_KEY = "dentord:calendar:view";
 
 export function parseAnchorDate(
   raw: string | undefined,
@@ -176,16 +207,12 @@ export function titleForRange(
   timeZone = CLINIC_TIMEZONE,
 ): string {
   if (view === "day") {
-    return formatInTimeZone(anchor, timeZone, "d MMMM yyyy");
+    return formatClinicDate(anchor, "d MMMM yyyy", locale, timeZone);
   }
   if (view === "week") {
     const { rangeStart, rangeEnd } = rangeForView(view, anchor, timeZone);
     const endInclusive = addMinutes(rangeEnd, -1);
-    return `${formatInTimeZone(rangeStart, timeZone, "d MMM")} – ${formatInTimeZone(endInclusive, timeZone, "d MMM yyyy")}`;
+    return `${formatClinicDate(rangeStart, "d MMM", locale, timeZone)} – ${formatClinicDate(endInclusive, "d MMM yyyy", locale, timeZone)}`;
   }
-  return anchor.toLocaleDateString(locale, {
-    month: "long",
-    year: "numeric",
-    timeZone,
-  });
+  return formatClinicDate(anchor, "LLLL yyyy", locale, timeZone);
 }

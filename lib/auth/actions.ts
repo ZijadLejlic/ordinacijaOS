@@ -151,7 +151,15 @@ export async function loginAction(
 
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
   if (error) {
+    // D13: 5 failed attempts → 15 min lock. Surface lock on the attempt that
+    // trips the threshold (not only on the next try).
     await supabase.rpc("record_failed_login", { p_email: email });
+    const { error: lockAfter } = await supabase.rpc("check_login_lockout", {
+      p_email: email,
+    });
+    if (mapLoginRpcError(lockAfter?.message)) {
+      return { error: "locked" };
+    }
     return { error: "invalidCredentials" };
   }
 

@@ -6,8 +6,20 @@ type Client = SupabaseClient<Database>;
 export type MfaGate = "ok" | "enroll" | "verify";
 
 /**
+ * D11 owner TOTP enroll enforcement.
+ *
+ * `false` during free trial — keep MFA UI/RLS/helpers in the codebase, but do
+ * not force `/mfa/enroll` for owners without a factor. Flip to `true` when
+ * trial ends / billing starts.
+ *
+ * If an owner already enrolled a factor, verify (aal2) still runs — RLS
+ * `owner_mfa_ok()` requires it.
+ */
+export const OWNER_MFA_ENROLL_ENFORCED = false;
+
+/**
  * D11: Owner must use TOTP. Staff never required.
- * - no verified factor → enroll
+ * - no verified factor → enroll (when OWNER_MFA_ENROLL_ENFORCED)
  * - verified factor but session is aal1 → verify
  * - aal2 (or non-owner) → ok
  */
@@ -23,7 +35,7 @@ export async function resolveOwnerMfaGate(supabase: Client): Promise<MfaGate> {
     await supabase.auth.mfa.listFactors();
 
   if (factorsError) {
-    return "enroll";
+    return OWNER_MFA_ENROLL_ENFORCED ? "enroll" : "ok";
   }
 
   const hasVerifiedTotp = (factors.totp ?? []).some(
@@ -31,7 +43,7 @@ export async function resolveOwnerMfaGate(supabase: Client): Promise<MfaGate> {
   );
 
   if (!hasVerifiedTotp) {
-    return "enroll";
+    return OWNER_MFA_ENROLL_ENFORCED ? "enroll" : "ok";
   }
 
   const { data: aal, error: aalError } =

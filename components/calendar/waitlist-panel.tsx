@@ -65,6 +65,7 @@ export function WaitlistPanel({
   suggestions,
   onClearSuggestions,
   defaultDoctorId,
+  hideHeader = false,
 }: {
   rows: WaitlistRow[];
   doctors: DoctorOption[];
@@ -75,6 +76,7 @@ export function WaitlistPanel({
   suggestions: WaitlistSuggestion[];
   onClearSuggestions: () => void;
   defaultDoctorId: string;
+  hideHeader?: boolean;
 }) {
   const t = useTranslations("Waitlist");
   const [addState, addAction, addPending] = useActionState<
@@ -94,10 +96,12 @@ export function WaitlistPanel({
 
   return (
     <section className="space-y-4">
-      <div>
-        <h2 className="text-lg font-semibold tracking-tight">{t("title")}</h2>
-        <p className="text-muted-foreground text-sm">{t("subtitle")}</p>
-      </div>
+      {hideHeader ? null : (
+        <div>
+          <h2 className="text-lg font-semibold tracking-tight">{t("title")}</h2>
+          <p className="text-muted-foreground text-sm">{t("subtitle")}</p>
+        </div>
+      )}
 
       {suggestions.length > 0 ? (
         <div className="border-amber-200 bg-amber-50 rounded-lg border p-3">

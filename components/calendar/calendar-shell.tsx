@@ -1,20 +1,20 @@
 "use client";
 
-import { useCallback, useMemo, useState, useTransition } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useTransition,
+} from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { addMinutes } from "date-fns";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -27,6 +27,7 @@ import {
 } from "@/components/calendar/calendar-form-options";
 import { DayWeekGrid } from "@/components/calendar/day-week-grid";
 import { MonthGrid } from "@/components/calendar/month-grid";
+import { WeekAgenda } from "@/components/calendar/week-agenda";
 import type {
   CalendarAppointment,
   WaitlistRow,
@@ -38,9 +39,11 @@ import {
 } from "@/lib/appointments/actions";
 import { sendAppointmentReminderAction } from "@/lib/email/actions";
 import {
+  CALENDAR_VIEW_STORAGE_KEY,
   CLINIC_TIMEZONE,
   daysInRange,
   formatDateKey,
+  isCalendarView,
   parseAnchorDate,
   parseView,
   rangeForView,
@@ -50,9 +53,23 @@ import {
   type CalendarView,
 } from "@/lib/calendar/time";
 import { appointmentStatuses } from "@/lib/validations/appointment";
+import { cn } from "@/lib/utils";
+
+function useIsMobileCalendar() {
+  const [mobile, setMobile] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 639px)");
+    const sync = () => setMobile(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+  return mobile;
+}
 
 export function CalendarShell({
   initialView,
+  hasViewQuery,
   initialDate,
   initialDoctorId,
   appointments,
@@ -68,6 +85,7 @@ export function CalendarShell({
   currentUserId,
 }: {
   initialView: string;
+  hasViewQuery: boolean;
   initialDate: string;
   initialDoctorId: string;
   appointments: CalendarAppointment[];
@@ -83,11 +101,14 @@ export function CalendarShell({
   currentUserId: string;
 }) {
   const t = useTranslations("Calendar");
+  const tw = useTranslations("Waitlist");
   const locale = useLocale();
   const router = useRouter();
   const view = parseView(initialView);
   const anchor = parseAnchorDate(initialDate || undefined);
+  const isMobile = useIsMobileCalendar();
   const [doctorFilter, setDoctorFilter] = useState(initialDoctorId);
+  const [waitlistOpen, setWaitlistOpen] = useState(false);
   const [panel, setPanel] = useState<
     | { type: "create"; startsAt: string; endsAt: string }
     | { type: "edit"; appointment: CalendarAppointment }
@@ -110,14 +131,24 @@ export function CalendarShell({
     ? doctorFilter || doctors[0]?.id || ""
     : currentUserId;
 
+  const waitingCount = waitlist.filter((r) => r.status === "waiting").length;
+
   const navigate = useCallback(
     (next: {
       view?: CalendarView;
       date?: Date;
       doctorId?: string;
     }) => {
+      const nextView = next.view ?? view;
+      if (typeof window !== "undefined") {
+        try {
+          window.localStorage.setItem(CALENDAR_VIEW_STORAGE_KEY, nextView);
+        } catch {
+          // ignore quota / private mode
+        }
+      }
       const params = new URLSearchParams();
-      params.set("view", next.view ?? view);
+      params.set("view", nextView);
       params.set(
         "date",
         formatDateKey(next.date ?? anchor, CLINIC_TIMEZONE),
@@ -132,8 +163,31 @@ export function CalendarShell({
     [anchor, doctorFilter, router, view],
   );
 
+  // Restore last view when URL has no explicit ?view=
+  useEffect(() => {
+    if (hasViewQuery) return;
+    try {
+      const saved = window.localStorage.getItem(CALENDAR_VIEW_STORAGE_KEY);
+      if (isCalendarView(saved) && saved !== view) {
+        navigate({ view: saved });
+      } else if (!saved) {
+        window.localStorage.setItem(CALENDAR_VIEW_STORAGE_KEY, view);
+      }
+    } catch {
+      // ignore
+    }
+    // Intentionally once on mount for URL without view param.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasViewQuery]);
+
+  // Open waitlist sheet when cancel yields suggestions
+  useEffect(() => {
+    if (suggestions.length > 0) setWaitlistOpen(true);
+  }, [suggestions]);
+
   const title = titleForRange(view, anchor, locale, CLINIC_TIMEZONE);
   const monthKey = formatDateKey(anchor, CLINIC_TIMEZONE);
+  const useAgenda = view === "week" && isMobile;
 
   function openCreate(startsAt: Date, endsAt: Date) {
     if (!canWrite) return;
@@ -151,25 +205,43 @@ export function CalendarShell({
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 sm:space-y-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
         <div className="min-w-0">
           <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
           <p className="text-muted-foreground text-sm">{t("subtitle")}</p>
         </div>
-        {canWrite ? (
-          <Button
-            type="button"
-            className="w-full sm:w-auto"
-            data-testid="calendar-new-appointment"
-            onClick={() => {
-              const start = new Date();
-              openCreate(start, addMinutes(start, SLOT_MINUTES));
-            }}
-          >
-            {t("new")}
-          </Button>
-        ) : null}
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+          {showWaitlist ? (
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full sm:w-auto"
+              data-testid="calendar-waitlist-open"
+              onClick={() => setWaitlistOpen(true)}
+            >
+              {tw("title")}
+              {waitingCount > 0 || suggestions.length > 0 ? (
+                <span className="bg-primary text-primary-foreground ml-1.5 inline-flex h-5 min-w-5 items-center justify-center rounded-md px-1 text-[11px] font-semibold">
+                  {suggestions.length > 0 ? suggestions.length : waitingCount}
+                </span>
+              ) : null}
+            </Button>
+          ) : null}
+          {canWrite ? (
+            <Button
+              type="button"
+              className="w-full sm:w-auto"
+              data-testid="calendar-new-appointment"
+              onClick={() => {
+                const start = new Date();
+                openCreate(start, addMinutes(start, SLOT_MINUTES));
+              }}
+            >
+              {t("new")}
+            </Button>
+          ) : null}
+        </div>
       </div>
 
       {flash ? (
@@ -339,120 +411,148 @@ export function CalendarShell({
         </DialogContent>
       </Dialog>
 
-      <Card>
-        <CardHeader className="gap-3 px-4 sm:px-6">
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-            <div className="min-w-0">
-              <CardTitle className="text-base leading-snug">{title}</CardTitle>
-              <CardDescription className="hidden sm:block">
-                {t("timezoneHint")}
-              </CardDescription>
-            </div>
-            <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                className="w-full sm:w-auto"
-                onClick={() =>
-                  navigate({ date: shiftAnchor(view, anchor, -1) })
-                }
-              >
-                {t("prev")}
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                className="w-full sm:w-auto"
-                onClick={() => navigate({ date: new Date() })}
-              >
-                {t("today")}
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                className="w-full sm:w-auto"
-                onClick={() =>
-                  navigate({ date: shiftAnchor(view, anchor, 1) })
-                }
-              >
-                {t("next")}
-              </Button>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-            <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
-              {(["day", "week", "month"] as const).map((v) => (
-                <Button
-                  key={v}
-                  type="button"
-                  size="sm"
-                  variant={view === v ? "default" : "outline"}
-                  className="w-full sm:w-auto"
-                  onClick={() => navigate({ view: v })}
-                >
-                  {t(`views.${v}`)}
-                </Button>
-              ))}
-            </div>
-            {canPickDoctor ? (
-              <select
-                className="border-input bg-background h-8 w-full rounded-lg border px-2 text-sm sm:h-7 sm:w-auto sm:min-w-[10rem]"
-                value={doctorFilter}
-                onChange={(e) => {
-                  setDoctorFilter(e.target.value);
-                  navigate({ doctorId: e.target.value });
-                }}
-              >
-                <option value="">{t("allDoctors")}</option>
-                {doctors.map((d) => (
-                  <option key={d.id} value={d.id}>
-                    {d.fullName}
-                  </option>
-                ))}
-              </select>
-            ) : null}
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4 px-2 sm:px-6">
-          {view === "month" ? (
-            <MonthGrid
-              days={days}
-              currentMonthKey={monthKey}
-              appointments={filteredAppointments}
-              onSelectDay={(day) => navigate({ view: "day", date: day })}
-              onSelectAppointment={openEdit}
-            />
-          ) : (
-            <DayWeekGrid
-              days={days}
-              appointments={filteredAppointments}
-              canDrag={canDrag && canWrite}
-              onSelect={openEdit}
-              onCreatedSlot={openCreate}
-            />
-          )}
-        </CardContent>
-      </Card>
-
       {showWaitlist ? (
-        <Card>
-          <CardContent className="pt-6">
-            <DeferredWaitlistPanel
-              formOptionsPromise={formOptionsPromise}
-              rows={waitlist}
-              doctors={doctors}
-              canWrite={canWriteWaitlist}
-              suggestions={suggestions}
-              onClearSuggestions={() => setSuggestions([])}
-              defaultDoctorId={defaultDoctorId}
-            />
-          </CardContent>
-        </Card>
+        <Dialog open={waitlistOpen} onOpenChange={setWaitlistOpen}>
+          <DialogContent
+            className={cn(
+              "fixed z-50 flex max-h-[min(90dvh,40rem)] w-full max-w-[calc(100%-1.5rem)] flex-col gap-0 overflow-hidden p-0 sm:max-w-md",
+              // Mobile: bottom sheet
+              "top-auto bottom-3 left-1/2 -translate-x-1/2 translate-y-0 rounded-2xl data-open:zoom-in-100 data-closed:zoom-out-100",
+              // Desktop: right sheet
+              "sm:top-3 sm:right-3 sm:bottom-3 sm:left-auto sm:h-auto sm:max-h-[calc(100dvh-1.5rem)] sm:translate-x-0 sm:rounded-2xl",
+            )}
+            data-testid="calendar-waitlist-sheet"
+          >
+            <DialogHeader className="border-b px-4 py-3 pr-12">
+              <DialogTitle>{tw("title")}</DialogTitle>
+              <DialogDescription>{tw("subtitle")}</DialogDescription>
+            </DialogHeader>
+            <div className="overflow-y-auto px-4 py-4">
+              <DeferredWaitlistPanel
+                formOptionsPromise={formOptionsPromise}
+                rows={waitlist}
+                doctors={doctors}
+                canWrite={canWriteWaitlist}
+                suggestions={suggestions}
+                onClearSuggestions={() => setSuggestions([])}
+                defaultDoctorId={defaultDoctorId}
+                hideHeader
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
       ) : null}
+
+      <div className="bg-background/95 sticky top-14 z-20 -mx-1 space-y-3 border-b px-1 py-3 backdrop-blur-md supports-backdrop-filter:bg-background/80 md:top-0">
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <p className="text-base leading-snug font-semibold">{title}</p>
+            <p className="text-muted-foreground hidden text-xs sm:block">
+              {t("timezoneHint")}
+            </p>
+          </div>
+          <div className="grid grid-cols-3 gap-1.5 sm:flex sm:flex-wrap">
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="w-full sm:w-auto"
+              onClick={() =>
+                navigate({ date: shiftAnchor(view, anchor, -1) })
+              }
+            >
+              {t("prev")}
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="w-full sm:w-auto"
+              onClick={() => navigate({ date: new Date() })}
+            >
+              {t("today")}
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              className="w-full sm:w-auto"
+              onClick={() =>
+                navigate({ date: shiftAnchor(view, anchor, 1) })
+              }
+            >
+              {t("next")}
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+          <div
+            className="bg-muted/60 inline-grid grid-cols-3 gap-0.5 rounded-lg p-0.5 sm:inline-flex"
+            role="group"
+            aria-label={t("viewsLabel")}
+          >
+            {(["day", "week", "month"] as const).map((v) => (
+              <Button
+                key={v}
+                type="button"
+                size="sm"
+                variant={view === v ? "default" : "ghost"}
+                className="w-full shadow-none sm:w-auto"
+                onClick={() => navigate({ view: v })}
+              >
+                {t(`views.${v}`)}
+              </Button>
+            ))}
+          </div>
+          {canPickDoctor ? (
+            <select
+              className="border-input bg-background h-8 w-full rounded-lg border px-2 text-sm sm:h-8 sm:w-auto sm:min-w-[10rem]"
+              value={doctorFilter}
+              onChange={(e) => {
+                setDoctorFilter(e.target.value);
+                navigate({ doctorId: e.target.value });
+              }}
+            >
+              <option value="">{t("allDoctors")}</option>
+              {doctors.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.fullName}
+                </option>
+              ))}
+            </select>
+          ) : null}
+        </div>
+      </div>
+
+      <div className="min-w-0">
+        {view === "month" ? (
+          <MonthGrid
+            days={days}
+            currentMonthKey={monthKey}
+            appointments={filteredAppointments}
+            onSelectDay={(day) => navigate({ view: "day", date: day })}
+            onSelectAppointment={openEdit}
+          />
+        ) : useAgenda ? (
+          <WeekAgenda
+            days={days}
+            appointments={filteredAppointments}
+            canWrite={canWrite}
+            onSelect={openEdit}
+            onCreatedSlot={openCreate}
+            onOpenDay={(day) => navigate({ view: "day", date: day })}
+          />
+        ) : (
+          <DayWeekGrid
+            days={days}
+            appointments={filteredAppointments}
+            canDrag={canDrag && canWrite}
+            onSelect={openEdit}
+            onCreatedSlot={openCreate}
+          />
+        )}
+      </div>
     </div>
   );
 }

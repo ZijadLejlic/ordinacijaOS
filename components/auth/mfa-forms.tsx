@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
@@ -32,6 +32,9 @@ const STORE_LINKS = {
   },
 } as const;
 
+type EnrollStep = "install" | "scan" | "confirm";
+type StorePlatform = "android" | "ios" | "both";
+
 function StoreLink({ href, children }: { href: string; children: string }) {
   return (
     <a
@@ -45,68 +48,37 @@ function StoreLink({ href, children }: { href: string; children: string }) {
   );
 }
 
-function MfaEnrollGuide() {
-  const t = useTranslations("Mfa");
+function useStorePlatform(): StorePlatform {
+  const [platform, setPlatform] = useState<StorePlatform>("both");
 
+  useEffect(() => {
+    const ua = navigator.userAgent ?? "";
+    if (/iPhone|iPad|iPod/i.test(ua)) {
+      setPlatform("ios");
+      return;
+    }
+    if (/Android/i.test(ua)) {
+      setPlatform("android");
+    }
+  }, []);
+
+  return platform;
+}
+
+function StepDots({ step }: { step: EnrollStep }) {
+  const index = step === "install" ? 0 : step === "scan" ? 1 : 2;
   return (
-    <div className="space-y-5 text-sm">
-      <section className="space-y-2">
-        <h2 className="text-foreground text-sm font-medium">{t("whyTitle")}</h2>
-        <ul className="text-muted-foreground list-disc space-y-1.5 pl-4 leading-relaxed">
-          <li>{t("whyProtect")}</li>
-          <li>{t("whyCode")}</li>
-          <li>{t("whyOwnerOnly")}</li>
-        </ul>
-      </section>
-
-      <section className="space-y-2">
-        <h2 className="text-foreground text-sm font-medium">
-          {t("stepsTitle")}
-        </h2>
-        <ol className="text-muted-foreground list-decimal space-y-1.5 pl-4 leading-relaxed">
-          <li>{t("stepInstall")}</li>
-          <li>{t("stepScan")}</li>
-          <li>{t("stepEnter")}</li>
-        </ol>
-      </section>
-
-      <section className="bg-muted/50 space-y-3 rounded-lg border p-3">
-        <div className="space-y-1">
-          <h2 className="text-foreground text-sm font-medium">
-            {t("appsTitle")}
-          </h2>
-          <p className="text-muted-foreground text-xs leading-relaxed">
-            {t("appsHint")}
-          </p>
-        </div>
-        <ul className="space-y-2.5">
-          <li>
-            <p className="text-foreground font-medium">{t("googleAuth")}</p>
-            <p className="text-muted-foreground mt-0.5 flex flex-wrap gap-x-3 gap-y-1 text-xs">
-              <StoreLink href={STORE_LINKS.google.android}>
-                {t("android")}
-              </StoreLink>
-              <StoreLink href={STORE_LINKS.google.ios}>{t("iphone")}</StoreLink>
-            </p>
-          </li>
-          <li>
-            <p className="text-foreground font-medium">
-              {t("microsoftAuth")}{" "}
-              <span className="text-muted-foreground font-normal">
-                ({t("microsoftOptional")})
-              </span>
-            </p>
-            <p className="text-muted-foreground mt-0.5 flex flex-wrap gap-x-3 gap-y-1 text-xs">
-              <StoreLink href={STORE_LINKS.microsoft.android}>
-                {t("android")}
-              </StoreLink>
-              <StoreLink href={STORE_LINKS.microsoft.ios}>
-                {t("iphone")}
-              </StoreLink>
-            </p>
-          </li>
-        </ul>
-      </section>
+    <div className="flex items-center justify-center gap-1.5" aria-hidden>
+      {[0, 1, 2].map((i) => (
+        <span
+          key={i}
+          className={
+            i === index
+              ? "bg-foreground h-1.5 w-6 rounded-full"
+              : "bg-muted-foreground/30 h-1.5 w-1.5 rounded-full"
+          }
+        />
+      ))}
     </div>
   );
 }
@@ -114,13 +86,18 @@ function MfaEnrollGuide() {
 export function MfaEnrollForm() {
   const t = useTranslations("Mfa");
   const router = useRouter();
+  const platform = useStorePlatform();
+  const [step, setStep] = useState<EnrollStep>("install");
+  const [showAltApp, setShowAltApp] = useState(false);
   const [factorId, setFactorId] = useState("");
   const [qr, setQr] = useState("");
   const [secret, setSecret] = useState("");
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
   const [pending, startTransition] = useTransition();
+  const submittingRef = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -159,59 +136,155 @@ export function MfaEnrollForm() {
     };
   }, [t]);
 
-  function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
+  function submitCode(raw: string) {
+    if (submittingRef.current || pending || !factorId) return;
 
-    const parsed = totpCodeSchema.safeParse(code);
+    const parsed = totpCodeSchema.safeParse(raw);
     if (!parsed.success) {
       setError(t("invalidCode"));
       return;
     }
 
+    setError(null);
+    submittingRef.current = true;
+
     startTransition(async () => {
-      const supabase = createClient();
-      const challenge = await supabase.auth.mfa.challenge({ factorId });
-      if (challenge.error) {
-        setError(challenge.error.message);
-        return;
+      try {
+        const supabase = createClient();
+        const challenge = await supabase.auth.mfa.challenge({ factorId });
+        if (challenge.error) {
+          setError(challenge.error.message);
+          return;
+        }
+
+        const verify = await supabase.auth.mfa.verify({
+          factorId,
+          challengeId: challenge.data.id,
+          code: parsed.data,
+        });
+
+        if (verify.error) {
+          setError(t("codeWrong"));
+          setCode("");
+          return;
+        }
+
+        router.replace("/dashboard");
+        router.refresh();
+      } finally {
+        submittingRef.current = false;
       }
-
-      const verify = await supabase.auth.mfa.verify({
-        factorId,
-        challengeId: challenge.data.id,
-        code: parsed.data,
-      });
-
-      if (verify.error) {
-        setError(verify.error.message);
-        return;
-      }
-
-      router.replace("/dashboard");
-      router.refresh();
     });
   }
 
-  if (loading) {
-    return (
-      <div className="space-y-6">
-        <MfaEnrollGuide />
-        <p className="text-muted-foreground text-sm">{t("loading")}</p>
-      </div>
-    );
+  function onCodeChange(value: string) {
+    const digits = value.replace(/\D/g, "").slice(0, 6);
+    setCode(digits);
+    setError(null);
+    if (digits.length === 6) {
+      submitCode(digits);
+    }
+  }
+
+  async function copySecret() {
+    if (!secret) return;
+    try {
+      await navigator.clipboard.writeText(secret);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  }
+
+  function onConfirmSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    submitCode(code);
   }
 
   return (
     <div className="space-y-6">
-      <MfaEnrollGuide />
+      <StepDots step={step} />
 
-      <form onSubmit={onSubmit} className="space-y-6">
-        <div className="space-y-3">
-          <h2 className="text-foreground text-sm font-medium">
-            {t("scanSectionTitle")}
-          </h2>
-          {qr ? (
+      {step === "install" ? (
+        <div className="space-y-5">
+          <div className="space-y-2">
+            <h2 className="text-foreground text-sm font-medium">
+              {t("stepInstallTitle")}
+            </h2>
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              {t("stepInstallBody")}
+            </p>
+          </div>
+
+          <div className="bg-muted/50 space-y-3 rounded-lg border p-3">
+            <p className="text-foreground text-sm font-medium">
+              {t("googleAuth")}
+            </p>
+            <p className="text-muted-foreground flex flex-wrap gap-x-3 gap-y-1 text-sm">
+              {(platform === "android" || platform === "both") && (
+                <StoreLink href={STORE_LINKS.google.android}>
+                  {t("android")}
+                </StoreLink>
+              )}
+              {(platform === "ios" || platform === "both") && (
+                <StoreLink href={STORE_LINKS.google.ios}>{t("iphone")}</StoreLink>
+              )}
+            </p>
+            <button
+              type="button"
+              className="text-muted-foreground text-xs underline-offset-4 hover:underline"
+              onClick={() => setShowAltApp((v) => !v)}
+            >
+              {t("otherApp")}
+            </button>
+            {showAltApp ? (
+              <div className="space-y-1 border-t pt-2">
+                <p className="text-foreground text-sm font-medium">
+                  {t("microsoftAuth")}
+                </p>
+                <p className="text-muted-foreground flex flex-wrap gap-x-3 gap-y-1 text-xs">
+                  <StoreLink href={STORE_LINKS.microsoft.android}>
+                    {t("android")}
+                  </StoreLink>
+                  <StoreLink href={STORE_LINKS.microsoft.ios}>
+                    {t("iphone")}
+                  </StoreLink>
+                </p>
+              </div>
+            ) : null}
+          </div>
+
+          <p className="text-muted-foreground text-xs leading-relaxed">
+            {t("whyOwnerOnly")}
+          </p>
+
+          <Button
+            type="button"
+            className="w-full"
+            onClick={() => setStep("scan")}
+          >
+            {t("continue")}
+          </Button>
+        </div>
+      ) : null}
+
+      {step === "scan" ? (
+        <div className="space-y-5">
+          <div className="space-y-2">
+            <h2 className="text-foreground text-sm font-medium">
+              {t("stepScanTitle")}
+            </h2>
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              {t("stepScanBody")}
+            </p>
+          </div>
+
+          {loading ? (
+            <p className="text-muted-foreground text-sm">{t("loading")}</p>
+          ) : error && !qr ? (
+            <FieldError>{error}</FieldError>
+          ) : qr ? (
             <div className="flex flex-col items-center gap-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -220,38 +293,102 @@ export function MfaEnrollForm() {
                 className="bg-background size-48 rounded-md border p-2"
               />
               <FieldDescription className="text-center">
-                {t("secretHint")}:{" "}
-                <code className="text-foreground break-all text-xs">
+                {t("secretHint")}
+              </FieldDescription>
+              <div className="flex max-w-full flex-col items-center gap-2">
+                <code className="text-foreground break-all text-center text-xs">
                   {secret}
                 </code>
-              </FieldDescription>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={copySecret}
+                >
+                  {copied ? t("secretCopied") : t("copySecret")}
+                </Button>
+              </div>
             </div>
           ) : null}
+
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              className="flex-1"
+              onClick={() => setStep("install")}
+            >
+              {t("back")}
+            </Button>
+            <Button
+              type="button"
+              className="flex-1"
+              disabled={loading || !factorId}
+              onClick={() => {
+                setError(null);
+                setStep("confirm");
+              }}
+            >
+              {t("continue")}
+            </Button>
+          </div>
         </div>
+      ) : null}
 
-        <FieldGroup>
-          <Field>
-            <FieldLabel htmlFor="code">{t("code")}</FieldLabel>
-            <Input
-              id="code"
-              name="code"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              pattern="\d{6}"
-              maxLength={6}
-              required
-              value={code}
-              onChange={(e) => setCode(e.target.value.trim())}
-            />
-          </Field>
-        </FieldGroup>
+      {step === "confirm" ? (
+        <form onSubmit={onConfirmSubmit} className="space-y-5">
+          <div className="space-y-2">
+            <h2 className="text-foreground text-sm font-medium">
+              {t("stepConfirmTitle")}
+            </h2>
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              {t("stepConfirmBody")}
+            </p>
+          </div>
 
-        {error ? <FieldError>{error}</FieldError> : null}
+          <FieldGroup>
+            <Field>
+              <FieldLabel htmlFor="code">{t("code")}</FieldLabel>
+              <Input
+                id="code"
+                name="code"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                autoFocus
+                pattern="\d{6}"
+                maxLength={6}
+                required
+                value={code}
+                onChange={(e) => onCodeChange(e.target.value)}
+              />
+            </Field>
+          </FieldGroup>
 
-        <Button type="submit" className="w-full" disabled={pending || !factorId}>
-          {pending ? t("submitting") : t("enrollSubmit")}
-        </Button>
-      </form>
+          {error ? <FieldError>{error}</FieldError> : null}
+
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              className="flex-1"
+              onClick={() => {
+                setError(null);
+                setCode("");
+                setStep("scan");
+              }}
+            >
+              {t("back")}
+            </Button>
+            <Button
+              type="submit"
+              className="flex-1"
+              disabled={pending || !factorId || code.length !== 6}
+            >
+              {pending ? t("submitting") : t("enrollSubmit")}
+            </Button>
+          </div>
+        </form>
+      ) : null}
 
       <form action={logoutAction}>
         <Button type="submit" variant="ghost" className="w-full">
@@ -270,54 +407,76 @@ export function MfaVerifyForm() {
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const submittingRef = useRef(false);
 
-  function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
+  function submitCode(raw: string) {
+    if (submittingRef.current || pending) return;
 
-    const parsed = totpCodeSchema.safeParse(code);
+    const parsed = totpCodeSchema.safeParse(raw);
     if (!parsed.success) {
       setError(t("invalidCode"));
       return;
     }
 
+    setError(null);
+    submittingRef.current = true;
+
     startTransition(async () => {
-      const supabase = createClient();
-      const factors = await supabase.auth.mfa.listFactors();
-      if (factors.error) {
-        setError(factors.error.message);
-        return;
+      try {
+        const supabase = createClient();
+        const factors = await supabase.auth.mfa.listFactors();
+        if (factors.error) {
+          setError(factors.error.message);
+          return;
+        }
+
+        const totpFactor = factors.data.totp.find((f) => f.status === "verified");
+        if (!totpFactor) {
+          setError(t("noFactor"));
+          return;
+        }
+
+        const challenge = await supabase.auth.mfa.challenge({
+          factorId: totpFactor.id,
+        });
+        if (challenge.error) {
+          setError(challenge.error.message);
+          return;
+        }
+
+        const verify = await supabase.auth.mfa.verify({
+          factorId: totpFactor.id,
+          challengeId: challenge.data.id,
+          code: parsed.data,
+        });
+
+        if (verify.error) {
+          setError(t("codeWrong"));
+          setCode("");
+          return;
+        }
+
+        // Allowlisted in safeMfaNextPath (typed next-intl pathnames).
+        router.replace(nextPath as "/reset-password");
+        router.refresh();
+      } finally {
+        submittingRef.current = false;
       }
-
-      const totpFactor = factors.data.totp.find((f) => f.status === "verified");
-      if (!totpFactor) {
-        setError(t("noFactor"));
-        return;
-      }
-
-      const challenge = await supabase.auth.mfa.challenge({
-        factorId: totpFactor.id,
-      });
-      if (challenge.error) {
-        setError(challenge.error.message);
-        return;
-      }
-
-      const verify = await supabase.auth.mfa.verify({
-        factorId: totpFactor.id,
-        challengeId: challenge.data.id,
-        code: parsed.data,
-      });
-
-      if (verify.error) {
-        setError(verify.error.message);
-        return;
-      }
-
-      // Allowlisted in safeMfaNextPath (typed next-intl pathnames).
-      router.replace(nextPath as "/reset-password");
-      router.refresh();
     });
+  }
+
+  function onCodeChange(value: string) {
+    const digits = value.replace(/\D/g, "").slice(0, 6);
+    setCode(digits);
+    setError(null);
+    if (digits.length === 6) {
+      submitCode(digits);
+    }
+  }
+
+  function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    submitCode(code);
   }
 
   return (
@@ -331,18 +490,23 @@ export function MfaVerifyForm() {
               name="code"
               inputMode="numeric"
               autoComplete="one-time-code"
+              autoFocus
               pattern="\d{6}"
               maxLength={6}
               required
               value={code}
-              onChange={(e) => setCode(e.target.value.trim())}
+              onChange={(e) => onCodeChange(e.target.value)}
             />
           </Field>
         </FieldGroup>
 
         {error ? <FieldError>{error}</FieldError> : null}
 
-        <Button type="submit" className="w-full" disabled={pending}>
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={pending || code.length !== 6}
+        >
           {pending ? t("submitting") : t("verifySubmit")}
         </Button>
       </form>
