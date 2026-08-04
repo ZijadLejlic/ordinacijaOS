@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState, useTransition } from "react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -268,9 +269,12 @@ export function ImagesList({
           >
             <div className="flex min-w-0 items-center gap-3">
               {image.previewUrl ? (
-                <img
+                <Image
                   src={image.previewUrl}
                   alt={image.title}
+                  width={48}
+                  height={48}
+                  unoptimized
                   className="bg-muted h-12 w-12 shrink-0 rounded object-cover"
                 />
               ) : null}
