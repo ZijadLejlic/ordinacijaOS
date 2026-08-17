@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
@@ -41,14 +41,17 @@ const inputClass =
 export function ContactLeadForm() {
   const t = useTranslations("Marketing.contact.form");
   const locale = useLocale();
-  const [formTs, setFormTs] = useState("");
+  const formTsRef = useRef<HTMLInputElement>(null);
   const [state, formAction, pending] = useActionState<
     LeadActionState,
     FormData
   >(submitLeadWithRecovery, null);
 
   useEffect(() => {
-    setFormTs(String(Date.now()));
+    const input = formTsRef.current;
+    if (input && !input.value) {
+      input.value = String(Date.now());
+    }
   }, []);
 
   if (state?.ok) {
@@ -88,7 +91,7 @@ export function ContactLeadForm() {
 
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="sourcePage" value="contact" />
-      <input type="hidden" name="formTs" value={formTs} />
+      <input ref={formTsRef} type="hidden" name="formTs" defaultValue="" />
 
       {/* Honeypot — hidden from users, bots often fill it. */}
       <div aria-hidden className="absolute -left-[9999px] top-auto h-0 w-0 overflow-hidden">
