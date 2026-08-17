@@ -35,7 +35,7 @@ Odluke su finalne za v1 planiranje. Agent/developer **ne nagađa** mimo ovog log
 | D2 | MVP paket | **Professional** (25€/mj prikaz); branding uključen |
 | D3 | Van MVP u free periodu | Bez AI, bez SMS/WhatsApp, bez patient portala |
 | D4 | Free trial | Self-signup, bez plaćanja; svi nalozi kreirani do 31.12.2026 = free do kraja 2026 |
-| D5 | Billing start | Stripe online plaćanje od **1.1.2027**; do tada samo evidencija uplata u app |
+| D5 | Billing start | Online plaćanje od **1.1.2027**; do tada samo evidencija uplata u app. Provider i načini plaćanja: **D54 / D55** |
 | D6 | Nakon isteka free | 7 dana read-only → export → brisanje |
 | D7 | Tenant model | 1 user = 1 klinika; owner vidi sve lokacije klinike |
 | D8 | Professional limiti | ≤5 doktora, ≤10 korisnika, ≤2 lokacije; **hard block** + upsell alert |
@@ -67,7 +67,7 @@ Odluke su finalne za v1 planiranje. Agent/developer **ne nagađa** mimo ovog log
 | D34 | Data residency | EU-only (Supabase EU) |
 | D35 | GDPR delete | Hard delete iz baze uz **owner approval** |
 | D36 | Access log kartona | Ne (samo change audit) |
-| D37 | Jezici start | BS (default) + HR + SR (latinica) + EN. Strategija sadržaja B: `hr`/`sr` fallback na BS katalog dok ne postoji pravi prevod. EN zaseban. |
+| D37 | Jezici start | BS (default) + HR + SR (latinica) + EN. Zasebni katalozi `messages/{bs,hr,sr,en}.json`. Marketing cijene: BS u KM, HR/SR/EN u EUR. Blog MDX: hr/sr još dijele BS postove. |
 | D38 | Marketing site | Full (SEO, blog, pricing, signup CTA, reviews, case studies) |
 | D39 | Deploy model | Modul ide na produkciju čim je gotov; free period = testiranje s partnerima |
 | D40 | Responsive | Full responsive obavezno |
@@ -84,6 +84,8 @@ Odluke su finalne za v1 planiranje. Agent/developer **ne nagađa** mimo ovog log
 | D51 | Cross-clinic membership | v1 ostaje **1 user = 1 klinika** (D7). **Poslije razmotriti**: `clinic_memberships` + aktivna klinika / switcher (npr. doktor u više ordinacija) |
 | D52 | Appointment reminder send | Owner + reception + **doktor (samo svoj termin)**; edit šablona ostaje owner; CRM send ostaje owner/reception (D24) |
 | D53 | Invoice issue by doctor | Doktor može **izdati fakturu**, PDF i uplate (kao accountant); rashodi/Excel i legal settings ostaju owner/accountant |
+| D54 | Billing provider (mijenja D5) | **Lemon Squeezy** (Merchant of Record) umjesto Stripea — Stripe nije dostupan za prodavce iz BiH. LS vodi checkout, recurring i PDV/VAT, isplata na BiH račun. Kolone/kod ostaju **provider-agnostični** (LS → Stripe Managed Payments je vjerovatna migracija). **Preduvjet prije implementacije:** verifikovan LS nalog + potvrđen test payout na BiH račun; ako padne, fallback je Paddle (vidi §4.5) |
+| D55 | Načini plaćanja pretplate | Klinika bira: **(a) kartica** — self-serve LS checkout, ili **(b) virman** — DentOrd izda domaći račun, platform admin (D41) aktivira/produži pretplatu. Oba puta pišu **isti** `clinic_subscriptions` red; entitlements (D42) i lifecycle (D6) su identični bez obzira na način plaćanja. **Virman zahtijeva registrovanu pravnu formu prodavca** (§4.5); dok je prodavac freelance/fizičko lice, dostupna je samo kartica preko MoR-a |
 
 ---
 
@@ -99,9 +101,9 @@ Razlikovanje od postojećih rješenja (alpinDent i slični):
 - put ka AI, portalu, marketingu i mini websiteu (kasnije paketi)
 - self-serve registracija i owner-managed staff
 
-**Do 31.12.2026:** svi koji se registruju dobijaju **Professional-level free trial** (bez AI, SMS, portala). Platform owner u tom periodu registruje firmu i priprema Stripe.
+**Do 31.12.2026:** svi koji se registruju dobijaju **Professional-level free trial** (bez AI, SMS, portala). Platform owner u tom periodu registruje firmu i priprema naplatu (D54).
 
-**Od 1.1.2027:** online pretplata (Stripe). Neplaćeni nalozi: 7 dana read-only → export → brisanje.
+**Od 1.1.2027:** pretplata se plaća **karticom ili virmanom — klinika bira** (D55). Neplaćeni nalozi: 7 dana read-only → export → brisanje.
 
 **MVP definicija uspjeha do kraja 2026:** Professional core moduli rade u produkciji; 2–3 design partner ordinacije aktivno testiraju; marketing site konvertuje na signup.
 
@@ -265,7 +267,7 @@ Prekoračenje: **nije dozvoljeno**. UI alert: “Za ovo treba veći paket”.
 
 ### 4.4 Metered billing (2027+)
 
-Dodatno se plaća (prikazati cijene + **+15%** platform fee), ili owner poveže **vlastite** API/Stripe keys i snosi trošak direktno:
+Dodatno se plaća (prikazati cijene + **+15%** platform fee), ili owner poveže **vlastite** provider API keys (SMS/WhatsApp/AI) i snosi trošak direktno:
 
 - SMS
 - WhatsApp
@@ -273,6 +275,36 @@ Dodatno se plaća (prikazati cijene + **+15%** platform fee), ili owner poveže 
 - Storage overage
 
 Prije slanja/metered akcije: UI pokazuje **procjenu troška** gdje je moguće.
+
+### 4.5 Naplata pretplate (2027+) — D54 / D55
+
+Dva **ravnopravna** puta plaćanja. Klinika bira šta joj odgovara; ishod je isti red u `clinic_subscriptions` i isti entitlements.
+
+#### A) Kartica — self-serve preko Lemon Squeezyja
+
+- Lemon Squeezy je **Merchant of Record**: on izdaje račun kupcu, naplaćuje karticu i rješava PDV/VAT po zemlji kupca. DentOrd ne implementira vlastiti tax engine.
+- **Radi i dok je prodavac fizičko lice** (freelance, bez registrovane firme) — račun klinici izdaje LS, ne DentOrd; LS prima individualce uz W-8BEN. Prihod se i dalje prijavljuje u BiH i redovna djelatnost povlači obavezu registracije (§14).
+- Owner u appu bira paket → LS checkout. `custom_data` nosi **`clinic_id`** (+ `user_id` samo za audit) — tenant je klinika (D7), ne user.
+- LS webhook (`subscription_created`, `subscription_updated`, `subscription_cancelled`, `subscription_expired`, `subscription_payment_success`, `subscription_payment_failed`) upisuje stanje u `clinic_subscriptions`.
+- Mapiranje LS variant → `plans.id` živi u bazi/configu. **LS nikad ne određuje feature set** — entitlements se i dalje čitaju iz `plans` (D42).
+- Ekonomika: MoR fee je procentualan + fiksni dio po transakciji, što na Starteru (15€/mj) boli. **Godišnje plaćanje (D48) je preporučeni default** kod kartice.
+- PayPal kao **način plaćanja kupca** unutar LS checkouta je OK ako ga LS store ima uključen — MoR, webhook i payout ostaju nepromijenjeni. **PayPal kao samostalna naplata (mimo MoR-a) nije opcija** — vidi §14.
+- Fallback ako LS ne prihvati BiH prodavca ili payout ne prođe: **Paddle** (također MoR, ne ovisi o Stripe infrastrukturi). Provideri koji voze na Stripe Connectu (Polar, Creem, Dodo) nisu opcija dok je prodavac u BiH.
+
+#### B) Virman / bankovni transfer
+
+- Za klinike koje ne plaćaju karticom — u BiH je to očekivano stanje (poslovni račun + knjigovodstvo, često nema kartice za recurring u EUR).
+- DentOrd izdaje **domaći račun**; nakon evidentirane uplate platform admin (D41) postavlja plan, status i `current_period_end`. Akcija se **auditira** (`audit_events`).
+- Podržava godišnju pretplatu (D48) i Enterprise ugovore (cijena "od 60€/mj", dogovorno).
+- Ovaj put **ne ovisi o vanjskom provideru** — naplata može krenuti i prije nego što je LS nalog verifikovan.
+- **Preduvjet: registrovana pravna forma** (obrt / samostalna djelatnost ili d.o.o.). Fizičko lice ne može izdati račun koji klinika proknjiži kao trošak, a `ugovor o djelu` pretvara kliniku u poreskog obveznika po odbitku — neupotrebljivo za pretplatu od 15–35€/mj. **Dok prodavac nije registrovan, virman put je nedostupan i naplata ide isključivo karticom preko MoR-a.**
+
+#### Zajedničko za oba puta
+
+- Status pretplate hrani **postojeći clinic lifecycle (D6)**: neplaćeno → 7 dana read-only → export → brisanje. Ne pravi se paralelni mehanizam gašenja.
+- `past_due` / prvi neuspjeli payment **ne gasi pristup odmah** — gašenje ide isključivo kroz lifecycle grace.
+- Otkazana pretplata vrijedi **do kraja plaćenog perioda**.
+- Način plaćanja je vidljiv na klinici (kartica / virman) da support i platform admin znaju šta gledaju.
 
 ---
 
@@ -460,7 +492,7 @@ Javni prodajni site DentOrd (isti Next.js projekat, public route group).
 ### 7.1 Jezici i SEO
 
 - BS (default) + HR + SR (latinica) + EN
-- Strategija B: UI copy za `hr`/`sr` trenutno = BS katalog (`i18n/catalog.ts`); TODO pravi HR/SR prevod
+- Zasebni UI katalozi `messages/{bs,hr,sr,en}.json`. Marketing cijene: BS u KM, HR/SR/EN u EUR.
 - Full SEO: meta, sitemap, OG, blog, hreflang za `bs`/`hr`/`sr`/`en`
 - Cookie consent + analytics (PostHog i/ili Plausible)
 
@@ -546,14 +578,14 @@ Formalni playbook kasnije; proces postoji od dana 1.
 
 | Period | Ponašanje |
 |---|---|
-| Do 31.12.2026 | Self-signup free; Professional entitlements (bez AI/SMS/portal); nema Stripe charge |
-| 1.1.2027 | Stripe pretplate aktivne; trial/grace pravila za postojeće |
+| Do 31.12.2026 | Self-signup free; Professional entitlements (bez AI/SMS/portal); nema naplate |
+| 1.1.2027 | Pretplate aktivne — kartica (Lemon Squeezy) **ili** virman, po izboru klinike (D54/D55); trial/grace pravila za postojeće |
 | Neplaćeno nakon free/trial | 7 dana **read-only** → export dostupan → brisanje |
 | Metered add-ons | Uključeno uz transparentan +15% ili own keys |
 
 Svi nalozi kreirani prije 1.1.2027 tretiraju se kao free do kraja 2026.
 
-Online naplata usluga pacijentima (avans preko portala): **nadogradnja poslije** core Stripe pretplata.
+Online naplata usluga pacijentima (avans preko portala): **nadogradnja poslije** core pretplata.
 
 ---
 
@@ -616,7 +648,8 @@ Online naplata usluga pacijentima (avans preko portala): **nadogradnja poslije**
 
 ### Faza 4 — Premium / Enterprise / 2027 billing
 
-26. Stripe subscriptions + metered
+26. Pretplate: Lemon Squeezy checkout + webhook **i** virman/manual aktivacija (D54/D55) + metered
+    - **Povučeno naprijed: implementacija + testiranje u septembru 2026** (LS test mode), produkcija tek nakon zelenog testa. **Naplata i dalje kreće 1.1.2027 — D5 se ne mijenja.** Cilj je da billing bude gotov i odležan prije nego što prvi račun ode klijentu, a ne da se piše pod pritiskom u decembru.
 27. AI copilot (opt-in, draft, 90d transcripts)
 28. SMS/WhatsApp metered
 29. Patient portal + OTP/magic link
@@ -697,7 +730,7 @@ Dodatni blocker: **tenant isolation** suite (clinic A vs B na patients, appointm
 3. Pravni osnovi (ugovor, legitimni interes, pristanak za cookies/marketing)
 4. Uloga klinike: klinika je **voditelj obrade** za podatke pacijenata; DentOrd je **obradaitelj**
 5. Čuvanje i lokacija (EU)
-6. Djelioci (Supabase, Vercel, Resend, Sentry, PostHog, Stripe od 2027)
+6. Djelioci (Supabase, Vercel, Resend, Sentry, PostHog, Lemon Squeezy od naplate 2027)
 7. Periodi čuvanja (trial, pretplata, nakon brisanja, AI transcript 90 dana)
 8. Prava ispitanika (pristup, ispravka, brisanje, prenosivost, prigovor)
 9. Sigurnost (šifrovanje u tranzitu, RLS, access control)
@@ -776,10 +809,15 @@ Dodatni blocker: **tenant isolation** suite (clinic A vs B na patients, appointm
 | Stavka | Status |
 |---|---|
 | Finalni domen / pravno ime firme | domen **dentord.com** (brand **DentOrd**); pravno ime firme još TBD |
+| Pravna forma prodavca prije 1.1.2027 | Trenutno freelance (fizičko lice) — dovoljno do kraja free perioda jer se ništa ne naplaćuje (D4). Za virman put (D55) treba **obrt / samostalna djelatnost ili d.o.o.**; d.o.o. nije nužan. Odlučiti s knjigovođom prije prve naplate |
+| PayPal kao payout kanal iz LS-a | **Slab fallback u BiH:** PayPal nalog registrovan u BiH ne može držati balance, a povlačenje ide samo na Visa Classic / Visa Debit (Mastercard/Maestro ne rade). Primarni payout ostaje bankovni transfer |
+| PayPal kao samostalni sistem naplate | **Odbačeno.** PayPal je procesor, ne Merchant of Record → PDV/VAT i izdavanje računa ostaju na nama (nemoguće kao fizičko lice, §4.5), a cijeli subscription lifecycle bismo gradili sami. Uz to BiH ordinacije PayPal ne koriste kao B2B način plaćanja. Ostaje samo kao način plaćanja **unutar** LS checkouta |
 | Tačan PDV / poreski ID na fakturama platforme | Nakon registracije firme |
 | Mjerodavno pravo u Terms | Nakon registracije firme |
 | Vanjski pen-test prije masovne naplate 2027 | Preporučeno; timing TBD |
 | Exact metered unit cijene (SMS/AI) | Objaviti prije uključivanja kanala |
+| Lemon Squeezy: verifikacija BiH prodavca + test payout | **Blokira D54 implementaciju; rok = prije početka septembra 2026.** Otvoriti nalog, W-8BEN, prodati test proizvod i potvrditi da payout sjedne na BiH račun **prije** pisanja integracije. LS review nakon Stripe akvizicije zna trajati, pa se pokreće odmah — ne zadnje sedmice. Ako padne → Paddle |
+| Poreski tretman MoR računa za BiH klinike | Provjeriti s knjigovođom (usluga iz inostranstva / obračun PDV-a kod primaoca). Utiče na to koliko klinika realno bira virman umjesto kartice |
 
 ---
 

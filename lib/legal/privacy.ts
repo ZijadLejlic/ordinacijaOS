@@ -65,7 +65,7 @@ function privacyBs(): LegalDocument {
         id: "djelioci",
         title: "6. Djelioci (podobradaitelji)",
         paragraphs: [
-          "Koristimo pouzdane pružatelje usluga: Supabase (baza, auth, storage), Vercel (hosting aplikacije), Resend (email), Sentry (greške aplikacije), PostHog (produkt analitika — bez imena pacijenata), te Stripe za naplatu od 2027.",
+          "Koristimo pouzdane pružatelje usluga: Supabase (baza, auth, storage), Vercel (hosting aplikacije), Resend (email), Sentry (greške aplikacije), PostHog (produkt analitika — bez imena pacijenata), te Lemon Squeezy za naplatu pretplate karticom od 2027. Ako klinika plaća virmanom, podaci o plaćanju ne prolaze kroz vanjskog pružatelja naplate.",
           "Svaki djelilac obrađuje podatke samo u mjeri potrebnoj za svoju uslugu i pod odgovarajućim ugovornim zaštitama.",
         ],
       },
@@ -185,7 +185,7 @@ function privacyEn(): LegalDocument {
         id: "processors",
         title: "6. Recipients (sub-processors)",
         paragraphs: [
-          "We use trusted providers: Supabase (database, auth, storage), Vercel (app hosting), Resend (email), Sentry (application errors), PostHog (product analytics — no patient names), and Stripe for billing from 2027.",
+          "We use trusted providers: Supabase (database, auth, storage), Vercel (app hosting), Resend (email), Sentry (application errors), PostHog (product analytics — no patient names), and Lemon Squeezy for card subscription billing from 2027. If a clinic pays by bank transfer, no external billing provider is involved.",
           "Each recipient processes data only as needed for its service under appropriate contractual safeguards.",
         ],
       },

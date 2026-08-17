@@ -17,10 +17,25 @@ const EXPECTED_MESSAGE =
 
 /** Intentional smoke / browser noise — never report as product bugs. */
 const DROP_MESSAGE =
-  /DentOrd Sentry (?:client|server)?\s*test|REMOVE (?:page|endpoint)|Non-Error promise rejection captured with value: undefined/i;
+  /DentOrd Sentry (?:client|server)?\s*test|REMOVE (?:page|endpoint)|Non-Error promise rejection captured with value: undefined|Failed to find Server Action|older or newer deployment/i;
+
+/** Stale Next.js Server Action ID after a deploy (client still has the old bundle). */
+export function isStaleServerActionError(error: unknown): boolean {
+  const parts: string[] = [];
+  if (typeof error === "string") parts.push(error);
+  if (error instanceof Error) {
+    parts.push(error.name, error.message);
+  } else if (error && typeof error === "object" && "message" in error) {
+    parts.push(String((error as { message: unknown }).message));
+  }
+  return /Failed to find Server Action|older or newer deployment/i.test(
+    parts.join("\n"),
+  );
+}
 
 export function isExpectedBusinessError(error: unknown): boolean {
   if (!error) return false;
+  if (isStaleServerActionError(error)) return true;
 
   if (typeof error === "object" && error !== null) {
     const record = error as {

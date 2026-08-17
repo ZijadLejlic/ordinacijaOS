@@ -75,11 +75,16 @@ vi.mock("@/lib/clinic/lifecycle-job", () => ({
 /** Auth matrix only: prove no session gate before ImageResponse. */
 vi.mock("next/og", () => ({
   ImageResponse: class extends Response {
-    // Auth matrix only: prove no session gate before ImageResponse.
-    constructor() {
+    constructor(
+      _el: unknown,
+      init?: { headers?: Record<string, string> },
+    ) {
       super("og-image-placeholder", {
         status: 200,
-        headers: { "Content-Type": "image/png" },
+        headers: {
+          "Content-Type": "image/png",
+          ...(init?.headers ?? {}),
+        },
       });
     }
   },
@@ -169,6 +174,7 @@ describe("API routes auth matrix — public / env-gated (DB-free)", () => {
 
       expect(res.status).toBe(200);
       expect(res.headers.get("content-type")).toMatch(/image\/png/);
+      expect(res.headers.get("cache-control")).toMatch(/s-maxage=86400/);
     });
   });
 

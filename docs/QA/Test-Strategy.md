@@ -115,7 +115,7 @@ Emails pattern (existing): `security-test-{tag}@ordinacijaos.test`, `e2e-{role}-
 | Resend | Stub module / env missing → assert “would send” or capture payload in test double |
 | PostHog | No-op; assert event shape in unit tests |
 | Sentry | No-op |
-| Stripe | N/A until Faza 4 |
+| Lemon Squeezy (billing, D54) | N/A until Faza 4; then stub webhook payloads + signing secret, no live calls |
 | `sharp` | Optional; or run real convert in INT with small PNG |
 | Cron | Call `runClinicLifecycleJob` directly in INT; API tests hit route with secret |
 
@@ -279,6 +279,7 @@ Format per row: **ID** · Requirement · Risk · Level · Preconditions · Expec
 | CRM-UNIT-002 | D24 | Birthday window wrong | UNIT | dates | due/null | Medium | COVERED |
 | MKT-UNIT-001 | §4 | Wrong public prices | UNIT | MARKETING_PLANS | PRD §4.1/4.2/4.3 | Medium | COVERED |
 | MKT-UNIT-003 | W13 | Invalid lead accepted | UNIT | Zod cases | reject honeypot/no consent | Medium | COVERED |
+| MKT-UNIT-004 | W13 | SEO/index spam accepted | UNIT | helpindex / lookalike mail | silent drop, no email | Medium | COVERED |
 | PII-UNIT-002 | §8.2 | Consent storage broken | UNIT | localStorage mock | accept/reject | Medium | COVERED |
 | PLAT-UNIT-001 | D41 | user_metadata admin spoof | UNIT | fake user | only app_metadata true | Medium | COVERED |
 | PLAN-UNIT-001 | D8 D42 | limits parse wrong | UNIT | limits_json | numbers/null unlimited | Medium | COVERED |
@@ -299,6 +300,7 @@ Format per row: **ID** · Requirement · Risk · Level · Preconditions · Expec
 | FILE-INT-011 | §6.13 | Branding upload ACL | INT | doctor | denied | Medium | COVERED |
 | IMP-INT-002 | D30 | Oversized CSV | INT | >1MB / >500 rows | rejected | Medium | COVERED |
 | MKT-INT-001 | W13 | Rate limit bypass | INT | 6 leads / hour same IP | 6th blocked | Medium | COVERED |
+| MKT-INT-003 | W13 | SEO/index form spam | INT | helpindex / lookalike mail | silent drop, no INSERT/email | Medium | COVERED |
 | MKT-E2E-002 | §7 | Pricing CTA broken | E2E | marketing pages | CTA → signup | Medium | COVERED |
 | MKT-E2E-004 | §13.4 | Cookie banner missing | E2E | fresh browser | banner; PostHog gated | Medium | COVERED |
 | RBAC-INT-010 | §3.2 | Dashboard KPI overshare | INT | assistant session | canSeeDashboardKpis false; doctor true | Medium | COVERED |

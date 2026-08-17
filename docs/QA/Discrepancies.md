@@ -468,7 +468,7 @@ supabase db reset
 
 ### D-18 — Faza 4 / out-of-scope items marked N/A (S3)
 
-Stripe, AI, SMS/WhatsApp, portal, online booking, mini-site, lab — correctly out of MVP. No discrepancy unless code ships them early (negative `PLAN-INT-010`).
+Billing charge paths (D54/D55), AI, SMS/WhatsApp, portal, online booking, mini-site, lab — correctly out of MVP. No discrepancy unless code ships them early (negative `PLAN-INT-010`).
 
 ---
 

@@ -44,7 +44,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     for (const [key, pathname] of Object.entries(MARKETING_SEO_PAGES)) {
       entries.push({
         url: absolute(locale, pathname),
-        lastModified: new Date(),
         changeFrequency: key === "home" ? "weekly" : "monthly",
         priority: PRIORITY[key as keyof typeof PRIORITY] ?? 0.5,
         alternates: {

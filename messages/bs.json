@@ -789,7 +789,9 @@
         "errors": {
           "invalid": "Provjerite unesena polja i pokušajte ponovo.",
           "rateLimited": "Previše zahtjeva s ove adrese. Pokušajte za sat vremena.",
-          "failed": "Slanje nije uspjelo. Pišite nam na support@dentord.com ili pokušajte ponovo."
+          "failed": "Slanje nije uspjelo. Pišite nam na support@dentord.com ili pokušajte ponovo.",
+          "stale": "Stranica je zastarjela nakon ažuriranja. Osvježite je pa pošaljite ponovo.",
+          "staleReload": "Osvježi stranicu"
         }
       }
     },
@@ -1637,7 +1639,7 @@
     "totalsSummary": "Osnovica {subtotal} · PDV {vat} · Ukupno {total} · Dug {balance}",
     "voidedReason": "Razlog storniranja",
     "paymentsTitle": "Uplate",
-    "paymentsDescription": "Samo evidencija do Stripe 2027 (D5). Append-only.",
+    "paymentsDescription": "Samo evidencija do naplate 2027 (D5). Append-only.",
     "noPayments": "Još nema uplata.",
     "paymentAmount": "Iznos",
     "paymentMethod": "Način",
@@ -1711,7 +1713,7 @@
     "open": "Otvori",
     "back": "← Sve klinike",
     "billingTitle": "Billing i status",
-    "billingDescription": "Plan, clinic status i subscription flagovi (bez Stripe charge do 2027).",
+    "billingDescription": "Plan, clinic status i subscription flagovi (bez naplate do 2027). Od 2027: kartica ili virman.",
     "entitlementsTitle": "Entitlements",
     "entitlementsDescription": "Aktivni feature flagovi iz plana (+ free-2026 override).",
     "ownersTitle": "Impersonacija",
@@ -1728,7 +1730,9 @@
     "subscriptionUpdated": "Pretplata ažurirana.",
     "noSubscription": "Nema subscription reda.",
     "trialEnds": "Trial do",
-    "stripeCustomer": "Stripe customer",
+    "billingCustomer": "Billing customer",
+    "billingProvider": "Provajder naplate",
+    "billingPaymentMethod": "Način plaćanja pretplate",
     "currentPlan": "Trenutni plan",
     "inactive": "neaktivan",
     "impersonate": "Impersoniraj ownera",

@@ -18,6 +18,8 @@ describe("currencyForLocale", () => {
     expect(currencyForLocale("hr")).toBe("EUR");
     expect(currencyForLocale("sr")).toBe("EUR");
     expect(currencyLabel("en")).toBe("EUR");
+    expect(currencyLabel("hr")).toBe("EUR");
+    expect(currencyLabel("sr")).toBe("EUR");
   });
 });
 
@@ -61,9 +63,11 @@ describe("formatSubscriptionPrice", () => {
     expect(s).not.toMatch(/15/);
   });
 
-  it("keeps 15 € for en", () => {
-    const s = formatSubscriptionPrice(15, "en");
-    expect(s).toMatch(/15/);
-    expect(s).toMatch(/€|EUR/);
+  it("keeps 15 € for en, hr and sr", () => {
+    for (const locale of ["en", "hr", "sr"] as const) {
+      const s = formatSubscriptionPrice(15, locale);
+      expect(s).toMatch(/15/);
+      expect(s).toMatch(/€|EUR/);
+    }
   });
 });

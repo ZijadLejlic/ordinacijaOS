@@ -789,7 +789,9 @@
         "errors": {
           "invalid": "Check the fields and try again.",
           "rateLimited": "Too many requests from this address. Try again in an hour.",
-          "failed": "Could not send. Email us at support@dentord.com or try again."
+          "failed": "Could not send. Email us at support@dentord.com or try again.",
+          "stale": "This page is out of date after a deploy. Refresh and submit again.",
+          "staleReload": "Refresh page"
         }
       }
     },
@@ -1637,7 +1639,7 @@
     "totalsSummary": "Subtotal {subtotal} · VAT {vat} · Total {total} · Balance {balance}",
     "voidedReason": "Void reason",
     "paymentsTitle": "Payments",
-    "paymentsDescription": "Record-only until Stripe 2027 (D5). Append-only.",
+    "paymentsDescription": "Record-only until billing starts in 2027 (D5). Append-only.",
     "noPayments": "No payments yet.",
     "paymentAmount": "Amount",
     "paymentMethod": "Method",
@@ -1711,7 +1713,7 @@
     "open": "Open",
     "back": "← All clinics",
     "billingTitle": "Billing and status",
-    "billingDescription": "Plan, clinic status, and subscription flags (no Stripe charge until 2027).",
+    "billingDescription": "Plan, clinic status, and subscription flags (no charge until 2027). From 2027: card or bank transfer.",
     "entitlementsTitle": "Entitlements",
     "entitlementsDescription": "Active feature flags from the plan (+ free-2026 override).",
     "ownersTitle": "Impersonation",
@@ -1728,7 +1730,9 @@
     "subscriptionUpdated": "Subscription updated.",
     "noSubscription": "No subscription row.",
     "trialEnds": "Trial ends",
-    "stripeCustomer": "Stripe customer",
+    "billingCustomer": "Billing customer",
+    "billingProvider": "Billing provider",
+    "billingPaymentMethod": "Subscription payment method",
     "currentPlan": "Current plan",
     "inactive": "inactive",
     "impersonate": "Impersonate owner",

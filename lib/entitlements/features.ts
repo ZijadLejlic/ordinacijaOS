@@ -34,7 +34,7 @@ export type FeatureKey = (typeof FEATURE_KEYS)[number];
 /**
  * Free period 2026 (D3/D4): Professional entitlements minus these,
  * even if the plan matrix has them enabled (e.g. metered SMS).
- * Stripe billing starts 2027-01-01 (D5).
+ * Billing starts 2027-01-01 (D5); card or bank transfer (D54/D55).
  */
 export const FREE_PERIOD_DISABLED_FEATURES = [
   "sms_whatsapp",

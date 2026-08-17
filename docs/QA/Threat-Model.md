@@ -3,7 +3,7 @@
 > STRIDE-oriented threat model for DentOrd Professional MVP (Faze 1–3).
 > Emphasis: authentication, authorization, multi-tenancy, financial data, personal/health data, file uploads, platform impersonation, cron/service-role.
 > Mitigations cite code/DB controls; guarding tests cite IDs from [Test-Strategy.md](./Test-Strategy.md).
-> Residual Faza 4 (Stripe/AI/SMS/portal) noted briefly at the end.
+> Residual Faza 4 (billing/AI/SMS/portal) noted briefly at the end.
 
 ---
 
@@ -167,7 +167,7 @@ Each row: **Threat ID**, category, description, likelihood×impact → **Risk**,
 
 | ID | STRIDE | Threat | Risk | Mitigations | Tests |
 |---|---|---|---|---|---|
-| T-AVL-01 | DoS | Lead form spam | Medium | Honeypot + IP rate limit | `MKT-INT-001`, `MKT-SEC-002` |
+| T-AVL-01 | DoS | Lead form spam | Medium | Honeypot + IP rate limit + content/lookalike filter | `MKT-INT-001`, `MKT-INT-003`, `MKT-SEC-002`, `MKT-UNIT-004` |
 | T-AVL-02 | DoS | CSV import huge file | Medium | Max 500 rows / 1 MB | `IMP-INT-002` |
 | T-AVL-03 | DoS | Overlap storms / calendar write flood | Low | DB EXCLUDE; auth required | `CAL-DB-001` |
 
@@ -217,7 +217,7 @@ Starter clinic (or forged plan) inserts `crm_notifications` / `inventory_items` 
 | Image limit app-only | Same | P1 `FILE-DB-001` + optional trigger |
 | Phase 1 schema not in local migrations | Blocks hermetic tests | **P0** dump schema |
 | JWT hook manually enabled | Ops | Production-Ops + `TEN-SEC-004` |
-| Stripe / metered / portal (2027) | Out of MVP | Threat model addendum in Faza 4 |
+| Billing / metered / portal (2027) | Out of MVP | Threat model addendum in Faza 4: forged webhook (signature over raw body), replayed webhook (idempotency), variant→plan mapping tamper (entitlements from `plans` only, D42), and manual bank-transfer activation abuse (platform-admin action must be audited, D41) |
 | External pen-test | Recommended before mass billing | Open item PRD §14 |
 | Email notification on lockout | Deferred §6.16 | MVP notify = audit (`AUTH-INT-002` COVERED); push email/bell when notification center ships |
 

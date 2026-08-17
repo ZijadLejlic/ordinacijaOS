@@ -1,0 +1,2843 @@
+{
+  "Marketing": {
+    "nav": {
+      "features": "Funkcije",
+      "pricing": "Cene",
+      "tour": "Tour",
+      "whyDentord": "Zašto DentOrd",
+      "faq": "FAQ",
+      "install": "Instalacija",
+      "demo": "Demo",
+      "contact": "Kontakt",
+      "blog": "Blog",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "dpa": "DPA",
+      "login": "Prijava",
+      "signup": "Registruj ordinaciju",
+      "openMenu": "Otvori meni",
+      "closeMenu": "Zatvori meni"
+    },
+    "pages": {
+      "features": {
+        "eyebrow": "Funkcije",
+        "title": "Sve što vašoj ordinaciji treba.",
+        "description": "Karton, odontogram, termini, fakture, inventar i još — na jednom mestu.",
+        "comingSoon": "Puna stranica funkcija stiže uskoro. U međuvremenu pogledajte cene ili se registrujte."
+      },
+      "whyDentord": {
+        "eyebrow": "Zašto DentOrd",
+        "title": "Zašto ordinacije biraju DentOrd?",
+        "description": "Napravljen za BiH, Hrvatsku i Srbiju — jezik našeg regiona, EUR + PDV, EU hosting.",
+        "comingSoon": "Detaljno poređenje i benefiti stižu uskoro."
+      },
+      "tour": {
+        "eyebrow": "Tour",
+        "title": "Od registracije do prvog pacijenta.",
+        "description": "Korak-po-korak pregled kako DentOrd izgleda u svakodnevnom radu.",
+        "comingSoon": "Interaktivni tour stiže uskoro."
+      },
+      "demo": {
+        "eyebrow": "Demo",
+        "title": "Pogledajte DentOrd iznutra.",
+        "description": "Isprobajte demo ordinaciju s primjerima pacijenata — bez registracije.",
+        "comingSoon": "Live demo pristup stiže uskoro."
+      },
+      "faq": {
+        "eyebrow": "FAQ",
+        "title": "Česta pitanja",
+        "description": "Odgovori o registraciji, cenama, sigurnosti i svakodnevnom korištenju.",
+        "comingSoon": "Puna FAQ stranica stiže uskoro."
+      },
+      "contact": {
+        "eyebrow": "Kontakt",
+        "title": "Tu smo za vas.",
+        "description": "Javite nam se — odgovaramo isti radni dan.",
+        "comingSoon": "Kontakt forma stiže uskoro. Pišite nam na support@dentord.com."
+      },
+      "blog": {
+        "eyebrow": "Blog",
+        "title": "Blog",
+        "description": "Savjeti za vođenje ordinacije i novosti o DentOrdu.",
+        "comingSoon": "Prvi članci stižu uskoro."
+      },
+      "privacy": {
+        "eyebrow": "Pravno",
+        "title": "Privacy Policy",
+        "description": "Kako štitimo podatke vaše ordinacije i pacijenata.",
+        "comingSoon": "Puna politika privatnosti stiže uskoro."
+      },
+      "terms": {
+        "eyebrow": "Pravno",
+        "title": "Terms of Service",
+        "description": "Uslovi korištenja DentOrd platforme.",
+        "comingSoon": "Puni uslovi korištenja stižu uskoro."
+      },
+      "dpa": {
+        "eyebrow": "Pravno",
+        "title": "Data Processing Agreement",
+        "description": "Ugovor o obradi podataka (GDPR) između vas i DentOrda.",
+        "comingSoon": "Puni DPA stiže uskoro."
+      }
+    },
+    "footer": {
+      "blurb": "Softver za stomatološke ordinacije — kartoni, termini, fakture i zalihe na jednom mestu.",
+      "product": "Proizvod",
+      "company": "Kompanija",
+      "legal": "Pravno"
+    },
+    "finalCta": {
+      "titles": {
+        "default": "Registrujte ordinaciju danas — besplatno do kraja 2026.",
+        "demo": "Svidelo vam se? Registrujte svoju ordinaciju.",
+        "contact": "Ne želite čekati poziv? Registrujte se sami za 5 minuta.",
+        "tour": "To je sve. Ozbiljno."
+      },
+      "subtitles": {
+        "demo": "Isti alati, vaša ordinacija, vaši podaci.",
+        "contact": "Bez kartice. Besplatno do 31.12.2026.",
+        "tour": "Registrujte ordinaciju i prođite ove korake uživo — besplatno do kraja 2026."
+      },
+      "primary": "Registruj ordinaciju besplatno",
+      "secondary": "Pozovite me",
+      "microcopy": "Besplatno do 31.12.2026 · Bez kartice · Postavka za 5 minuta",
+      "secondaryDemo": "Isprobajte live demo"
+    },
+    "home": {
+      "hero": {
+        "badge": "Besplatno za sve ordinacije do 31.12.2026",
+        "headline": "Vaša ordinacija, konačno organizovana.",
+        "support": "DentOrd objedinjuje kartone pacijenata, odontogram, termine, fakture i zalihe — u jednoj jednostavnoj aplikaciji, na jeziku našeg regiona.",
+        "ctaPrimary": "Registruj ordinaciju besplatno",
+        "ctaSecondary": "Pogledajte kako radi",
+        "microcopy": "Besplatno do 31.12.2026 · Bez kartice · Postavka za 5 minuta",
+        "browserUrl": "app.dentord.com",
+        "screenshotAlt": "Pregled DentOrd dashboarda s KPI karticama i današnjim terminima",
+        "phoneScreenshotAlt": "DentOrd kalendar na telefonu — današnji termini",
+        "mock": {
+          "kpiPatients": "Pacijenti danas",
+          "kpiRevenue": "Prihod (danas)",
+          "kpiAppointments": "Termini",
+          "scheduleTitle": "Današnji termini",
+          "appt1": "Amina Hodžić · Kontrola",
+          "appt2": "Emir Begić · Plomba",
+          "appt3": "Lejla Softić · Higijena",
+          "time1": "09:00",
+          "time2": "10:30",
+          "time3": "12:00"
+        }
+      },
+      "trust": {
+        "eu": "Podaci na EU serverima",
+        "gdpr": "GDPR usklađeno",
+        "backup": "Dnevni backup",
+        "support": "Podrška na našem jeziku"
+      },
+      "problem": {
+        "eyebrow": "Problem",
+        "title": "Papirni kartoni i Excel tabele koštaju vas vremena svaki dan.",
+        "pains": {
+          "charts": "Izgubljeni ili nepotpuni kartoni kad vam trebaju.",
+          "double": "Dupli termini i zabune u rasporedu.",
+          "invoices": "Ručno pisanje faktura i greške u PDV-u.",
+          "payments": "Niko ne zna ko je šta naplatio — do kraja meseca."
+        },
+        "solutionEyebrow": "Rešenje",
+        "solution": "DentOrd sve to stavlja na jedno mesto — dostupno svakom članu tima, prema ulozi, s bilo kojeg uređaja."
+      },
+      "features": {
+        "eyebrow": "Funkcije",
+        "title": "Sve što vam treba za svakodnevni rad.",
+        "learnMore": "Saznajte više",
+        "items": {
+          "charts": {
+            "title": "Karton i odontogram",
+            "body": "Kompletan karton pacijenta s istorijom, alergijama i FDI odontogramom. Sve na jednom kliku."
+          },
+          "calendar": {
+            "title": "Kalendar termina",
+            "body": "Dan ili sedmica po doktoru, statusi termina i waitlist. Manje telefona, manje zabuna."
+          },
+          "invoices": {
+            "title": "Fakture i finansije",
+            "body": "Fakture u eurima s PDV-om, uplate, rate i pregled dugovanja — bez Excela."
+          },
+          "reminders": {
+            "title": "Email podsjetnici",
+            "body": "Automatski podsjetnici na termine i recall pacijenata koji dugo nisu dolazili."
+          },
+          "documents": {
+            "title": "Dokumenti i saglasnosti",
+            "body": "Saglasnosti s potpisom na ekranu i PDF arhiva direktno u kartonu."
+          },
+          "inventory": {
+            "title": "Inventar",
+            "body": "Zalihe materijala, minimalne količine i upozorenja pre nego što ostanete bez zaliha."
+          }
+        }
+      },
+      "tour": {
+        "eyebrow": "Brzi start",
+        "title": "Od registracije do prvog pacijenta za 5 minuta.",
+        "steps": {
+          "1": "Registrujte ordinaciju",
+          "2": "Dodajte usluge i tim",
+          "3": "Zakažite prvi termin"
+        },
+        "cta": "Pogledajte celi tour"
+      },
+      "security": {
+        "eyebrow": "Sigurnost",
+        "title": "Podaci pacijenata zaslužuju bankarski nivo sigurnosti.",
+        "items": {
+          "eu": {
+            "title": "EU hosting",
+            "body": "Podaci žive na serverima u EU (Supabase EU) — bliže vama i u skladu s propisima."
+          },
+          "isolation": {
+            "title": "Potpuna izolacija klinika",
+            "body": "Svaka ordinacija vidi samo svoje podatke. Row Level Security na svakom redu."
+          },
+          "rbac": {
+            "title": "Kontrola pristupa po ulogama",
+            "body": "Vlasnik, doktor, recepcija — svako vidi ono što treba, ništa više."
+          },
+          "gdpr": {
+            "title": "GDPR: export i brisanje",
+            "body": "Izvezite podatke ili pokrenite brisanje kad zakon i pacijent to zahtijevaju."
+          }
+        },
+        "disclaimer": "DentOrd je alat za evidenciju — medicinske odluke uvek donosi doktor."
+      },
+      "pricing": {
+        "eyebrow": "Cene",
+        "title": "Jednostavne cene. Trenutno — besplatno.",
+        "badge": "Besplatno do 31.12.2026",
+        "vat": "sa PDV-om",
+        "from": "od {price}/mj",
+        "perMonth": "{price}/mj",
+        "popular": "Najpopularniji",
+        "cta": "Uporedite pakete"
+      },
+      "faq": {
+        "eyebrow": "FAQ",
+        "title": "Česta pitanja",
+        "cta": "Sva pitanja",
+        "items": {
+          "free": {
+            "q": "Šta znači „besplatno do 31.12.2026“?",
+            "a": "Registrujete se i koristite puni Professional paket bez naplate do kraja 2026. Kreditna kartica nije potrebna. Od 1.1.2027. birate paket i nastavljate."
+          },
+          "card": {
+            "q": "Treba li kreditna kartica?",
+            "a": "Ne. Za registraciju i korištenje tokom besplatnog perioda kartica nije potrebna."
+          },
+          "setup": {
+            "q": "Koliko traje postavka?",
+            "a": "Onboarding ima tri koraka: podaci ordinacije, usluge i poziv tima. Većina ordinacija krene raditi za oko 5 minuta."
+          },
+          "install": {
+            "q": "Mogu li instalirati DentOrd na telefon ili računar?",
+            "a": "Da. Dodajte DentOrd na početni ekran telefona, tableta ili radnu površinu — otvarate ga kao aplikaciju, bez traženja u pregledniku. Ažuriranja stižu automatski.",
+            "linkLabel": "Vodič za instalaciju"
+          },
+          "data": {
+            "q": "Gde se čuvaju podaci?",
+            "a": "Na EU serverima. Vaša klinika je izolovana od drugih; radimo dnevni backup i poštujemo GDPR."
+          }
+        }
+      }
+    },
+    "pricing": {
+      "eyebrow": "Cene",
+      "title": "Besplatno do 31.12.2026. Posle — od 15 € mesečno.",
+      "subtitle": "Registrujte se danas i koristite puni Professional paket bez ijedne marke troška do kraja 2026. Bez kartice.",
+      "freeBadge": "Besplatno do 31.12.2026",
+      "popular": "Najpopularniji",
+      "vat": "sa PDV-om",
+      "perMonth": "{price}/mj",
+      "from": "od {price}/mj",
+      "cta": "Registruj se besplatno",
+      "annualNote": "Od 2027. godišnja pretplata donosi 2 meseca gratis.",
+      "limits": {
+        "doctors": "Doktori: {count}",
+        "users": "Korisnici: {count}",
+        "locations": "Lokacije: {count}",
+        "images": "Slike/RTG po pacijentu: {count}",
+        "unlimited": "bez limita"
+      },
+      "availability": {
+        "yes": "Da",
+        "no": "Ne",
+        "metered": "po potrošnji*"
+      },
+      "compare": {
+        "eyebrow": "Poređenje",
+        "title": "Šta je uključeno u kojem paketu?",
+        "description": "Puna matrica funkcija — isti podaci kao u produktu.",
+        "featureColumn": "Funkcija",
+        "expand": "Prikaži",
+        "collapse": "Sakrij",
+        "footnote": "* SMS/WhatsApp i AI dostupni su kao dodatna potrošnja (metered) od naplate kanala — nisu uključeni u besplatni period 2026."
+      },
+      "faq": {
+        "eyebrow": "FAQ",
+        "title": "Pitanja o cenama",
+        "items": {
+          "free": {
+            "q": "Šta znači besplatno do 2026?",
+            "a": "Registrujete se i koristite puni Professional paket bez naplate do 31.12.2026. Kreditna kartica nije potrebna. AI, SMS/WhatsApp i portal za pacijente nisu dio besplatnog perioda."
+          },
+          "card": {
+            "q": "Treba li kreditna kartica?",
+            "a": "Ne. Za registraciju i korištenje tokom besplatnog perioda kartica nije potrebna."
+          },
+          "billing2027": {
+            "q": "Šta se dešava 1.1.2027.?",
+            "a": "Počinje naplata pretplate. Birate paket (Starter, Professional, Premium AI ili Enterprise) i nastavljate raditi — vaši podaci ostaju. Godišnja pretplata od tada donosi 2 meseca gratis."
+          },
+          "changePlan": {
+            "q": "Mogu li mijenjati paket?",
+            "a": "Da. Možete nadograditi ili smanjiti paket u skladu s potrebama ordinacije. Limiti većeg paketa odmah postaju dostupni; smanjenje poštuje postojeće podatke uz hard limit za nove unose."
+          },
+          "limits": {
+            "q": "Šta ako pređem limit?",
+            "a": "Limiti su strogi — prekoračenje nije dozvoljeno. Aplikacija vas upozorava i predlaže veći paket. Doktori, korisnici, lokacije i broj slika po pacijentu zavise od izabranog paketa."
+          }
+        }
+      },
+      "plans": {
+        "starter": {
+          "name": "Starter",
+          "blurb": "Za male i solo ordinacije"
+        },
+        "professional": {
+          "name": "Professional",
+          "blurb": "Sve što prosječnoj ordinaciji treba"
+        },
+        "premium_ai": {
+          "name": "Premium AI",
+          "blurb": "AI asistent i napredna analitika"
+        },
+        "enterprise": {
+          "name": "Enterprise",
+          "blurb": "Portal za pacijente, više lokacija, bez limita"
+        }
+      },
+      "features": {
+        "patients_chart": "Karton pacijenata",
+        "odontogram": "Odontogram",
+        "treatment_plan": "Plan terapije",
+        "calendar_basic": "Osnovni kalendar",
+        "calendar_advanced": "Napredni kalendar",
+        "invoices": "Fakture",
+        "expenses_reports_excel": "Troškovi i Excel izveštaji",
+        "installments_calculator": "Kalkulator rata",
+        "email_reminders": "Email podsjetnici",
+        "branding_custom": "Brending ordinacije",
+        "crm_light": "CRM (recall)",
+        "waitlist_auto": "Lista čekanja",
+        "consent_draw_sign": "Saglasnosti (potpis)",
+        "inventory_basic": "Inventar",
+        "sms_whatsapp": "SMS / WhatsApp",
+        "ai_copilot": "AI asistent",
+        "patient_portal": "Portal za pacijente",
+        "mini_website": "Mini website",
+        "online_booking": "Online zakazivanje",
+        "lab_technician": "Lab / tehničar",
+        "marketing_campaigns": "Marketing kampanje"
+      }
+    },
+    "features": {
+      "eyebrow": "Funkcije",
+      "title": "Sve što vašoj ordinaciji treba. Ništa što joj ne treba.",
+      "subtitle": "Karton, odontogram, termini, fakture, podsjetnici, inventar i tim — moduli koji rade zajedno, bez suvišnih komplikacija.",
+      "ctaPrimary": "Registruj ordinaciju besplatno",
+      "ctaSecondary": "Pogledajte kako radi",
+      "proBadge": "Pro",
+      "browserUrl": "app.dentord.com",
+      "modules": {
+        "karton": {
+          "eyebrow": "Pacijenti i karton",
+          "title": "Celi karton pacijenta — na jedan klik.",
+          "body": "Kontakt, medicinska istorija, alergije, dokumenti i RTG slike na jednom mestu. Vaš tim uvek vidi isto što i vi — bez traženja papira.",
+          "bullets": {
+            "1": "Kontakt i istorija posjeta uvek dostupni",
+            "2": "Alergije i napomene istaknute u kartonu",
+            "3": "Dokumenti i RTG slike uz pacijenta"
+          },
+          "preview": {
+            "title": "Karton · Amina Hodžić",
+            "row1": "Telefon · +387 61 123 456",
+            "row2": "Alergije · Penicilin",
+            "row3": "Dokumenti · 4 · RTG · 2"
+          }
+        },
+        "odontogram": {
+          "eyebrow": "Odontogram (FDI)",
+          "title": "Vizuelna mapa zuba 11–48.",
+          "body": "Kliknite na zub, označite status po površini i pratite istoriju tretmana. FDI numeracija koju već poznajete — bez skica na papiru.",
+          "bullets": {
+            "1": "FDI mapa stalnih zuba 11–48",
+            "2": "Statusi po zubu i površini",
+            "3": "Istorija događaja po zubu"
+          },
+          "preview": {
+            "title": "Odontogram",
+            "row1": "16 · karies (O)",
+            "row2": "26 · plomba (MOD)",
+            "row3": "36 · planirana ekstrakcija"
+          }
+        },
+        "planTerapije": {
+          "eyebrow": "Plan terapije",
+          "title": "Šta sledi — i koliko košta.",
+          "body": "Stavke plana sa cenama i statusima. Pacijent zna redosled tretmana; vi pratite šta je urađeno, a šta čeka.",
+          "bullets": {
+            "1": "Stavke sa cenama iz cenovnika",
+            "2": "Statusi: planirano, u toku, završeno",
+            "3": "Jasan pregled za pacijenta i tim"
+          },
+          "preview": {
+            "title": "Plan terapije",
+            "row1": "Higijena · 40 € · završeno",
+            "row2": "Plomba 26 · 55 € · u toku",
+            "row3": "Krunica 16 · 280 € · planirano"
+          }
+        },
+        "kalendar": {
+          "eyebrow": "Kalendar i termini",
+          "title": "Raspored po doktoru — bez dvostrukih termina.",
+          "body": "Prikaz dana ili sedmice, statusi termina i waitlist koji predlaže zamjenu kad neko otkaže. Manje telefona, manje zabuna.",
+          "bullets": {
+            "1": "Dan / sedmica po doktoru",
+            "2": "Statusi termina na prvi pogled",
+            "3": "Waitlist automatski predlaže zamjenu (Pro)"
+          },
+          "preview": {
+            "title": "Kalendar · sedmica",
+            "row1": "Pon 09:00 · Amina · kontrola",
+            "row2": "Uto 10:30 · Emir · plomba",
+            "row3": "Sri 12:00 · Lejla · higijena"
+          }
+        },
+        "finansije": {
+          "eyebrow": "Fakture i finansije",
+          "title": "Fakture u eurima s PDV-om — bez Excela.",
+          "body": "Od tretmana do fakture, uplata i rata. Troškovi i mesečni izveštaji s izvozom u Excel kad vam trebaju za knjigovodstvo.",
+          "bullets": {
+            "1": "Fakture u eurima s PDV-om",
+            "2": "Uplate, dugovanja i rate (Pro)",
+            "3": "Troškovi i Excel izveštaji (Pro)"
+          },
+          "preview": {
+            "title": "Faktura · INV-2026-0042",
+            "row1": "Ukupno · 95,00 €",
+            "row2": "PDV 17% · uključeno",
+            "row3": "Status · delimično plaćeno"
+          }
+        },
+        "podsjetnici": {
+          "eyebrow": "Email podsjetnici i CRM",
+          "title": "Podsjetnici koji smanjuju no-show.",
+          "body": "Automatski email pre termina i recall za pacijente koji dugo nisu dolazili. Recepcija šalje — sistem priprema listu.",
+          "bullets": {
+            "1": "Automatski podsjetnici na termine",
+            "2": "Recall pacijenata koji kasne s kontrolom (Pro)",
+            "3": "Rođendani i kontrolni pregledi u inboxu (Pro)"
+          },
+          "preview": {
+            "title": "CRM inbox",
+            "row1": "Recall · 12 pacijenata",
+            "row2": "Kontrola · 5 ove sedmice",
+            "row3": "Rođendani · 3 danas"
+          }
+        },
+        "dokumenti": {
+          "eyebrow": "Dokumenti i saglasnosti",
+          "title": "Saglasnosti s potpisom — u kartonu.",
+          "body": "Pacijent potpiše na ekranu; PDF ostaje arhiviran uz karton. Manje papira, jasniji trag za svaku proceduru.",
+          "bullets": {
+            "1": "Saglasnosti s potpisom na ekranu (Pro)",
+            "2": "PDF arhiva direktno u kartonu",
+            "3": "Pregled dokumenata po pacijentu"
+          },
+          "preview": {
+            "title": "Saglasnost · implantat",
+            "row1": "Status · potpisano",
+            "row2": "Datum · 14.07.2026.",
+            "row3": "PDF · spreman za arhivu"
+          }
+        },
+        "inventar": {
+          "eyebrow": "Inventar",
+          "title": "Zalihe pod kontrolom pre nego što nestanu.",
+          "body": "Materijali, minimalne količine i upozorenja kad stanje padne. Manje hitnih narudžbi i zastoja usred radnog dana.",
+          "bullets": {
+            "1": "Stanje zaliha po materijalu",
+            "2": "Minimalne količine koje sami definišete",
+            "3": "Upozorenja pre nego ostanete bez zaliha"
+          },
+          "preview": {
+            "title": "Inventar",
+            "row1": "Kompozit A2 · 4 kom · OK",
+            "row2": "Anestezija · 2 amp · nisko",
+            "row3": "Rukavice M · 120 pari · OK"
+          }
+        },
+        "tim": {
+          "eyebrow": "Tim i uloge",
+          "title": "Svako vidi ono što treba.",
+          "body": "Vlasnik, doktor i recepcija — različite uloge, jasna prava. Finansijske iznose kolega možete sakriti postavkom ordinacije.",
+          "bullets": {
+            "1": "Uloge: vlasnik, doktor, recepcija",
+            "2": "Pristup po ulozi (RBAC)",
+            "3": "Vidljivost iznosa kolega — postavka ordinacije"
+          },
+          "preview": {
+            "title": "Tim",
+            "row1": "Dr. Softić · vlasnik",
+            "row2": "Dr. Begić · doktor",
+            "row3": "A. Hodžić · recepcija"
+          }
+        },
+        "branding": {
+          "eyebrow": "Vaš brend",
+          "title": "Logo i boje na fakturama i emailovima.",
+          "body": "Postavite logo i boje ordinacije. Pacijenti vide vaš brend na fakturama i podsjetnicima — ne generički softver.",
+          "bullets": {
+            "1": "Logo ordinacije na fakturama",
+            "2": "Boje brenda u aplikaciji i PDF-u",
+            "3": "Dosledan izgled u email podsjetnicima"
+          },
+          "preview": {
+            "title": "Brending",
+            "row1": "Logo · učitano",
+            "row2": "Akcent · plava ordinacije",
+            "row3": "Faktura · s vašim brendom"
+          }
+        }
+      }
+    },
+    "faq": {
+      "eyebrow": "FAQ",
+      "title": "Česta pitanja",
+      "subtitle": "Odgovori o registraciji, cenama, sigurnosti i svakodnevnom korištenju.",
+      "navAria": "Kategorije pitanja",
+      "categories": {
+        "gettingStarted": {
+          "eyebrow": "Početak",
+          "title": "Kako da počnete",
+          "items": {
+            "register": {
+              "q": "Kako se registrujem?",
+              "a": "Kliknite „Registruj ordinaciju“, unesite naziv ordinacije, vaše ime i email. Potvrdite nalog i uđete u onboarding. Kreditna kartica nije potrebna."
+            },
+            "setup": {
+              "q": "Koliko traje postavka?",
+              "a": "Onboarding ima tri koraka: podaci ordinacije, usluge i poziv tima. Većina ordinacija krene raditi za oko 5 minuta."
+            },
+            "import": {
+              "q": "Mogu li prebaciti postojeće pacijente?",
+              "a": "Da. Pacijente i usluge možete uvesti iz CSV fajla u postavkama. Sistem vas vodi kroz pregled (dry-run) pre nego što podatke snimi."
+            },
+            "education": {
+              "q": "Treba li mi edukacija?",
+              "a": "Ne obavezno. Interfejs je jednostavan; tour na sajtu pokazuje tok rada. Za pitanja pišite na support@dentord.com — odgovaramo isti radni dan."
+            }
+          }
+        },
+        "pricing": {
+          "eyebrow": "Cene",
+          "title": "Besplatno, kartica i naplata",
+          "items": {
+            "free": {
+              "q": "Šta znači „besplatno do 31.12.2026“?",
+              "a": "Registrujete se i koristite puni Professional paket bez naplate do kraja 2026. Kreditna kartica nije potrebna. AI, SMS/WhatsApp i portal za pacijente nisu dio besplatnog perioda."
+            },
+            "card": {
+              "q": "Treba li kreditna kartica?",
+              "a": "Ne. Za registraciju i korištenje tokom besplatnog perioda kartica nije potrebna."
+            },
+            "billing": {
+              "q": "Šta se dešava kad počne naplata?",
+              "a": "Od 1.1.2027. birate paket i nastavljate — vaši podaci ostaju. Godišnja pretplata od tada donosi 2 meseca gratis."
+            },
+            "cancel": {
+              "q": "Mogu li otkazati bilo kad?",
+              "a": "Da. Možete zatvoriti ordinaciju: prvo izvezete podatke (ZIP), zatim sledi kratki grace period, pa trajno brisanje. Detalje vidite u postavkama privatnosti."
+            }
+          }
+        },
+        "security": {
+          "eyebrow": "Sigurnost i podaci",
+          "title": "Gde su i ko ih vidi",
+          "items": {
+            "storage": {
+              "q": "Gde se čuvaju podaci?",
+              "a": "Na EU serverima (Supabase EU). Podaci ostaju u EU, bliže vama i u skladu s propisima."
+            },
+            "visibility": {
+              "q": "Ko sve vidi podatke moje ordinacije?",
+              "a": "Samo korisnici vaše klinike, prema ulogama. Druge ordinacije ne mogu vidjeti vaše redove — Row Level Security na svakom zapisu."
+            },
+            "backup": {
+              "q": "Kako izgleda backup?",
+              "a": "Radimo dnevni backup. Možete i sami izvesti podatke (ZIP) iz postavki privatnosti kad god vam zatreba."
+            },
+            "delete": {
+              "q": "Kako brišem podatke pacijenta?",
+              "a": "GDPR brisanje ide uz odobrenje vlasnika ordinacije. Proces je u postavkama privatnosti — hard delete iz baze kad je odobreno."
+            },
+            "export": {
+              "q": "Mogu li izvesti sve svoje podatke?",
+              "a": "Da. Vlasnik može preuzeti ZIP export (pacijenti, računi, meta dokumenata) iz postavki privatnosti."
+            }
+          }
+        },
+        "usage": {
+          "eyebrow": "Korištenje",
+          "title": "Uređaji, tim i lokacije",
+          "items": {
+            "mobile": {
+              "q": "Radi li na mobitelu/tabletu?",
+              "a": "Da. DentOrd je potpuno responzivan — radi u pregledniku na telefonu, tabletu i računaru. Možete i dodati ikonu na početni ekran ili radnu površinu — vodič je na stranici Instalacija.",
+              "linkLabel": "Vodič za instalaciju"
+            },
+            "users": {
+              "q": "Koliko korisnika mogu dodati?",
+              "a": "Zavisi od paketa. Starter do 3, Professional do 10, Premium AI do 20; Enterprise po dogovoru. Tokom besplatnog perioda imate Professional limite."
+            },
+            "locations": {
+              "q": "Mogu li imati dvije lokacije?",
+              "a": "Da, ovisno o paketu. Professional podržava do 2 lokacije; veći paketi više. Tokom besplatnog perioda vrijede Professional limiti."
+            },
+            "invite": {
+              "q": "Kako pozivam doktora/recepciju?",
+              "a": "Vlasnik šalje invite na email iz postavki korisnika. Kolega postavi lozinku i pridruži se. Limiti paketa se provjeravaju pre slanja pozivnice."
+            }
+          }
+        }
+      }
+    },
+    "install": {
+      "eyebrow": "Instalacija",
+      "title": "Dodajte DentOrd na početni ekran",
+      "subtitle": "Otvorite ga kao aplikaciju — jednim dodirom, bez traženja u pregledniku. Ista DentOrd app; ažuriranja stižu automatski kad otvorite.",
+      "benefit1": "Brži ulaz s telefona ili tableta",
+      "benefit2": "Ikona na početnom ekranu ili radnoj površini",
+      "benefit3": "Nove verzije bez reinstalacije",
+      "platformsEyebrow": "Uređaji",
+      "platformsTitle": "Odaberite svoj uređaj",
+      "platformsDescription": "Koraci se malo razlikuju po sistemu. Ilustracije su pojednostavljene — meniji u Chromeu ili Safariju mogu izgledati slično.",
+      "platformsAria": "Platforme za instalaciju",
+      "platforms": {
+        "android": {
+          "label": "Android",
+          "intro": "Na Androidu koristite Chrome. Otvorite DentOrd (app.dentord.com ili dentord.com), pa pratite korake.",
+          "steps": {
+            "step1": {
+              "title": "Otvorite meni Chromea",
+              "body": "U gornjem desnom uglu pritisnite tri tačke (⋮).",
+              "caption": "Chrome meni — tri tačke"
+            },
+            "step2": {
+              "title": "Izaberite Instaliraj aplikaciju",
+              "body": "U meniju pronađite „Install app“, „Instaliraj aplikaciju“ ili „Add to Home screen“ / „Dodaj na početni ekran“.",
+              "caption": "Opcija za instalaciju u meniju"
+            },
+            "step3": {
+              "title": "Potvrdite instalaciju",
+              "body": "Pojavi se potvrda s ikonom DentOrd. Pritisnite Instaliraj / Dodaj.",
+              "caption": "Potvrda instalacije"
+            },
+            "step4": {
+              "title": "Otvorite s početnog ekrana",
+              "body": "Ikona DentOrd sada je među aplikacijama. Otvorite je kao svaku drugu app — ulazite istim nalogom.",
+              "caption": "Ikona na početnom ekranu"
+            }
+          }
+        },
+        "ios": {
+          "label": "iPhone / iPad",
+          "intro": "Na iPhoneu i iPadu koristite Safari (ne Chrome u ovom koraku — Apple dozvoljava „Dodaj na početni ekran“ iz Safarija).",
+          "steps": {
+            "step1": {
+              "title": "Otvorite Share meni",
+              "body": "U Safariju otvorite DentOrd, zatim pritisnite dugme za dijeljenje (kvadrat sa strelicom gore) na dnu ili na vrhu ekrana.",
+              "caption": "Safari — dugme za dijeljenje"
+            },
+            "step2": {
+              "title": "Dodaj na početni ekran",
+              "body": "U listi opcija skrolujte i pritisnite „Add to Home Screen“ / „Dodaj na početni ekran“.",
+              "caption": "Opcija u Share sheetu"
+            },
+            "step3": {
+              "title": "Potvrdite Dodaj",
+              "body": "Po želji uredite naziv (ostavite DentOrd), zatim pritisnite „Add“ / „Dodaj“ gore desno.",
+              "caption": "Potvrda na početnom ekranu"
+            },
+            "step4": {
+              "title": "Pokrenite kao app",
+              "body": "Na početnom ekranu pronađite ikonu DentOrd i otvorite je. Radi u vlastitom prozoru, bez Safari trake.",
+              "caption": "Ikona na Home Screenu"
+            }
+          }
+        },
+        "windows": {
+          "label": "Windows",
+          "intro": "Na Windowsu koristite Google Chrome ili Microsoft Edge. Otvorite DentOrd u tom pregledniku.",
+          "steps": {
+            "step1": {
+              "title": "Pronađite dugme Install",
+              "body": "U address baru (desno) potražite ikonu računara/plusa za instalaciju, ili otvorite meni ⋮ → „Install DentOrd…“ / „Apps“ → „Install this site as an app“.",
+              "caption": "Install ikona u address baru"
+            },
+            "step2": {
+              "title": "Potvrdite instalaciju",
+              "body": "U dijalogu pritisnite Instaliraj. Windows će dodati DentOrd u Start meni i po želji na taskbar.",
+              "caption": "Dijalog za potvrdu"
+            },
+            "step3": {
+              "title": "Pokrenite s radne površine",
+              "body": "Otvorite DentOrd iz Start menija ili prečice — isti nalog, automatska ažuriranja pri sledećem otvaranju.",
+              "caption": "Prečica nakon instalacije"
+            }
+          }
+        },
+        "mac": {
+          "label": "Mac",
+          "intro": "Na Macu instalirajte iz Google Chromea ili Microsoft Edgea. Safari trenutno nema isti „Install app“ tok kao Chrome/Edge.",
+          "steps": {
+            "step1": {
+              "title": "Otvorite u Chromeu ili Edgeu",
+              "body": "Idite na DentOrd. U address baru desno potražite ikonu za instalaciju, ili meni → „Install DentOrd…“.",
+              "caption": "Install u Chrome/Edge na Macu"
+            },
+            "step2": {
+              "title": "Potvrdite Install",
+              "body": "Pritisnite Instaliraj. Aplikacija se pojavi u Launchpadu / Applications folderu za taj preglednik.",
+              "caption": "Potvrda instalacije"
+            },
+            "step3": {
+              "title": "Dodajte u Dock po želji",
+              "body": "Pokrenite DentOrd, pa po želji zadržite ikonu u Docku (Options → Keep in Dock). Ažuriranja stižu kad otvorite app.",
+              "caption": "Ikona u Docku"
+            }
+          }
+        }
+      },
+      "notesEyebrow": "Važno",
+      "notesTitle": "Pre nego što instalirate",
+      "notesDescription": "Kratke napomene da instalacija ide glatko — i da znate šta očekivati.",
+      "notes": {
+        "browsers": {
+          "title": "Preglednici",
+          "body": "Android i desktop: Chrome ili Edge. iPhone/iPad: Safari za „Dodaj na početni ekran“."
+        },
+        "login": {
+          "title": "Isti nalog",
+          "body": "Instalacija ne pravi novi nalog. Prijavljujete se emailom i lozinkom kao u pregledniku."
+        },
+        "updates": {
+          "title": "Ažuriranja",
+          "body": "Ne morate ponovo instalirati. Kad objavimo novu verziju, dobijate je pri sledećem otvaranju."
+        },
+        "offline": {
+          "title": "Internet potreban",
+          "body": "DentOrd nije offline app. Za rad s kartonima i terminima treba veza s internetom."
+        },
+        "tablet": {
+          "title": "Tablet",
+          "body": "Na Android i iPad tabletu koristite iste korake kao na telefonu (Android ili iOS sekcija iznad)."
+        }
+      }
+    },
+    "contact": {
+      "eyebrow": "Kontakt",
+      "title": "Tu smo za vas.",
+      "subtitle": "Javite nam se — odgovaramo isti radni dan.",
+      "writeUs": {
+        "title": "Pišite nam",
+        "body": "Za podršku i opšta pitanja — odgovaramo isti radni dan.",
+        "supportLabel": "Podrška",
+        "helloLabel": "Opšta pitanja"
+      },
+      "form": {
+        "title": "Pozovite me",
+        "body": "Ostavite kontakt — nazvat ćemo vas u terminu koji vam odgovara.",
+        "name": "Ime i prezime",
+        "clinicName": "Naziv ordinacije",
+        "phone": "Telefon",
+        "phoneHint": "npr. +387 61 123 456",
+        "email": "Email",
+        "emailHint": "Preporučeno — lakše je potvrditi termin",
+        "preferredTime": "Kada vas nazvati?",
+        "preferredTimeOptions": {
+          "morning": "Prepodne",
+          "afternoon": "Poslepodne",
+          "anytime": "Svejedno"
+        },
+        "message": "Poruka",
+        "messageHint": "Opciono — do 1000 karaktera",
+        "gdpr": "Saglasan/na sam da me DentOrd kontaktira povodom mog upita.",
+        "submit": "Pošalji zahtjev",
+        "submitting": "Šaljem…",
+        "honeypot": "Ne popunjavajte ovo polje",
+        "success": "Hvala! Nazvat ćemo vas u izabranom terminu.",
+        "successTour": "U međuvremenu pogledajte tour",
+        "errors": {
+          "invalid": "Provjerite unesena polja i pokušajte ponovo.",
+          "rateLimited": "Previše zahtjeva s ove adrese. Pokušajte za sat vremena.",
+          "failed": "Slanje nije uspelo. Pišite nam na support@dentord.com ili pokušajte ponovo.",
+          "stale": "Stranica je zastarjela nakon ažuriranja. Osvežite je pa pošaljite ponovo.",
+          "staleReload": "Osveži stranicu"
+        }
+      }
+    },
+    "seo": {
+      "home": {
+        "title": "DentOrd — Softver za vođenje stomatološke ordinacije",
+        "description": "Cloud softver za stomatološke ordinacije: kartoni, termini, fakture i inventar. Besplatno do 31.12.2026."
+      },
+      "pricing": {
+        "title": "Cene — DentOrd",
+        "description": "Paketi Starter, Professional, Premium AI i Enterprise. Cene u eurima s PDV-om. Besplatno do kraja 2026."
+      },
+      "features": {
+        "title": "Funkcije — DentOrd",
+        "description": "Karton, odontogram, termini, fakture, inventar i CRM — softver za stomatološke ordinacije."
+      },
+      "whyDentord": {
+        "title": "Zašto DentOrd",
+        "description": "Napravljen za BiH, Hrvatsku i Srbiju: jezik našeg regiona, EUR + PDV, EU hosting i GDPR."
+      },
+      "tour": {
+        "title": "Tour — DentOrd",
+        "description": "Korak-po-korak pregled DentOrda: od registracije do prvog pacijenta."
+      },
+      "demo": {
+        "title": "Demo — DentOrd",
+        "description": "Isprobajte demo ordinaciju s primjerima pacijenata — bez registracije."
+      },
+      "faq": {
+        "title": "FAQ — DentOrd",
+        "description": "Česta pitanja o registraciji, cenama, sigurnosti i svakodnevnom korištenju DentOrda."
+      },
+      "install": {
+        "title": "Instalacija — DentOrd na telefon, tablet i računar",
+        "description": "Kako dodati DentOrd na početni ekran: Android, iPhone, Windows i Mac. Korak po korak."
+      },
+      "contact": {
+        "title": "Kontakt — DentOrd",
+        "description": "Javite nam se — odgovaramo isti radni dan. support@dentord.com."
+      },
+      "blog": {
+        "title": "Blog — DentOrd",
+        "description": "Savjeti za vođenje ordinacije i novosti o DentOrd softveru."
+      },
+      "privacy": {
+        "title": "Privacy Policy — DentOrd",
+        "description": "Kako štitimo podatke vaše ordinacije i pacijenata (GDPR, EU hosting)."
+      },
+      "terms": {
+        "title": "Terms of Service — DentOrd",
+        "description": "Uslovi korištenja DentOrd platforme za stomatološke ordinacije."
+      },
+      "dpa": {
+        "title": "DPA — DentOrd",
+        "description": "Ugovor o obradi podataka (GDPR) između klinike i DentOrda."
+      }
+    },
+    "cookieConsent": {
+      "title": "Kolačići",
+      "description": "Koristimo neophodne kolačiće za rad sajta. Analitičke (PostHog, Vercel) uključujemo samo uz vaš pristanak — bez ličnih podataka pacijenata.",
+      "accept": "Prihvati",
+      "reject": "Samo neophodni",
+      "privacyLink": "Politika privatnosti"
+    },
+    "tour": {
+      "eyebrow": "Product tour",
+      "title": "Od registracije do svakodnevnog rada.",
+      "subtitle": "Dvadeset kratkih koraka — kako DentOrd izgleda od prvog logina do dashboarda, kalendara i naplate.",
+      "ctaPrimary": "Registruj ordinaciju besplatno",
+      "ctaSecondary": "Isprobajte live demo",
+      "browserUrl": "app.dentord.com",
+      "chapterNavLabel": "Poglavlja toura",
+      "minutesBadge": "~{minutes} min",
+      "chapters": {
+        "signup": {
+          "title": "Registracija",
+          "eyebrow": "Početak"
+        },
+        "setup": {
+          "title": "Postavka ordinacije",
+          "eyebrow": "Onboarding"
+        },
+        "patient": {
+          "title": "Prvi pacijent",
+          "eyebrow": "Karton"
+        },
+        "appointments": {
+          "title": "Termini",
+          "eyebrow": "Kalendar"
+        },
+        "billing": {
+          "title": "Naplata",
+          "eyebrow": "Finansije"
+        },
+        "daily": {
+          "title": "Svakodnevni rad",
+          "eyebrow": "Operativa"
+        }
+      },
+      "steps": {
+        "register": {
+          "title": "Registrujte ordinaciju — bez kartice",
+          "body": "Email, lozinka, ime ordinacije i vlasnika. Odmah dobijate puni Professional paket do kraja 2026.",
+          "a1": "Forma za signup — bez unosa kartice",
+          "a2": "Ime ordinacije postaje vaš radni prostor"
+        },
+        "confirm": {
+          "title": "Potvrdite email i prijavite se",
+          "body": "Nakon potvrde ulazite u aplikaciju s emailom i lozinkom — spremni za sledeći korak.",
+          "note": "Link za potvrdu stiže u inbox; bez potvrde nalog nije aktivan."
+        },
+        "mfa": {
+          "title": "Authenticator za vlasnika (2FA)",
+          "body": "Vlasnički nalog štitimo authenticator aplikacijom na telefonu — ne SMS-om. To štiti nalog i podatke pacijenata čak i ako neko sazna lozinku. Obavezno je samo za vlasnika; doktori i recepcija ne moraju.",
+          "a1": "Pripremite telefon i besplatnu app (npr. Google ili Microsoft Authenticator)",
+          "a2": "Nakon prve prijave skenirate QR i unesete 6-cifreni kod (~30 s)",
+          "a3": "Tek tada ulazite u onboarding i postavku ordinacije"
+        },
+        "basics": {
+          "title": "Osnovni podaci i radno vreme",
+          "body": "U tri koraka onboardinga unesete adresu, timezone i radno vreme ordinacije.",
+          "a1": "Europe/Sarajevo je default",
+          "a2": "Radno vreme po danima"
+        },
+        "services": {
+          "title": "Cenovnik usluga",
+          "body": "Dodajte usluge ručno ili uvezite CSV. Cene u eurima s PDV-om — spremno za fakture.",
+          "a1": "Ručni unos ili CSV import",
+          "a2": "EUR + PDV po stavci"
+        },
+        "team": {
+          "title": "Pozovite tim",
+          "body": "Doktor i recepcija dobiju email pozivnicu — svako sa svojom ulogom i pravima pristupa.",
+          "a1": "Invite link u inboxu",
+          "a2": "Uloga određuje šta vide"
+        },
+        "newPatient": {
+          "title": "Novi pacijent za minute",
+          "body": "Kontakt, medicinska istorija i alergije na jednoj formi — bez papirnih kartona.",
+          "a1": "Ime, telefon (+387), email",
+          "a2": "Alergije i napomene odmah vidljive"
+        },
+        "chart": {
+          "title": "Karton: dokumenti i RTG",
+          "body": "Sve što pripada pacijentu — saglasnosti, PDF-ovi i slike — na jednom mestu.",
+          "a1": "Dokumenti u kartonu",
+          "a2": "RTG galerija uz istoriju"
+        },
+        "odontogram": {
+          "title": "Odontogram (FDI)",
+          "body": "Klik na zub → status po površini. Istorija tretmana ostaje vezana za taj zub.",
+          "a1": "Mapa 11–48",
+          "a2": "Statusi po površini",
+          "a3": "Istorija po zubu"
+        },
+        "plan": {
+          "title": "Plan terapije s cenama",
+          "body": "Stavke, statusi i iznosi — pacijent uvek zna šta sledi i koliko košta.",
+          "a1": "Stavke s cenama",
+          "a2": "Status: predloženo / u toku / gotovo"
+        },
+        "calendar": {
+          "title": "Kalendar po doktoru",
+          "body": "Dan ili sedmica, filter po doktoru, novi termin u nekoliko klikova.",
+          "a1": "Pogled sedmice",
+          "a2": "Novi termin uz pacijenta i uslugu"
+        },
+        "reminder": {
+          "title": "Automatski email podsjetnik",
+          "body": "Pacijent dobije podsjetnik pre termina — manje no-showova, manje telefonskih poziva.",
+          "note": "Predlošci na našem jeziku, s brendom ordinacije (Pro)."
+        },
+        "waitlist": {
+          "title": "Waitlist kad neko otkaže",
+          "body": "Otkazani termin → lista čekanja predlaže zamjenu. Recepcija potvrdi u par klikova.",
+          "a1": "Automatski predlog",
+          "a2": "Potvrda sa liste čekanja"
+        },
+        "invoice": {
+          "title": "Faktura iz tretmana",
+          "body": "Iz završenog tretmana generišete fakturu u eurima s PDV-om i brendom ordinacije.",
+          "a1": "Stavke s PDV-om",
+          "a2": "PDF spreman za slanje"
+        },
+        "payments": {
+          "title": "Uplate i rate",
+          "body": "Evidentirajte uplate ili podelite iznos na rate — kalkulator radi umesto Excela.",
+          "a1": "Delimične uplate",
+          "a2": "Plan rata"
+        },
+        "reports": {
+          "title": "Izveštaji i Excel",
+          "body": "Mesečni promet, troškovi i izvoz u Excel za knjigovodstvo.",
+          "a1": "Pregled po periodu",
+          "a2": "Export u Excel"
+        },
+        "dashboard": {
+          "title": "Dashboard ujutro",
+          "body": "Današnji termini, novi pacijenti i promet — jedan ekran pre prvog pacijenta.",
+          "a1": "KPI kartice",
+          "a2": "Lista termina",
+          "a3": "Brzi linkovi"
+        },
+        "crm": {
+          "title": "CRM recall",
+          "body": "Pacijenti koji dugo nisu dolazili — pošaljite email u par klikova.",
+          "a1": "Lista za recall",
+          "a2": "Email iz predloška"
+        },
+        "inventory": {
+          "title": "Inventar i minimumi",
+          "body": "Zalihe materijala s upozorenjem kad padnete ispod minimuma.",
+          "a1": "Stanje zaliha",
+          "a2": "Low-stock badge"
+        },
+        "settings": {
+          "title": "Uloge i audit",
+          "body": "Ko šta vidi, ko je šta mijenjao — postavke tima i trag aktivnosti.",
+          "a1": "RBAC po ulozi",
+          "a2": "Audit događaji"
+        }
+      },
+      "previews": {
+        "signup": {
+          "title": "Registracija",
+          "row1": "Email i lozinka",
+          "row2": "Naziv ordinacije",
+          "row3": "Bez kartice"
+        },
+        "mfa": {
+          "title": "Owner 2FA · authenticator",
+          "row1": "Telefon + authenticator app",
+          "row2": "QR → 6-cifreni kod",
+          "row3": "Samo vlasnik (D11)"
+        },
+        "onboarding": {
+          "title": "Onboarding · korak 1",
+          "row1": "Adresa ordinacije",
+          "row2": "Europe/Sarajevo",
+          "row3": "Radno vreme"
+        },
+        "services": {
+          "title": "Cenovnik",
+          "row1": "Kontrola · 25 €",
+          "row2": "Plomba · 45 €",
+          "row3": "Higijena · 35 €"
+        },
+        "team": {
+          "title": "Pozivnice",
+          "row1": "Dr. Softić · doktor",
+          "row2": "Recepcionarka · invite poslan",
+          "row3": "Uloga = prava pristupa"
+        },
+        "patients": {
+          "title": "Pacijenti",
+          "row1": "Amina Hodžić",
+          "row2": "Emir Begić",
+          "row3": "Lejla Softić"
+        },
+        "chart": {
+          "title": "Karton · Amina Hodžić",
+          "row1": "Alergije: penicilin",
+          "row2": "Dokumenti: 3",
+          "row3": "RTG: 2 snimka"
+        },
+        "odontogram": {
+          "title": "Odontogram",
+          "row1": "Zub 16 · karies",
+          "row2": "Zub 26 · plomba",
+          "row3": "Zub 36 · zdrav"
+        },
+        "plan": {
+          "title": "Plan terapije",
+          "row1": "Plomba 16 · 45 €",
+          "row2": "Higijena · 35 €",
+          "row3": "Kontrola · zakazano"
+        },
+        "calendar": {
+          "title": "Kalendar",
+          "row1": "09:00 Amina",
+          "row2": "10:30 Emir",
+          "row3": "12:00 Lejla",
+          "row4": "14:00 Haris"
+        },
+        "reminder": {
+          "title": "Email podsjetnik",
+          "row1": "Termin sutra 09:00",
+          "row2": "Predložak na našem jeziku",
+          "row3": "Poslano automatski"
+        },
+        "waitlist": {
+          "title": "Waitlist",
+          "row1": "Otkazano: 11:00",
+          "row2": "Predlog: Sara Delić",
+          "row3": "Potvrdi zamjenu"
+        },
+        "invoice": {
+          "title": "Faktura FA-2026-014",
+          "row1": "Plomba · 45 €",
+          "row2": "PDV 17%",
+          "row3": "Ukupno 52,65 €"
+        },
+        "payments": {
+          "title": "Uplate",
+          "row1": "Uplaćeno 30 €",
+          "row2": "Preostalo 22,65 €",
+          "row3": "2 rate"
+        },
+        "reports": {
+          "title": "Izveštaji",
+          "row1": "Prihod ovaj mesec",
+          "row2": "Troškovi",
+          "row3": "Export Excel"
+        },
+        "dashboard": {
+          "title": "Dashboard",
+          "row1": "Pacijenti danas",
+          "row2": "Prihod",
+          "row3": "Termini",
+          "row4": "Amina Hodžić · Kontrola"
+        },
+        "crm": {
+          "title": "CRM recall",
+          "row1": "Nisu dolazili 6+ mj.",
+          "row2": "8 pacijenata",
+          "row3": "Pošalji email"
+        },
+        "inventory": {
+          "title": "Inventar",
+          "row1": "Kompozit A2 · 12",
+          "row2": "Anestezija · nisko",
+          "row3": "Rukavice M · 8"
+        },
+        "settings": {
+          "title": "Postavke tima",
+          "row1": "Owner · MFA",
+          "row2": "Doktor · karton",
+          "row3": "Audit log"
+        }
+      }
+    },
+    "demo": {
+      "eyebrow": "Demo",
+      "title": "Pogledajte DentOrd iznutra.",
+      "subtitle": "Isprobajte demo ordinaciju s primjerima pacijenata — bez registracije, bez obaveza.",
+      "browserUrl": "app.dentord.com",
+      "live": {
+        "eyebrow": "Live demo",
+        "title": "Otvori demo ordinaciju",
+        "body": "Read-only pristup seed klinici s izmišljenim BS podacima. Možete pregledati kartone, kalendar i fakture — izmene su onemogućene.",
+        "point1": "10-ak primjera pacijenata",
+        "point2": "Termini kroz sedmicu, odontogram, inventar",
+        "point3": "Bez kartice i bez obaveze",
+        "cta": "Otvori demo ordinaciju",
+        "opening": "Otvaranje…",
+        "unavailable": "Live demo još nije povezan na ovom okruženju. Pogledajte galeriju ispod ili tour.",
+        "microcopy": "Demo mod · samo čitanje · Registrujte svoju ordinaciju kad ste spremni",
+        "errors": {
+          "unavailable": "Demo trenutno nije dostupan.",
+          "failed": "Prijava u demo nije uspela. Pokušajte ponovo."
+        }
+      },
+      "gallery": {
+        "eyebrow": "Screenshoti",
+        "title": "Ključni ekrani",
+        "description": "Pregledajte kako izgledaju dashboard, karton, kalendar i naplata — klik za uvećanje.",
+        "close": "Zatvori",
+        "items": {
+          "dashboard": {
+            "title": "Dashboard",
+            "caption": "KPI i današnji termini na jednom ekranu.",
+            "row1": "12 pacijenata",
+            "row2": "480 € danas",
+            "row3": "8 termina"
+          },
+          "patients": {
+            "title": "Pacijenti",
+            "caption": "Pretraga i lista s kontaktima.",
+            "row1": "Amina Hodžić",
+            "row2": "Emir Begić",
+            "row3": "Lejla Softić"
+          },
+          "odontogram": {
+            "title": "Odontogram",
+            "caption": "FDI mapa sa statusima po zubu.",
+            "row1": "Zub 16",
+            "row2": "Zub 26",
+            "row3": "Istorija"
+          },
+          "calendar": {
+            "title": "Kalendar",
+            "caption": "Sedmični pogled po doktoru.",
+            "row1": "Pon 09:00",
+            "row2": "Uto 10:30",
+            "row3": "Sri 12:00"
+          },
+          "invoice": {
+            "title": "Fakture",
+            "caption": "EUR + PDV, brend ordinacije.",
+            "row1": "FA-2026-014",
+            "row2": "52,65 €",
+            "row3": "Plaćeno delimično"
+          },
+          "crm": {
+            "title": "CRM",
+            "caption": "Recall pacijenata koji dugo nisu dolazili.",
+            "row1": "6+ meseci",
+            "row2": "8 kandidata",
+            "row3": "Email predložak"
+          },
+          "inventory": {
+            "title": "Inventar",
+            "caption": "Zalihe i upozorenja na minimum.",
+            "row1": "Kompozit",
+            "row2": "Anestezija · low",
+            "row3": "Rukavice"
+          },
+          "settings": {
+            "title": "Tim i uloge",
+            "caption": "RBAC i postavke ordinacije.",
+            "row1": "Owner",
+            "row2": "Doktor",
+            "row3": "Recepcija"
+          }
+        },
+        "mobile": {
+          "calendar": "Mobilni kalendar",
+          "calendarAlt": "DentOrd kalendar na telefonu — današnji termini",
+          "chart": "Mobilni karton",
+          "chartAlt": "DentOrd karton pacijenta na telefonu"
+        }
+      }
+    },
+    "whyDentord": {
+      "eyebrow": "Zašto DentOrd",
+      "title": "Zašto ordinacije biraju DentOrd?",
+      "subtitle": "Umesto papira i Excela — jedna aplikacija na jeziku našeg regiona, s EUR + PDV-om, EU hostingom i jasnim ulogama za celi tim.",
+      "beforeAfter": {
+        "eyebrow": "Pre / posle",
+        "title": "Isti posao — manje haosa.",
+        "description": "Šest stvari koje ordinacije najčešće rješavaju papirima ili Excelom — i kako izgledaju u DentOrdu.",
+        "beforeLabel": "Pre",
+        "afterLabel": "S DentOrdom",
+        "rows": {
+          "charts": {
+            "before": "Kartoni na papiru ili po fasciklama — traženje traje minutima.",
+            "after": "Kompletan digitalni karton s istorijom, alergijama i dokumentima na klik."
+          },
+          "appointments": {
+            "before": "Dupli termini, zabune u rasporedu i beskrajni telefoni.",
+            "after": "Kalendar po doktoru, statusi termina i waitlist koji predlaže zamjenu."
+          },
+          "invoices": {
+            "before": "Ručne fakture, greške u PDV-u i nejasno ko je šta naplatio.",
+            "after": "Fakture u eurima s PDV-om, uplate, rate i pregled dugovanja."
+          },
+          "reminders": {
+            "before": "Podsjetnici ručno — ili nikako. Više no-show-ova.",
+            "after": "Automatski email podsjetnici i recall za pacijente koji kasne s kontrolom."
+          },
+          "reports": {
+            "before": "Kraj meseca = sati u Excelu.",
+            "after": "Izveštaji i izvoz u Excel kad vam trebaju — bez sklapanja tabela."
+          },
+          "team": {
+            "before": "Svi vide sve, ili niko ne zna šta je ažurno.",
+            "after": "Uloge vlasnik / doktor / recepcija — svako vidi ono što treba."
+          }
+        }
+      },
+      "region": {
+        "eyebrow": "Region",
+        "title": "Napravljen za naš region.",
+        "description": "Nije lokalizacija na brzinu — defaults i jezik su postavljeni za BiH, Hrvatsku i Srbiju od prvog dana.",
+        "items": {
+          "language": {
+            "title": "Jezik našeg regiona",
+            "body": "Interfejs i komunikacija na jeziku našeg regiona; engleski je sekundarni jezik (D37)."
+          },
+          "currency": {
+            "title": "EUR + PDV",
+            "body": "Cene i fakture u eurima s PDV-om — bez ručnog prepravljanja za lokalnu praksu."
+          },
+          "phone": {
+            "title": "Telefon +387",
+            "body": "Default prefiks za unos brojeva usklađen s BiH (D46)."
+          },
+          "timezone": {
+            "title": "Europe/Sarajevo",
+            "body": "Termini i podsjetnici u vašoj vremenskoj zoni od starta (D47)."
+          },
+          "support": {
+            "title": "Podrška na našem jeziku",
+            "body": "Pišete nam na našem jeziku — odgovaramo isti radni dan."
+          }
+        }
+      },
+      "security": {
+        "eyebrow": "Sigurnost i povjerenje",
+        "title": "Podaci pacijenata zaslužuju bankarski nivo sigurnosti.",
+        "items": {
+          "eu": {
+            "title": "EU hosting",
+            "body": "Podaci žive na serverima u EU (Supabase EU) — bliže vama i u skladu s propisima."
+          },
+          "isolation": {
+            "title": "Potpuna izolacija klinika",
+            "body": "Svaka ordinacija vidi samo svoje podatke. Row Level Security na svakom redu."
+          },
+          "rbac": {
+            "title": "Kontrola pristupa po ulogama",
+            "body": "Vlasnik, doktor, recepcija — svako vidi ono što treba, ništa više."
+          },
+          "gdpr": {
+            "title": "GDPR: export i brisanje",
+            "body": "Izvezite podatke ili pokrenite brisanje kad zakon i pacijent to zahtijevaju."
+          },
+          "backup": {
+            "title": "Dnevni backup",
+            "body": "Redovne sigurnosne kopije tako da kvar jednog dana ne izbriše mesece rada."
+          },
+          "audit": {
+            "title": "Audit trag",
+            "body": "Ključne izmene ostaju zabilježene — ko je šta mijenjao i kada."
+          }
+        },
+        "disclaimer": "DentOrd je alat za evidenciju — medicinske odluke uvek donosi doktor."
+      },
+      "roadmap": {
+        "eyebrow": "Vizija",
+        "title": "Raste s vama.",
+        "description": "Osnova je spremna danas. Sledeći koraci dolaze kad ste spremni — bez obećanja datuma.",
+        "items": {
+          "ai": {
+            "title": "AI asistent",
+            "body": "Pomoć pri dokumentaciji i nacrtima — uvek pod vašom kontrolom pre spremanja u karton."
+          },
+          "messaging": {
+            "title": "SMS / WhatsApp podsjetnici",
+            "body": "Dodatni kanali podsjetnika kad budu spremni za naplatu i usklađenost."
+          },
+          "portal": {
+            "title": "Portal za pacijente",
+            "body": "Više lokacija i portal — na Enterprise nivou, kad ordinaciji zatreba."
+          }
+        },
+        "note": "Ove funkcije nisu dio besplatnog perioda 2026. i aktiviraju se po paketima / metered modelu — bez fiksnog datuma u v1."
+      }
+    },
+    "blog": {
+      "eyebrow": "Blog",
+      "title": "Blog",
+      "subtitle": "Savjeti za vođenje ordinacije, digitalizacija i novosti iz DentOrda.",
+      "readingTime": "{minutes} min čitanja",
+      "backToIndex": "Svi članci",
+      "related": "Povezani članci",
+      "empty": {
+        "title": "Prvi članci stižu uskoro",
+        "body": "Pripremamo sadržaj o vođenju ordinacije i digitalizaciji. U međuvremenu pogledajte tour ili se registrujte."
+      },
+      "categories": {
+        "practice": "Vođenje ordinacije",
+        "digitalization": "Digitalizacija",
+        "news": "Novosti iz DentOrda"
+      }
+    },
+    "legal": {
+      "lastUpdated": "Zadnja izmena",
+      "toc": "Sadržaj"
+    }
+  },
+  "Auth": {
+    "signupTitle": "Kreiraj ordinaciju",
+    "signupDescription": "Besplatno do kraja 2026. Bez kartice.",
+    "loginTitle": "Prijava",
+    "loginDescription": "Prijavi se u DentOrd.",
+    "clinicName": "Naziv ordinacije",
+    "fullName": "Ime i prezime vlasnika",
+    "email": "Email",
+    "password": "Lozinka",
+    "signupSubmit": "Kreiraj nalog",
+    "loginSubmit": "Prijavi se",
+    "submitting": "Sačekaj…",
+    "haveAccount": "Već imaš nalog?",
+    "noAccount": "Nemaš nalog?",
+    "loginLink": "Prijavi se",
+    "signupLink": "Registruj se",
+    "forgotPasswordLink": "Zaboravljena lozinka?",
+    "forgotPasswordTitle": "Reset lozinke",
+    "forgotPasswordDescription": "Unesi email — pošaljemo link za novu lozinku.",
+    "forgotPasswordSubmit": "Pošalji reset link",
+    "resetEmailSent": "Ako nalog postoji, poslan je email s linkom za reset. Provjeri inbox i spam.",
+    "resetPasswordTitle": "Nova lozinka",
+    "resetPasswordDescription": "Unesi novu lozinku za svoj DentOrd nalog.",
+    "newPassword": "Nova lozinka",
+    "confirmPassword": "Potvrdi lozinku",
+    "resetPasswordSubmit": "Spremi lozinku",
+    "backToLogin": "Nazad na prijavu",
+    "requestNewResetLink": "Zatraži novi reset link",
+    "passwordMismatch": "Lozinke se ne podudaraju.",
+    "resetSessionExpired": "Reset link je istekao ili nije važeći. Zatraži novi.",
+    "passwordSameAsOld": "Nova lozinka mora biti drugačija od stare.",
+    "emailSendFailed": "Email trenutno nije poslan. Pokušaj ponovo za par minuta.",
+    "mfaRequiredForPassword": "Prvo potvrdi 2FA kod, zatim postavi novu lozinku.",
+    "invalid": "Provjeri unesene podatke.",
+    "invalidCredentials": "Pogrešan email ili lozinka.",
+    "locked": "Previše neuspelih pokušaja. Pokušaj ponovo za 15 minuta.",
+    "confirmEmail": "Provjeri email i potvrdi nalog, zatim se prijavi.",
+    "missingClinic": "Nalog nema povezanu ordinaciju. Registruj se kao vlasnik.",
+    "emailTaken": "Ovaj email već ima nalog. Prijavi se umesto registracije.",
+    "missingAppUrl": "Nedostaje konfiguracija adrese aplikacije. Pokušaj ponovo kasnije."
+  },
+  "Mfa": {
+    "enrollTitle": "Zaštiti vlasnički nalog",
+    "enrollDescription": "Tri kratka koraka. Authenticator app na telefonu štiti nalog čak i ako neko sazna lozinku.",
+    "verifyTitle": "Potvrdi kod",
+    "verifyDescription": "Unesi 6-cifreni kod iz authenticator aplikacije.",
+    "code": "Kod",
+    "enrollSubmit": "Aktiviraj 2FA",
+    "verifySubmit": "Potvrdi",
+    "submitting": "Sačekaj…",
+    "loading": "Pripremam QR kod…",
+    "qrAlt": "QR kod za authenticator",
+    "secretHint": "Ako ne možeš skenirati, unesi tajni ključ ručno:",
+    "invalidCode": "Unesi tačan 6-cifreni kod.",
+    "codeWrong": "Kod nije tačan ili je istekao. Sačekaj novi u aplikaciji.",
+    "enrollFailed": "Nije moguće pokrenuti 2FA. Pokušaj ponovo.",
+    "noFactor": "Nije pronađen aktivni TOTP faktor. Prijavi se ponovo.",
+    "logout": "Odjava",
+    "continue": "Nastavi",
+    "back": "Nazad",
+    "copySecret": "Kopiraj ključ",
+    "secretCopied": "Kopirano",
+    "otherApp": "Koristim drugu app",
+    "stepInstallTitle": "1. Instaliraj app",
+    "stepInstallBody": "Preuzmi Google Authenticator (besplatno). Kasnije otvaraš tu app kad se prijaviš.",
+    "stepScanTitle": "2. Skeniraj QR",
+    "stepScanBody": "U app-u dodaj nalog i skeniraj ovaj QR kod.",
+    "stepConfirmTitle": "3. Unesi kod",
+    "stepConfirmBody": "Upiši 6 cifara koje app trenutno pokazuje — aktivacija ide automatski.",
+    "whyOwnerOnly": "Obavezno je samo za vlasnika. Doktori i recepcija ne moraju.",
+    "googleAuth": "Google Authenticator",
+    "microsoftAuth": "Microsoft Authenticator",
+    "android": "Android",
+    "iphone": "iPhone"
+  },
+  "Dashboard": {
+    "title": "Kontrolna tabla",
+    "subtitle": "KPI pregled klinike za danas i mesečne trendove.",
+    "clinicFallback": "Ordinacija",
+    "status": "Status",
+    "trialEnds": "Trial do",
+    "nextSteps": "Faza 1 foundation završena.",
+    "manageUsers": "Korisnici, pozivnice i PIN operatori →",
+    "plan": "Paket",
+    "featuresHint": "Feature gateovi se čitaju iz plana (D42).",
+    "patientsCardTitle": "Pacijenti",
+    "patientsCardDescription": "Kartoni, alergije, dokumenti i odontogram.",
+    "servicesCardTitle": "Usluge",
+    "servicesCardDescription": "Cenovnik i trajanja usluga.",
+    "calendarCardTitle": "Kalendar",
+    "calendarCardDescription": "Termini, pregledi rasporeda i waitlist.",
+    "invoicesCardTitle": "Fakture",
+    "invoicesCardDescription": "Računi, uplate, dugovanja i PDF.",
+    "expensesCardTitle": "Rashodi",
+    "expensesCardDescription": "Troškovi, profit i Excel export.",
+    "kpiTodayAppointments": "Današnji termini",
+    "kpiTodayRevenue": "Današnji prihod",
+    "kpiActivePatients": "Aktivni pacijenti",
+    "kpiMonthRevenue": "Prihod ovaj mesec",
+    "kpiMonthProfit": "Profit ovaj mesec",
+    "kpiPatientsTitle": "Pacijenti",
+    "kpiPatientsDescription": "Novi u mesecu · bez termina 90+ dana.",
+    "kpiNewPatients": "Novi pacijenti",
+    "kpiLostPatients": "Izgubljeni pacijenti",
+    "kpiRevenueByDoctor": "Prihod po doktoru",
+    "kpiRevenueByDoctorDescription": "Uplate u tekućem mesecu (ne-stornirane).",
+    "kpiMonthlyTrend": "Mesečni trend",
+    "kpiMonthlyTrendDescription": "Zadnjih 6 meseci.",
+    "kpiMonth": "Mesec",
+    "kpiRevenue": "Prihod",
+    "kpiExpenses": "Rashodi",
+    "kpiProfit": "Profit"
+  },
+  "Expenses": {
+    "title": "Rashodi",
+    "subtitle": "Troškovi ordinacije, profit pregled i Excel (Pro).",
+    "listTitle": "Lista rashoda",
+    "listDescription": "Filtriraj po kategoriji ili opisu.",
+    "activeTotal": "Aktivni zbir (prikaz)",
+    "createTitle": "Novi rashod",
+    "createDescription": "Iznosi u {currency}. Storniranje umesto brisanja.",
+    "searchPlaceholder": "Opis ili dobavljač…",
+    "search": "Traži",
+    "categoryFilter": "Kategorija",
+    "categoryAll": "Sve",
+    "category": "Kategorija",
+    "description": "Opis",
+    "amount": "Iznos ({currency})",
+    "date": "Datum",
+    "vendor": "Dobavljač",
+    "notes": "Napomena",
+    "create": "Dodaj rashod",
+    "created": "Rashod dodan.",
+    "saved": "Sačuvano.",
+    "save": "Sačuvaj",
+    "edit": "Uredi",
+    "closeEdit": "Zatvori",
+    "void": "Storniraj",
+    "voidReason": "Razlog storniranja",
+    "voidReasonPlaceholder": "Npr. dupli unos",
+    "submitting": "Sačekaj…",
+    "empty": "Nema rashoda.",
+    "exportExcel": "Excel export",
+    "colDate": "Datum",
+    "colCategory": "Kategorija",
+    "colDescription": "Opis",
+    "colAmount": "Iznos",
+    "colStatus": "Status",
+    "colActions": "Akcije",
+    "statusActive": "Aktivan",
+    "statusVoid": "Storniran",
+    "categories": {
+      "supplies": "Materijal",
+      "lab": "Laboratorij",
+      "rent": "Kirija",
+      "utilities": "Režije",
+      "salaries": "Plate",
+      "equipment": "Oprema",
+      "marketing": "Marketing",
+      "other": "Ostalo"
+    },
+    "errors": {
+      "invalid": "Provjeri unesene podatke.",
+      "unauthorized": "Morate biti prijavljeni.",
+      "forbidden": "Nemate dozvolu za rashode.",
+      "featureDisabled": "Rashodi/Excel nisu uključeni u vašem paketu.",
+      "createFailed": "Rashod nije kreiran.",
+      "saveFailed": "Izmena nije sačuvana.",
+      "expenseNotFound": "Rashod nije pronađen.",
+      "alreadyVoid": "Rashod je već storniran.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmene nisu dozvoljene."
+    }
+  },
+  "Inventory": {
+    "title": "Inventar",
+    "subtitle": "Stanje materijala i upozorenje na nisku zalihu (Pro).",
+    "listTitle": "Materijali",
+    "listDescription": "Pretraži po nazivu, statusu ili niskoj zalihi.",
+    "lowStockSummary": "Niska zaliha: {count}.",
+    "createTitle": "Novi materijal",
+    "createDescription": "Unesi početno stanje i prag za upozorenje.",
+    "searchPlaceholder": "Naziv materijala…",
+    "search": "Traži",
+    "statusFilter": "Status",
+    "statusAll": "Svi statusi",
+    "stockFilter": "Zaliha",
+    "stockAll": "Sve zalihe",
+    "stockLow": "Niska zaliha",
+    "name": "Naziv",
+    "unit": "Jedinica",
+    "quantity": "Količina",
+    "lowStockThreshold": "Prag niske zalihe",
+    "notes": "Napomena",
+    "create": "Dodaj",
+    "created": "Materijal dodan.",
+    "save": "Sačuvaj",
+    "edit": "Uredi",
+    "cancel": "Otkaži",
+    "activate": "Aktiviraj",
+    "deactivate": "Deaktiviraj",
+    "submitting": "Sačekaj…",
+    "active": "Aktivan",
+    "inactive": "Neaktivan",
+    "empty": "Nema materijala.",
+    "lowStockBadge": "Niska zaliha",
+    "stockOk": "OK",
+    "adjustMinus": "Smanji za 1",
+    "adjustPlus": "Povećaj za 1",
+    "columns": {
+      "name": "Naziv",
+      "quantity": "Količina",
+      "threshold": "Prag",
+      "stock": "Zaliha",
+      "status": "Status",
+      "actions": "Akcije"
+    },
+    "errors": {
+      "invalid": "Provjeri unesene podatke.",
+      "unauthorized": "Morate biti prijavljeni.",
+      "forbidden": "Nemate dozvolu za inventar.",
+      "featureDisabled": "Inventar nije uključen u vašem paketu.",
+      "createFailed": "Materijal nije kreiran.",
+      "itemNotFound": "Materijal nije pronađen.",
+      "saveFailed": "Izmena nije sačuvana.",
+      "insufficientStock": "Nema dovoljno na stanju.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmene nisu dozvoljene."
+    }
+  },
+  "Invoices": {
+    "title": "Fakture",
+    "subtitle": "Serijski broj, PDV linije, uplate i PDF (D29).",
+    "listTitle": "Lista faktura",
+    "listDescription": "Filtriraj po statusu ili dugovanjima.",
+    "createTitle": "Nova faktura",
+    "createDescription": "Broj se dodeljuje automatski (YYYY-####). Cene su sa PDV-om.",
+    "legalSettingsTitle": "Podaci na PDF-u",
+    "legalSettingsDescription": "Opciono pravno ime i poreski ID klinike za fakture.",
+    "searchPlaceholder": "Broj ili pacijent…",
+    "search": "Traži",
+    "statusFilter": "Status",
+    "statusAll": "Svi",
+    "statusDebts": "Dugovanja",
+    "empty": "Nema faktura.",
+    "colNumber": "Broj",
+    "colPatient": "Pacijent",
+    "colStatus": "Status",
+    "colTotal": "Ukupno",
+    "colBalance": "Dug",
+    "colDate": "Datum",
+    "patient": "Pacijent",
+    "selectPatient": "Odaberi pacijenta",
+    "doctor": "Doktor",
+    "location": "Lokacija",
+    "optional": "Opciono",
+    "notes": "Napomena",
+    "lines": "Stavke",
+    "addLine": "Dodaj stavku",
+    "removeLine": "Ukloni",
+    "service": "Usluga",
+    "customLine": "Prilagođena stavka",
+    "description": "Opis",
+    "quantity": "Količina",
+    "unitPrice": "Cena (sa PDV)",
+    "vatRate": "PDV stopa",
+    "create": "Izdaj fakturu",
+    "creating": "Izdavanje…",
+    "created": "Faktura kreirana.",
+    "openInvoice": "Otvori",
+    "invoice": "Faktura",
+    "backToList": "← Sve fakture",
+    "downloadPdf": "Preuzmi PDF",
+    "totalsSummary": "Osnovica {subtotal} · PDV {vat} · Ukupno {total} · Dug {balance}",
+    "voidedReason": "Razlog storniranja",
+    "paymentsTitle": "Uplate",
+    "paymentsDescription": "Samo evidencija do naplate 2027 (D5). Append-only.",
+    "noPayments": "Još nema uplata.",
+    "paymentAmount": "Iznos",
+    "paymentMethod": "Način",
+    "paymentNote": "Napomena uplate",
+    "recordPayment": "Evidenciraj uplatu",
+    "paymentRecorded": "Uplata je zabilježena.",
+    "saving": "Spremanje…",
+    "voidTitle": "Storniraj fakturu",
+    "voidDescription": "Void umesto brisanja — serijski broj ostaje zauzet.",
+    "voidReason": "Razlog",
+    "void": "Storniraj",
+    "planTitle": "Plan rata",
+    "planDescription": "Kalkulator rata (Pro+ entitlement installments_calculator).",
+    "planFeatureRequired": "Plan rata nije uključen u vašem paketu.",
+    "installmentCount": "Broj rata",
+    "firstDueDate": "Prva rata (datum)",
+    "createPlan": "Kreiraj plan",
+    "planCreated": "Plan rata kreiran.",
+    "cancelPlan": "Otkaži plan",
+    "activePlan": "Aktivni plan: {count} rata · {total}",
+    "noPlan": "Nema aktivnog plana rata.",
+    "legalName": "Pravno ime",
+    "taxId": "Poreski ID / PDV broj",
+    "saveSettings": "Sačuvaj",
+    "settingsSaved": "Postavke sačuvane.",
+    "status": {
+      "unpaid": "Neplaćeno",
+      "partial": "Delimično",
+      "paid": "Plaćeno",
+      "void": "Stornirano"
+    },
+    "methods": {
+      "cash": "Gotovina",
+      "card": "Kartica",
+      "bank_transfer": "Virman",
+      "other": "Ostalo"
+    },
+    "installmentStatus": {
+      "pending": "Na čekanju",
+      "paid": "Plaćeno",
+      "overdue": "Kasni",
+      "cancelled": "Otkazano"
+    },
+    "errors": {
+      "invalid": "Provjeri unesene podatke.",
+      "unauthorized": "Morate biti prijavljeni.",
+      "forbidden": "Nemate dozvolu za fakture.",
+      "featureDisabled": "Ova funkcija nije uključena u vašem paketu.",
+      "createFailed": "Faktura nije kreirana. Pokušaj ponovo.",
+      "saveFailed": "Izmena nije sačuvana. Pokušaj ponovo.",
+      "patientNotFound": "Pacijent nije pronađen.",
+      "patientInactive": "Pacijent je neaktivan.",
+      "linesRequired": "Dodaj barem jednu stavku.",
+      "invoiceNotFound": "Faktura nije pronađena.",
+      "alreadyVoid": "Faktura je već stornirana.",
+      "invoiceVoid": "Ne može se uplatiti na storniranu fakturu.",
+      "overpayment": "Iznos premašuje dugovanje.",
+      "planNotAllowed": "Plan rata nije dozvoljen za ovu fakturu.",
+      "planExists": "Već postoji aktivni plan rata.",
+      "planNotFound": "Plan nije pronađen.",
+      "planNotActive": "Plan nije aktivan.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmene nisu dozvoljene."
+    }
+  },
+  "Platform": {
+    "title": "Platform admin",
+    "subtitle": "Super-admin konzola (D41). Service role samo na serveru.",
+    "logout": "Odjava",
+    "empty": "Nema klinika.",
+    "open": "Otvori",
+    "back": "← Sve klinike",
+    "billingTitle": "Billing i status",
+    "billingDescription": "Plan, clinic status i subscription flagovi (bez naplate do 2027). Od 2027: kartica ili virman.",
+    "entitlementsTitle": "Entitlements",
+    "entitlementsDescription": "Aktivni feature flagovi iz plana (+ free-2026 override).",
+    "ownersTitle": "Impersonacija",
+    "ownersDescription": "Ulazak kao clinic owner. Svaki start/stop ide u audit_events.",
+    "clinicStatus": "Status klinike",
+    "subscriptionStatus": "Status pretplate",
+    "plan": "Paket",
+    "saveStatus": "Sačuvaj status",
+    "savePlan": "Sačuvaj paket",
+    "saveSubscription": "Sačuvaj pretplatu",
+    "submitting": "Sačekaj…",
+    "statusUpdated": "Status ažuriran.",
+    "planUpdated": "Paket ažuriran.",
+    "subscriptionUpdated": "Pretplata ažurirana.",
+    "noSubscription": "Nema subscription reda.",
+    "trialEnds": "Trial do",
+    "billingCustomer": "Billing customer",
+    "billingProvider": "Provajder naplate",
+    "billingPaymentMethod": "Način plaćanja pretplate",
+    "currentPlan": "Trenutni plan",
+    "inactive": "neaktivan",
+    "impersonate": "Impersoniraj ownera",
+    "impersonateHint": "Sesija prelazi na ownera. Banner na dashboardu omogućava izlaz.",
+    "impersonationBanner": "Platform impersonacija aktivna. Radiš kao clinic owner.",
+    "stopImpersonation": "Izađi iz impersonacije",
+    "columns": {
+      "name": "Klinika",
+      "plan": "Plan",
+      "status": "Status",
+      "subscription": "Pretplata",
+      "actions": "Akcije"
+    },
+    "clinicStatuses": {
+      "active": "Aktivna",
+      "readonly": "Read-only",
+      "pending_delete": "Pending delete"
+    },
+    "subscriptionStatuses": {
+      "trial": "Trial",
+      "active": "Aktivna",
+      "past_due": "Past due",
+      "canceled": "Otkazana",
+      "readonly": "Read-only"
+    },
+    "errors": {
+      "invalid": "Provjeri unesene podatke.",
+      "unauthorized": "Morate biti prijavljeni.",
+      "forbidden": "Samo platform admin.",
+      "updateFailed": "Ažuriranje nije uspelo.",
+      "planNotFound": "Plan nije pronađen.",
+      "ownerNotFound": "Owner klinike nije pronađen.",
+      "missingAdminEmail": "Platform admin nalog nema email.",
+      "alreadyImpersonating": "Impersonacija je već aktivna.",
+      "sessionSwitchFailed": "Prebacivanje sesije nije uspelo.",
+      "notImpersonating": "Nema aktivne impersonacije.",
+      "impersonationMismatch": "Sesija ne odgovara impersonaciji.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmene nisu dozvoljene."
+    }
+  },
+  "Users": {
+    "title": "Korisnici",
+    "subtitle": "Pozovi osoblje, upravljaj nalozima i limitima plana.",
+    "backDashboard": "← Kontrolna tabla",
+    "inviteTitle": "Pozovi člana tima",
+    "inviteDescription": "Šalje magic link (Resend). Primatelj postavlja lozinku i dobija rolu.",
+    "membersTitle": "Članovi",
+    "membersDescription": "Aktivni i deaktivirani nalozi u ordinaciji.",
+    "invitesTitle": "Pozivnice",
+    "invitesDescription": "Pending, prihvaćene i opozvane pozivnice.",
+    "operatorsTitle": "PIN operatori",
+    "operatorsDescription": "Za shared recepciju/asistenta: ime + PIN. Posle logina obavezan PIN switch (D10).",
+    "fullName": "Ime i prezime",
+    "email": "Email",
+    "role": "Uloga",
+    "status": "Status",
+    "actions": "Akcije",
+    "active": "Aktivan",
+    "inactive": "Neaktivan",
+    "inviteSubmit": "Pošalji pozivnicu",
+    "submitting": "Sačekaj…",
+    "inviteSent": "Pozivnica je poslana.",
+    "inviteRevoked": "Pozivnica je opozvana.",
+    "userDeactivated": "Korisnik je deaktiviran.",
+    "userLoggedOut": "Sesije korisnika su završene.",
+    "resetSent": "Email za reset lozinke je poslan.",
+    "resend": "Ponovo pošalji",
+    "revoke": "Opozovi",
+    "deactivate": "Deaktiviraj",
+    "forceLogout": "Force logout",
+    "resetPassword": "Reset lozinke",
+    "noInvites": "Nema pozivnica.",
+    "devLink": "Dev link",
+    "roles": {
+      "owner": "Vlasnik",
+      "doctor": "Doktor",
+      "assistant": "Asistent",
+      "reception": "Recepcija",
+      "accountant": "Računovodstvo",
+      "technician": "Tehničar"
+    },
+    "inviteStatus": {
+      "pending": "Na čekanju",
+      "accepted": "Prihvaćena",
+      "revoked": "Opozvana",
+      "expired": "Istekla"
+    },
+    "errors": {
+      "invalid": "Provjeri unesene podatke.",
+      "unauthorized": "Morate biti prijavljeni.",
+      "forbidden": "Samo vlasnik može upravljati korisnicima.",
+      "userLimit": "Dostignut je limit korisnika na planu. Nadogradite paket.",
+      "doctorLimit": "Dostignut je limit doktora na planu. Nadogradite paket.",
+      "locationLimit": "Dostignut je limit lokacija na planu. Nadogradite paket.",
+      "imageLimit": "Dostignut je limit slika po pacijentu. Nadogradite paket.",
+      "featureDisabled": "Ova funkcija nije uključena u vašem paketu.",
+      "emailTaken": "Ovaj email već ima nalog.",
+      "inviteExists": "Već postoji pending pozivnica za ovaj email.",
+      "inviteFailed": "Pozivnica nije spremljena.",
+      "emailFailed": "Email nije poslan. Pokušaj ponovo.",
+      "inviteNotFound": "Pozivnica nije pronađena.",
+      "inviteExpired": "Pozivnica je istekla.",
+      "cannotDeactivateSelf": "Ne možeš deaktivirati vlastiti nalog.",
+      "userNotFound": "Korisnik nije pronađen.",
+      "missingAppUrl": "Nedostaje NEXT_PUBLIC_APP_URL.",
+      "resetFailed": "Reset link nije kreiran.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmene nisu dozvoljene."
+    }
+  },
+  "Operators": {
+    "sharedAccount": "Shared nalog",
+    "displayName": "Ime operatora",
+    "pin": "PIN (4–6 cifara)",
+    "newPin": "Novi PIN",
+    "createSubmit": "Dodaj operatora",
+    "savePin": "Sačuvaj PIN",
+    "resetPin": "Reset PIN",
+    "deactivate": "Deaktiviraj",
+    "reactivate": "Aktiviraj",
+    "submitting": "Sačekaj…",
+    "status": "Status",
+    "actions": "Akcije",
+    "active": "Aktivan",
+    "inactive": "Neaktivan",
+    "noDesks": "Prvo pozovi reception ili assistant nalog.",
+    "noOperators": "Nema operatora.",
+    "operatorCreated": "Operator je dodan.",
+    "operatorDeactivated": "Operator je deaktiviran.",
+    "operatorReactivated": "Operator je aktiviran.",
+    "pinUpdated": "PIN je ažuriran.",
+    "errors": {
+      "invalid": "Provjeri unesene podatke.",
+      "forbidden": "Samo vlasnik može upravljati operatorima.",
+      "unauthorized": "Morate biti prijavljeni.",
+      "invalidPin": "PIN mora imati 4–6 cifara.",
+      "invalidProfile": "Odaberi aktivan reception/assistant nalog.",
+      "pinTaken": "Ovaj PIN već koristi drugi operator na istom nalogu.",
+      "notFound": "Operator nije pronađen.",
+      "locked": "Previše pokušaja. Sačekaj 15 minuta.",
+      "failed": "Akcija nije uspela.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmene nisu dozvoljene."
+    }
+  },
+  "Locations": {
+    "title": "Lokacije",
+    "subtitle": "Poslovnice ordinacije i zajednički cenovnik (D16).",
+    "usage": "Aktivne lokacije: {used} / {limit}",
+    "limitUnlimited": "neograničeno",
+    "limitReached": "Dostignut je limit lokacija na planu ({limit}). Deaktiviraj lokaciju ili nadogradi paket.",
+    "sharedCardTitle": "Cenovnik",
+    "sharedCardDescription": "Jedan zajednički cenovnik ili odvojene cene po lokaciji.",
+    "sharedTitle": "Isti cenovnik na svim lokacijama",
+    "sharedDescription": "Kad je isključeno, usluge mogu biti vezane za lokaciju. Uključivanje briše per-location veze.",
+    "saveSettings": "Sačuvaj",
+    "settingsSaved": "Postavke su sačuvane.",
+    "newTitle": "Dodaj lokaciju",
+    "newDescription": "Naziv i opcionalna adresa. Važe limiti plana (D8).",
+    "listTitle": "Sve lokacije",
+    "listDescription": "Deaktivacija umesto brisanja. Potrebna je barem jedna aktivna lokacija.",
+    "name": "Naziv",
+    "address": "Adresa",
+    "create": "Kreiraj",
+    "save": "Sačuvaj",
+    "edit": "Uredi",
+    "cancel": "Otkaži",
+    "activate": "Aktiviraj",
+    "deactivate": "Deaktiviraj",
+    "submitting": "Sačekaj…",
+    "active": "Aktivna",
+    "inactive": "Neaktivna",
+    "empty": "Nema lokacija.",
+    "created": "Lokacija je kreirana.",
+    "updated": "Lokacija je ažurirana.",
+    "activated": "Lokacija je aktivirana.",
+    "deactivated": "Lokacija je deaktivirana.",
+    "columns": {
+      "name": "Naziv",
+      "address": "Adresa",
+      "status": "Status",
+      "actions": "Akcije"
+    },
+    "errors": {
+      "invalid": "Provjeri unesene podatke.",
+      "unauthorized": "Morate biti prijavljeni.",
+      "forbidden": "Samo vlasnik može upravljati lokacijama.",
+      "locationLimit": "Dostignut je limit lokacija na planu. Nadogradite paket.",
+      "createFailed": "Lokacija nije kreirana.",
+      "saveFailed": "Izmena nije sačuvana. Pokušaj ponovo.",
+      "locationNotFound": "Lokacija nije pronađena.",
+      "lastLocation": "Zadrži barem jednu aktivnu lokaciju.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmene nisu dozvoljene."
+    }
+  },
+  "Branding": {
+    "title": "Branding",
+    "subtitle": "Logo i boje ordinacije u app shellu i na fakturama (Pro).",
+    "upsellTitle": "Professional funkcija",
+    "upsellDescription": "Prilagođeni branding je uključen u Professional i više pakete.",
+    "logoCardTitle": "Logo",
+    "logoCardDescription": "Prikazuje se u sidebaru i na PDF fakturama. Privatni storage (signed URL).",
+    "logoFile": "Slika",
+    "logoHint": "JPEG, PNG ili WebP do 2 MB. Pri uploadu se pretvara u WebP.",
+    "logoAlt": "Logo ordinacije",
+    "noLogo": "Logo još nije uploadan.",
+    "uploadLogo": "Uploadaj logo",
+    "removeLogo": "Ukloni logo",
+    "logoUploaded": "Logo je uploadan.",
+    "logoRemoved": "Logo je uklonjen.",
+    "colorsCardTitle": "Boje",
+    "colorsCardDescription": "Pozadina, tekst i accent za sidebar aplikacije.",
+    "colorBackground": "Pozadina",
+    "colorText": "Tekst",
+    "colorAccent": "Accent",
+    "colorsHint": "Ostavi prazno za default temu te boje. Hex format #RRGGBB.",
+    "saveColors": "Sačuvaj boje",
+    "colorsSaved": "Boje su sačuvane.",
+    "submitting": "Sačekaj…",
+    "errors": {
+      "invalid": "Provjeri unesene podatke.",
+      "unauthorized": "Morate biti prijavljeni.",
+      "forbidden": "Samo vlasnik može upravljati brandingom.",
+      "featureDisabled": "Prilagođeni branding nije dostupan na vašem planu.",
+      "saveFailed": "Izmena nije sačuvana. Pokušaj ponovo.",
+      "uploadFailed": "Logo nije uploadan.",
+      "logoTooLarge": "Logo mora biti 2 MB ili manji.",
+      "logoInvalidType": "Koristi JPEG, PNG, WebP, HEIC ili HEIF.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmene nisu dozvoljene."
+    }
+  },
+  "Onboarding": {
+    "title": "Postavi ordinaciju",
+    "subtitle": "Tri brza koraka — manje od 15 minuta.",
+    "logout": "Odjava",
+    "stepsLabel": "Koraci onboardinga",
+    "continue": "Nastavi",
+    "back": "Nazad",
+    "submitting": "Sačekaj…",
+    "clinicName": "Naziv ordinacije",
+    "timezone": "Vremenska zona",
+    "phoneCountry": "Pozivni broj (telefon)",
+    "workingHours": "Radno vreme",
+    "closed": "Zatvoreno",
+    "open": "Otvaranje",
+    "close": "Zatvaranje",
+    "serviceCount": "Aktivnih usluga: {count}",
+    "serviceName": "Naziv usluge",
+    "serviceCode": "Šifra",
+    "durationMinutes": "Trajanje (min)",
+    "priceEur": "Cena ({currency})",
+    "vatRate": "PDV (npr. 0.17)",
+    "addService": "Dodaj uslugu",
+    "serviceCreated": "Usluga dodana.",
+    "orImport": "Ili uvezi cenovnik:",
+    "importLink": "CSV import",
+    "fullName": "Ime i prezime",
+    "email": "Email",
+    "role": "Uloga",
+    "sendInvite": "Pošalji pozivnicu i završi",
+    "skipInvite": "Preskoči i završi",
+    "skipHint": "Možeš pozvati tim kasnije u Postavke → Korisnici.",
+    "devLink": "Dev link",
+    "days": {
+      "monday": "Ponedeljak",
+      "tuesday": "Utorak",
+      "wednesday": "Sreda",
+      "thursday": "Četvrtak",
+      "friday": "Petak",
+      "saturday": "Subota",
+      "sunday": "Nedelja"
+    },
+    "roles": {
+      "doctor": "Doktor",
+      "reception": "Recepcija"
+    },
+    "step1": {
+      "short": "1. Ordinacija",
+      "title": "Osnovni podaci",
+      "description": "Naziv, vremenska zona, telefon i radno vreme."
+    },
+    "step2": {
+      "short": "2. Usluge",
+      "title": "Prve usluge",
+      "description": "Dodaj barem jednu uslugu ručno ili CSV importom."
+    },
+    "step3": {
+      "short": "3. Tim",
+      "title": "Pozovi kolegu",
+      "description": "Pozovi doktora ili recepciju (email pozivnica)."
+    },
+    "errors": {
+      "invalid": "Provjeri unos.",
+      "unauthorized": "Morate biti prijavljeni.",
+      "forbidden": "Samo vlasnik može uraditi onboarding.",
+      "saveFailed": "Spremanje nije uspelo.",
+      "createFailed": "Kreiranje usluge nije uspelo.",
+      "needService": "Dodaj barem jednu aktivnu uslugu pre nastavka.",
+      "incompleteSteps": "Prvo završi korake 1 i 2.",
+      "userLimit": "Dostignut limit korisnika na planu.",
+      "doctorLimit": "Dostignut limit doktora na planu.",
+      "emailTaken": "Email je već registrovan.",
+      "inviteExists": "Pozivnica za ovaj email već postoji.",
+      "inviteFailed": "Slanje pozivnice nije uspelo.",
+      "emailFailed": "Email nije poslan. Provjeri EMAIL_FROM / Resend.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmene nisu dozvoljene."
+    }
+  },
+  "Import": {
+    "title": "CSV import",
+    "subtitle": "Uvezi pacijente i usluge iz CSV fajla. Prvo dry-run pregled, zatim potvrda.",
+    "fileLabel": "CSV fajl",
+    "preview": "Pregled (dry-run)",
+    "commit": "Uvezi validne redove",
+    "commitHint": "Commit radi samo kad svi redovi prođu validaciju. Koristi isti fajl.",
+    "submitting": "Sačekaj…",
+    "summary": "Ukupno {total} · validno {valid} · greške {errors}",
+    "rowErrorsTitle": "Greške po redu",
+    "rowError": "Red {row}: {message}",
+    "sampleTitle": "Primjer validnih redova",
+    "patientsImported": "Uvezeno {count} pacijenata.",
+    "servicesImported": "Uvezeno {count} usluga.",
+    "backToOnboarding": "Nazad na onboarding",
+    "patients": {
+      "title": "Pacijenti",
+      "description": "Samo vlasnik. Obavezna polja: ime i prezime.",
+      "columns": "Kolone (EN ili BS aliasi):",
+      "headerLine": "first_name,last_name,phone,email,date_of_birth,address,medical_history,notes",
+      "exampleLine": "Ana,Hodžić,+38761123456,ana@example.com,1990-03-15,,,,"
+    },
+    "services": {
+      "title": "Usluge",
+      "description": "Vlasnik ili računovodstvo. Obavezno: naziv i cena ({currency}).",
+      "columns": "Kolone (EN ili BS aliasi):",
+      "headerLine": "name,code,duration_minutes,price_eur,vat_rate",
+      "exampleLine": "Pregled,PR01,30,50,0.17"
+    },
+    "errors": {
+      "invalid": "Provjeri unos.",
+      "unauthorized": "Morate biti prijavljeni.",
+      "forbidden": "Nemate dozvolu za ovaj import.",
+      "featureDisabled": "Modul pacijenata nije dostupan na vašem planu.",
+      "emptyFile": "Fajl je prazan.",
+      "fileTooLarge": "CSV mora biti 1 MB ili manji.",
+      "invalidFileType": "Koristi CSV fajl.",
+      "missingHeaders": "Nedostaju obavezna zaglavlja kolona.",
+      "parseFailed": "CSV nije mogao biti pročitan.",
+      "noRows": "Nema redova za import.",
+      "tooManyRows": "Maksimalno 500 redova po fajlu.",
+      "hasRowErrors": "Ispravi greške u CSV-u pre importa.",
+      "importFailed": "Import nije uspio. Pokušaj ponovo.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmene nisu dozvoljene."
+    }
+  },
+  "Pin": {
+    "title": "Ko radi?",
+    "description": "Odaberi operatora i unesi PIN da nastaviš.",
+    "operator": "Operator",
+    "pin": "PIN",
+    "submit": "Nastavi",
+    "submitting": "Sačekaj…",
+    "logout": "Odjava",
+    "noOperators": "Nema aktivnih operatora. Traži od vlasnika da ih doda.",
+    "errors": {
+      "invalid": "Provjeri unesene podatke.",
+      "invalidPin": "Pogrešan PIN.",
+      "locked": "Nalog je privremeno zaključan (15 min) zbog pogrešnih PIN-ova.",
+      "forbidden": "PIN switch nije dostupan za ovu ulogu.",
+      "unauthorized": "Morate biti prijavljeni.",
+      "notFound": "Operator nije pronađen.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmene nisu dozvoljene."
+    }
+  },
+  "Invite": {
+    "title": "Pridruži se ordinaciji",
+    "description": "Pozvani ste u {clinic} kao {role}. Postavi lozinku da završiš registraciju.",
+    "email": "Email",
+    "password": "Lozinka",
+    "submit": "Postavi lozinku i uđi",
+    "submitting": "Sačekaj…",
+    "invalidTitle": "Pozivnica nije važeća",
+    "invalidDescription": "Link je istekao, opozvan ili već iskorišten. Zatraži novi od vlasnika.",
+    "loginLink": "Idi na prijavu",
+    "errors": {
+      "invalid": "Provjeri unesene podatke.",
+      "inviteInvalid": "Pozivnica nije važeća.",
+      "acceptFailed": "Nije moguće kreirati nalog."
+    }
+  },
+  "Nav": {
+    "dashboard": "Kontrolna tabla",
+    "calendar": "Kalendar",
+    "patients": "Pacijenti",
+    "services": "Usluge",
+    "invoices": "Fakture",
+    "expenses": "Rashodi",
+    "inventory": "Inventar",
+    "settings": "Postavke",
+    "users": "Korisnici",
+    "locations": "Lokacije",
+    "branding": "Branding",
+    "email": "Email šabloni",
+    "crm": "CRM",
+    "import": "Import",
+    "audit": "Audit log",
+    "privacy": "Privatnost",
+    "logout": "Odjava",
+    "menu": "Meni",
+    "closeMenu": "Zatvori meni",
+    "switchOperator": "Promijeni operatora (PIN)",
+    "clinicFallback": "Ordinacija",
+    "roles": {
+      "owner": "Vlasnik",
+      "doctor": "Doktor",
+      "assistant": "Asistent",
+      "reception": "Recepcija",
+      "accountant": "Računovodstvo",
+      "technician": "Tehničar"
+    },
+    "consent": "Predlošci saglasnosti"
+  },
+  "Patients": {
+    "title": "Pacijenti",
+    "subtitle": "Kartoni, alergije, dokumenti i slike.",
+    "new": "Novi pacijent",
+    "newTitle": "Novi pacijent",
+    "newDescription": "Osnovni podaci kartona. Telefon default +387.",
+    "editTitle": "Uredi pacijenta",
+    "chartTitle": "Karton",
+    "searchPlaceholder": "Pretraži ime, telefon ili email…",
+    "search": "Pretraži",
+    "listTruncatedHint": "Prikazano je do 100 pacijenata. Koristi pretragu da pronađeš ostale.",
+    "empty": "Nema pacijenata.",
+    "backList": "← Pacijenti",
+    "save": "Sačuvaj",
+    "create": "Kreiraj",
+    "deactivate": "Deaktiviraj",
+    "open": "Otvori",
+    "submitting": "Sačekaj…",
+    "active": "Aktivan",
+    "inactive": "Neaktivan",
+    "firstName": "Ime",
+    "lastName": "Prezime",
+    "phone": "Telefon",
+    "email": "Email",
+    "dateOfBirth": "Datum rođenja",
+    "nextControlAt": "Sledeća kontrola",
+    "address": "Adresa",
+    "medicalHistory": "Medicinska anamneza",
+    "notes": "Napomene",
+    "allergiesTitle": "Alergije",
+    "allergiesDescription": "Važne alergije za klinički rad.",
+    "allergyWarningTitle": "Upozorenje: alergije",
+    "allergen": "Alergen",
+    "severity": "Ozbiljnost",
+    "allergyNotes": "Napomena",
+    "addAllergy": "Dodaj alergiju",
+    "noAllergies": "Nema evidentiranih alergija.",
+    "deleteAllergy": "Obriši",
+    "documentsTitle": "Dokumenti",
+    "documentsDescription": "PDF dokumenti (max 20 MB). Privatni storage, signed URL.",
+    "documentTitle": "Naziv dokumenta",
+    "documentFile": "PDF fajl",
+    "uploadDocument": "Upload PDF",
+    "noDocuments": "Nema dokumenata.",
+    "openDocument": "Otvori",
+    "deleteDocument": "Obriši",
+    "imagesTitle": "Slike / RTG",
+    "imagesDescription": "Slike se kompresuju u WebP. Limit po planu.",
+    "imageTitle": "Naziv slike",
+    "imageFile": "Slika",
+    "uploadImage": "Upload sliku",
+    "noImages": "Nema slika.",
+    "openImage": "Otvori",
+    "deleteImage": "Obriši",
+    "odontogramTitle": "Odontogram",
+    "odontogramDescription": "FDI numeracija (D18). Status zuba i istorija izmena.",
+    "treatmentPlanTitle": "Plan terapije",
+    "treatmentPlanDescription": "Planirani tretmani odvojeni od današnje fakture (D19).",
+    "patientUpdated": "Pacijent je ažuriran.",
+    "patientDeactivated": "Pacijent je deaktiviran.",
+    "allergyAdded": "Alergija je dodana.",
+    "allergyDeleted": "Alergija je obrisana.",
+    "documentUploaded": "Dokument je uploadan.",
+    "documentDeleted": "Dokument je obrisan.",
+    "imageUploaded": "Slika je uploadana.",
+    "imageDeleted": "Slika je obrisana.",
+    "columns": {
+      "name": "Ime",
+      "phone": "Telefon",
+      "email": "Email",
+      "status": "Status",
+      "actions": "Akcije"
+    },
+    "severityLevels": {
+      "mild": "Blaga",
+      "moderate": "Umjerena",
+      "severe": "Teška",
+      "unknown": "Nepoznato"
+    },
+    "errors": {
+      "invalid": "Provjeri unesene podatke.",
+      "unauthorized": "Morate biti prijavljeni.",
+      "forbidden": "Nemate dozvolu za ovu akciju.",
+      "featureDisabled": "Karton pacijenata nije uključen u vašem paketu.",
+      "createFailed": "Pacijent nije kreiran.",
+      "patientNotFound": "Pacijent nije pronađen.",
+      "documentMustBePdf": "Dokument mora biti PDF.",
+      "documentTooLarge": "PDF je prevelik (max 20 MB).",
+      "uploadFailed": "Upload nije uspio.",
+      "documentNotFound": "Dokument nije pronađen.",
+      "imageMustBeImage": "Fajl mora biti slika.",
+      "imageTooLarge": "Slika je prevelika (max 20 MB).",
+      "imageLimit": "Dostignut je limit slika po pacijentu. Nadogradite paket.",
+      "imageConvertFailed": "Slika se nije mogla konvertovati u WebP.",
+      "imageNotFound": "Slika nije pronađena.",
+      "signedUrlFailed": "Signed URL nije kreiran.",
+      "saveFailed": "Izmena nije sačuvana. Pokušaj ponovo.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmene nisu dozvoljene."
+    }
+  },
+  "Services": {
+    "title": "Usluge",
+    "subtitle": "Cenovnik usluga ({currency} sa PDV-om).",
+    "new": "Nova usluga",
+    "newTitle": "Nova usluga",
+    "newDescription": "Samo vlasnik može uređivati cenovnik.",
+    "editTitle": "Uredi uslugu",
+    "empty": "Nema usluga.",
+    "search": "Pretraga",
+    "searchPlaceholder": "Naziv ili šifra…",
+    "statusFilter": "Status",
+    "statusAll": "Svi statusi",
+    "save": "Sačuvaj",
+    "create": "Kreiraj",
+    "edit": "Uredi",
+    "cancel": "Otkaži",
+    "activate": "Aktiviraj",
+    "deactivate": "Deaktiviraj",
+    "submitting": "Sačekaj…",
+    "active": "Aktivna",
+    "inactive": "Neaktivna",
+    "name": "Naziv",
+    "code": "Šifra",
+    "durationMinutes": "Trajanje (min)",
+    "priceEur": "Cena ({currency})",
+    "vatRate": "PDV stopa (0–1)",
+    "location": "Lokacija",
+    "locationAll": "Sve lokacije",
+    "locationShared": "Zajednički cenovnik na svim lokacijama.",
+    "serviceCreated": "Usluga je kreirana.",
+    "serviceUpdated": "Usluga je ažurirana.",
+    "serviceActivated": "Usluga je aktivirana.",
+    "serviceDeactivated": "Usluga je deaktivirana.",
+    "columns": {
+      "name": "Naziv",
+      "code": "Šifra",
+      "duration": "Trajanje",
+      "price": "Cena",
+      "vat": "PDV",
+      "location": "Lokacija",
+      "status": "Status",
+      "actions": "Akcije"
+    },
+    "errors": {
+      "invalid": "Provjeri unesene podatke.",
+      "unauthorized": "Morate biti prijavljeni.",
+      "forbidden": "Samo vlasnik može upravljati uslugama.",
+      "createFailed": "Usluga nije kreirana.",
+      "serviceNotFound": "Usluga nije pronađena.",
+      "saveFailed": "Izmena nije sačuvana. Pokušaj ponovo.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmene nisu dozvoljene."
+    }
+  },
+  "Odontogram": {
+    "title": "Odontogram",
+    "subtitle": "FDI zubni karton.",
+    "selectTooth": "Odaberi zub",
+    "tooth": "Zub {fdi}",
+    "status": "Status",
+    "note": "Napomena",
+    "noNote": "Nema napomene.",
+    "save": "Sačuvaj status",
+    "submitting": "Sačekaj…",
+    "history": "Istorija",
+    "noHistory": "Nema izmena.",
+    "eventLine": "Zub {fdi}: {before} → {after}",
+    "readOnly": "Samo owner i doktor mogu mijenjati odontogram.",
+    "toothUpdated": "Status zuba je sačuvan.",
+    "statuses": {
+      "healthy": "Zdrav",
+      "caries": "Karijes",
+      "filled": "Plomba",
+      "crown": "Krunica",
+      "missing": "Nedostaje",
+      "implant": "Implant",
+      "root_canal": "Endodoncija",
+      "bridge": "Most",
+      "other": "Ostalo"
+    },
+    "errors": {
+      "invalid": "Provjeri unesene podatke.",
+      "unauthorized": "Morate biti prijavljeni.",
+      "forbidden": "Nemate dozvolu za odontogram.",
+      "featureDisabled": "Odontogram nije uključen u vašem paketu.",
+      "patientNotFound": "Pacijent nije pronađen.",
+      "saveFailed": "Izmena nije sačuvana. Pokušaj ponovo.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmene nisu dozvoljene."
+    }
+  },
+  "TreatmentPlan": {
+    "titleField": "Naziv plana",
+    "notes": "Napomene",
+    "itemNotes": "Napomena stavke",
+    "service": "Usluga",
+    "tooth": "Zub (FDI)",
+    "toothNone": "Bez zuba",
+    "estimatedPrice": "Procena ({currency})",
+    "create": "Kreiraj plan",
+    "addItem": "Dodaj stavku",
+    "submitting": "Sačekaj…",
+    "activate": "Aktiviraj",
+    "deactivate": "Arhiviraj",
+    "active": "Aktivan",
+    "inactive": "Arhiviran",
+    "empty": "Nema planova terapije.",
+    "emptyItems": "Nema stavki u planu.",
+    "noServices": "Nema aktivnih usluga u cenovniku.",
+    "readOnly": "Samo owner i doktor mogu uređivati plan terapije.",
+    "planCreated": "Plan je kreiran.",
+    "itemAdded": "Stavka je dodana.",
+    "estimateTotal": "Procena: {amount}",
+    "columns": {
+      "service": "Usluga",
+      "tooth": "Zub",
+      "price": "Procena",
+      "status": "Status"
+    },
+    "statuses": {
+      "planned": "Planirano",
+      "in_progress": "U toku",
+      "done": "Završeno",
+      "cancelled": "Otkazano"
+    },
+    "errors": {
+      "invalid": "Provjeri unesene podatke.",
+      "unauthorized": "Morate biti prijavljeni.",
+      "forbidden": "Nemate dozvolu za plan terapije.",
+      "featureDisabled": "Plan terapije nije uključen u vašem paketu.",
+      "patientNotFound": "Pacijent nije pronađen.",
+      "patientInactive": "Pacijent je neaktivan — plan je samo za čitanje.",
+      "planNotFound": "Plan nije pronađen.",
+      "planInactive": "Plan je arhiviran.",
+      "serviceNotFound": "Usluga nije pronađena.",
+      "createFailed": "Nije kreirano. Pokušaj ponovo.",
+      "saveFailed": "Izmena nije sačuvana. Pokušaj ponovo.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmene nisu dozvoljene."
+    }
+  },
+  "Calendar": {
+    "title": "Kalendar",
+    "subtitle": "Termini po doktoru (Europe/Sarajevo).",
+    "timezoneHint": "Vremena su prikazana u Europe/Sarajevo.",
+    "loadingFormOptions": "Učitavam pacijente i usluge…",
+    "new": "Novi termin",
+    "newTitle": "Novi termin",
+    "editTitle": "Uredi termin",
+    "create": "Kreiraj",
+    "save": "Sačuvaj",
+    "cancel": "Zatvori",
+    "cancelAppointment": "Otkaži termin",
+    "submitting": "Sačekaj…",
+    "prev": "Prethodno",
+    "next": "Sledeće",
+    "today": "Danas",
+    "todayBadge": "danas",
+    "viewsLabel": "Prikaz kalendara",
+    "agendaEmpty": "Nema termina.",
+    "agendaAdd": "Dodaj",
+    "agendaDayGrid": "Dan",
+    "allDoctors": "Svi doktori",
+    "doctor": "Doktor",
+    "patient": "Pacijent",
+    "patientPlaceholder": "Odaberi pacijenta…",
+    "inactive": "neaktivan",
+    "service": "Usluga",
+    "serviceNone": "Bez usluge",
+    "location": "Lokacija",
+    "locationNone": "Bez lokacije",
+    "startsAt": "Početak",
+    "endsAt": "Kraj",
+    "pickDate": "Datum",
+    "pickTime": "Vreme",
+    "dateTimeDone": "Gotovo",
+    "status": "Status",
+    "notes": "Napomene",
+    "newAt": "Novi termin u {time}",
+    "moreCount": "+još {count}",
+    "views": {
+      "day": "Dan",
+      "week": "Sedmica",
+      "month": "Mesec"
+    },
+    "statuses": {
+      "pending_confirmation": "Na potvrdi",
+      "confirmed": "Potvrđen",
+      "completed": "Završen",
+      "cancelled": "Otkazan",
+      "no_show": "Nije došao"
+    },
+    "messages": {
+      "appointmentCreated": "Termin je kreiran.",
+      "appointmentUpdated": "Termin je ažuriran.",
+      "appointmentRescheduled": "Termin je premješten.",
+      "appointmentCancelled": "Termin je otkazan.",
+      "reminderSent": "Email podsjetnik je poslan."
+    },
+    "sendReminder": "Pošalji email podsjetnik",
+    "errors": {
+      "invalid": "Provjeri unesene podatke.",
+      "unauthorized": "Morate biti prijavljeni.",
+      "forbidden": "Nemate dozvolu za kalendar.",
+      "featureDisabled": "Kalendar nije uključen u vašem paketu.",
+      "patientNotFound": "Pacijent nije pronađen.",
+      "patientInactive": "Pacijent je neaktivan — nije moguće zakazati.",
+      "doctorNotFound": "Doktor nije pronađen.",
+      "appointmentNotFound": "Termin nije pronađen.",
+      "appointmentOverlap": "Ovaj doktor već ima preklapajući termin.",
+      "createFailed": "Nije kreirano. Pokušaj ponovo.",
+      "saveFailed": "Izmena nije sačuvana. Pokušaj ponovo.",
+      "patientNoEmail": "Pacijent nema email adresu.",
+      "appointmentNotSendable": "Podsjetnik se ne šalje za otkazane/no-show termine.",
+      "templateNotFound": "Email šablon nije pronađen.",
+      "sendFailed": "Email nije poslan. Pokušaj ponovo.",
+      "missingActorEmail": "Vaš nalog nema email.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmene nisu dozvoljene."
+    }
+  },
+  "EmailTemplates": {
+    "title": "Email šabloni",
+    "subtitle": "Podsjetnici pacijentima preko Resend-a. Jedan set po ordinaciji (BS/EN).",
+    "upsellTitle": "Email podsjetnici nisu uključeni",
+    "upsellDescription": "Ova funkcija nije uključena u vašem paketu.",
+    "reminderCardTitle": "Podsjetnik na termin",
+    "reminderCardDescription": "Šablon se šalje ručno iz kalendara ili kao test na vaš email.",
+    "birthdayCardTitle": "Rođendan",
+    "birthdayCardDescription": "CRM poruka za rođendan. Šalje se ručno iz CRM inboxa.",
+    "recallCardTitle": "Recall (povratak)",
+    "recallCardDescription": "CRM poruka kad pacijent nije bio 180+ dana. Šalje se ručno iz CRM inboxa.",
+    "controlCardTitle": "Kontrola",
+    "controlCardDescription": "CRM poruka za sledeću kontrolu (datum na kartonu). Šalje se ručno iz CRM inboxa.",
+    "subject": "Naslov",
+    "body": "Tekst poruke",
+    "varsHint": "Dostupne varijable: {vars}",
+    "save": "Sačuvaj",
+    "saved": "Šablon je sačuvan.",
+    "sendTest": "Pošalji test meni",
+    "testSent": "Test email je poslan na vašu adresu.",
+    "submitting": "Sačekaj…",
+    "readOnlyHint": "Samo vlasnik može uređivati šablon. Recepcija može slati.",
+    "locales": {
+      "bs": "Bosanski",
+      "en": "Engleski"
+    },
+    "keys": {
+      "appointment_reminder": "Podsjetnik na termin",
+      "birthday": "Rođendan",
+      "recall": "Recall",
+      "control": "Kontrola"
+    },
+    "errors": {
+      "invalid": "Provjeri unesene podatke.",
+      "unauthorized": "Morate biti prijavljeni.",
+      "forbidden": "Nemate dozvolu za email šablone.",
+      "featureDisabled": "Email podsjetnici nisu uključeni u vašem paketu.",
+      "saveFailed": "Izmena nije sačuvana.",
+      "sendFailed": "Email nije poslan. Pokušaj ponovo.",
+      "templateNotFound": "Šablon nije pronađen.",
+      "missingActorEmail": "Vaš nalog nema email.",
+      "patientNoEmail": "Pacijent nema email adresu.",
+      "appointmentNotFound": "Termin nije pronađen.",
+      "appointmentNotSendable": "Podsjetnik se ne šalje za otkazane/no-show termine.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmene nisu dozvoljene."
+    }
+  },
+  "Crm": {
+    "title": "CRM",
+    "subtitle": "In-app obavesti: rođendan, recall i kontrola. Recepcija eksplicitno šalje email.",
+    "upsellTitle": "CRM light nije uključen",
+    "upsellDescription": "Ova funkcija je dostupna na Professional i višim paketima.",
+    "inboxTitle": "Otvorene obavesti",
+    "inboxDescription": "Sistem generiše listu; vi odlučujete kome poslati poruku.",
+    "empty": "Nema otvorenih CRM obavesti.",
+    "send": "Pošalji email",
+    "dismiss": "Otkaži",
+    "noEmail": "Nema emaila",
+    "kinds": {
+      "birthday": "Rođendan",
+      "recall": "Recall",
+      "control": "Kontrola"
+    },
+    "columns": {
+      "kind": "Tip",
+      "patient": "Pacijent",
+      "dueOn": "Datum",
+      "email": "Email",
+      "actions": "Akcije"
+    },
+    "errors": {
+      "invalid": "Provjeri unos.",
+      "unauthorized": "Morate biti prijavljeni.",
+      "forbidden": "Nemate dozvolu za CRM.",
+      "featureDisabled": "CRM light nije uključen u vašem paketu.",
+      "notFound": "Obavest nije pronađena.",
+      "notOpen": "Obavest više nije otvorena.",
+      "patientNoEmail": "Pacijent nema email adresu.",
+      "templateNotFound": "Email šablon nije pronađen.",
+      "sendFailed": "Slanje nije uspelo. Pokušaj ponovo.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmene nisu dozvoljene."
+    }
+  },
+  "Waitlist": {
+    "title": "Lista čekanja",
+    "subtitle": "Pacijenti koji čekaju termin. Pri otkazivanju sistem predlaže sledeće.",
+    "addTitle": "Dodaj na listu",
+    "add": "Dodaj",
+    "empty": "Lista čekanja je prazna.",
+    "patient": "Pacijent",
+    "patientPlaceholder": "Odaberi pacijenta…",
+    "doctor": "Doktor",
+    "anyDoctor": "Bilo koji doktor",
+    "service": "Usluga",
+    "anyService": "Bilo koja usluga",
+    "location": "Lokacija",
+    "anyLocation": "Bilo koja lokacija",
+    "preferredFrom": "Poželjno od",
+    "preferredTo": "Poželjno do",
+    "anyDate": "Bilo koji datum",
+    "notes": "Napomene",
+    "startsAt": "Početak",
+    "endsAt": "Kraj",
+    "book": "Zakaži",
+    "bookTitle": "Zakaži za {name}",
+    "confirmBook": "Potvrdi termin",
+    "cancel": "Zatvori",
+    "cancelEntry": "Ukloni",
+    "submitting": "Sačekaj…",
+    "suggestionsTitle": "Predlozi sa liste čekanja nakon otkazivanja",
+    "dismissSuggestions": "Zatvori",
+    "errors": {
+      "invalid": "Provjeri unesene podatke.",
+      "unauthorized": "Morate biti prijavljeni.",
+      "forbidden": "Nemate dozvolu za listu čekanja.",
+      "featureDisabled": "Lista čekanja nije uključena u vašem paketu.",
+      "patientNotFound": "Pacijent nije pronađen.",
+      "patientInactive": "Pacijent je neaktivan.",
+      "doctorNotFound": "Doktor nije pronađen.",
+      "appointmentOverlap": "Ovaj doktor već ima preklapajući termin.",
+      "waitlistNotFound": "Stavka liste nije pronađena.",
+      "createFailed": "Nije kreirano. Pokušaj ponovo.",
+      "saveFailed": "Izmena nije sačuvana. Pokušaj ponovo.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmene nisu dozvoljene."
+    }
+  },
+  "AuditLog": {
+    "title": "Audit log",
+    "subtitle": "Pregled događaja u ordinaciji: ko, šta, kada i detalji promjene.",
+    "backDashboard": "← Kontrolna tabla",
+    "filterTitle": "Filter",
+    "filterDescription": "Filtriraj po tipu događaja.",
+    "eventLabel": "Događaj",
+    "allEvents": "Svi događaji",
+    "applyFilter": "Primijeni",
+    "listTitle": "Događaji",
+    "listDescription": "Najnoviji događaji prvi. Samo vlasnik može pregledati audit.",
+    "empty": "Nema audit događaja za odabrani filter.",
+    "prev": "Prethodna",
+    "next": "Sledeća",
+    "pageInfo": "Stranica {page} / {totalPages} · ukupno {total}",
+    "columns": {
+      "when": "Kada",
+      "actor": "Ko",
+      "event": "Šta",
+      "details": "Detalji (stara/nova)"
+    },
+    "events": {
+      "patient": {
+        "created": "Pacijent kreiran",
+        "updated": "Pacijent ažuriran",
+        "deactivated": "Pacijent deaktiviran"
+      },
+      "appointment": {
+        "created": "Termin kreiran",
+        "updated": "Termin ažuriran",
+        "cancelled": "Termin otkazan"
+      },
+      "invoice": {
+        "created": "Faktura kreirana",
+        "voided": "Faktura stornirana"
+      },
+      "payment": {
+        "recorded": "Uplata zabilježena"
+      },
+      "invite": {
+        "created": "Pozivnica poslana",
+        "revoked": "Pozivnica opozvana"
+      },
+      "user": {
+        "deactivated": "Korisnik deaktiviran"
+      },
+      "gdpr": {
+        "erasure_requested": "GDPR brisanje zatraženo",
+        "erasure_rejected": "GDPR brisanje odbijeno",
+        "patient_erased": "GDPR hard delete završen",
+        "patient_exported": "GDPR export pacijenta"
+      },
+      "operator": {
+        "switched": "PIN operator switch"
+      },
+      "auth": {
+        "login_lockout": "Login lockout"
+      },
+      "consent_template": {
+        "updated": "Predložak saglasnosti ažuriran"
+      },
+      "consent": {
+        "signed": "Saglasnost potpisana",
+        "deleted": "Saglasnost obrisana"
+      }
+    }
+  },
+  "Privacy": {
+    "title": "Privatnost / GDPR",
+    "subtitle": "Backup klinike, export pacijenta i zahtjevi za hard delete (owner approve).",
+    "backDashboard": "← Kontrolna tabla",
+    "clinicZipTitle": "Backup klinike (ZIP)",
+    "clinicZipDescription": "On-demand export za ownera: pacijenti, računi i meta podataka dokumenata (§8.3).",
+    "clinicZipHint": "ZIP sadrži patients, invoices (+ linije i uplate) i documents/images meta. Ne uključuje binarne fajlove ni puni karton (odontogram, plan terapije) — to je odvojeni GDPR JSON po pacijentu.",
+    "clinicZipClosureNote": "Pri zatvaranju naloga (D45): isti export → 7 dana grace → hard delete (automatski job noću).",
+    "clinicZipDownload": "Preuzmi ZIP",
+    "exportCardTitle": "Export pacijenta",
+    "exportCardDescription": "JSON export je dostupan na kartonu pacijenta (Export JSON).",
+    "exportHint": "Otvorite pacijenta → Export JSON. Uključuje karton, alergije, dokumente (meta), termine, fakture.",
+    "erasureCardTitle": "Zahtjevi za brisanje",
+    "erasureCardDescription": "Nakon odobrenja, podaci pacijenta i storage objekti se trajno brišu (D35).",
+    "emptyRequests": "Nema GDPR zahtjeva.",
+    "exportJson": "Export JSON",
+    "requestErasure": "Zatraži brisanje",
+    "confirmRequest": "Zatražiti hard delete ovog pacijenta? Owner mora odobriti.",
+    "confirmApprove": "Odobriti TRAJNO brisanje? Ovo se ne može poništiti.",
+    "approve": "Odobri i obriši",
+    "reject": "Odbij",
+    "rejectReasonPlaceholder": "Razlog (opcionalno)",
+    "submitting": "Sačekaj…",
+    "patientRemoved": "Pacijent obrisan",
+    "columns": {
+      "patient": "Pacijent",
+      "status": "Status",
+      "requestedAt": "Zatraženo",
+      "actions": "Akcije"
+    },
+    "status": {
+      "pending": "Na čekanju",
+      "rejected": "Odbijeno",
+      "completed": "Završeno",
+      "failed": "Neuspelo"
+    },
+    "errors": {
+      "unauthorized": "Morate biti prijavljeni.",
+      "forbidden": "Nemate dozvolu.",
+      "patientNotFound": "Pacijent nije pronađen.",
+      "alreadyPending": "Već postoji zahtjev na čekanju.",
+      "requestFailed": "Zahtjev nije kreiran.",
+      "notFound": "Zahtjev nije pronađen.",
+      "storageDeleteFailed": "Brisanje fajlova nije uspelo.",
+      "eraseFailed": "Hard delete nije uspio.",
+      "mfaRequired": "Owner MFA (AAL2) je obavezan.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmene nisu dozvoljene."
+    }
+  },
+  "ClinicLifecycle": {
+    "readonlyTitle": "Klinika je u režimu samo-za-čitanje",
+    "readonlyBody": "Izmene su privremeno blokirane. Preuzmite ZIP backup pre brisanja.",
+    "readonlyBodyWithGrace": "Izmene su blokirane do {date}. Preuzmite ZIP backup; nakon grace perioda nalog se trajno briše.",
+    "pendingDeleteTitle": "Nalog je zakazan za brisanje",
+    "pendingDeleteBody": "Podaci će biti trajno obrisani. Export više nije garantovan nakon hard delete-a.",
+    "exportCta": "Privacy / backup",
+    "closeCardTitle": "Zatvaranje naloga",
+    "closeCardDescription": "Export → 7 dana grace (readonly) → hard delete (D45).",
+    "closeHint": "Najprije preuzmite ZIP backup. Zatim možete zatvoriti nalog: 7 dana readonly, pa trajno brisanje.",
+    "closeConfirmPrompt": "Upišite tačan naziv klinike za potvrdu:",
+    "closeConfirm": "Zatvoriti nalog? Nakon 7 dana podaci se trajno brišu.",
+    "closeAccount": "Zatvori nalog",
+    "closing": "Zatvaranje…",
+    "closureInProgressTitle": "Zatvaranje u toku",
+    "closureInProgressBody": "Nalog je readonly. Grace ističe {date}. Hard delete sledi automatski.",
+    "errors": {
+      "unauthorized": "Morate biti prijavljeni.",
+      "forbidden": "Nemate dozvolu.",
+      "mfaRequired": "Owner MFA (AAL2) je obavezan.",
+      "alreadyClosing": "Zatvaranje je već pokrenuto.",
+      "notActive": "Klinika nije aktivna.",
+      "closureFailed": "Zatvaranje nije uspelo.",
+      "clinicReadonly": "Klinika je u režimu samo-za-čitanje. Izmene nisu dozvoljene.",
+      "clinicPendingDelete": "Nalog je zakazan za brisanje. Izmene nisu dozvoljene."
+    }
+  },
+  "ConsentTemplates": {
+    "title": "Predlošci saglasnosti",
+    "subtitle": "Predlošci dokumenata za potpis saglasnosti (BS/EN). Jedan set po ordinaciji.",
+    "upsellTitle": "Predlošci saglasnosti nisu uključeni",
+    "upsellDescription": "Draw-sign saglasnosti i predlošci dokumenata dostupni su na Professional i višim planovima.",
+    "generalCardTitle": "Opći tretman",
+    "generalCardDescription": "Standardna saglasnost za stomatološki tretman.",
+    "dataCardTitle": "Obrada podataka",
+    "dataCardDescription": "Saglasnost za obradu ličnih i zdravstvenih podataka.",
+    "radiographyCardTitle": "RTG",
+    "radiographyCardDescription": "Saglasnost za rendgensko snimanje.",
+    "titleField": "Naslov dokumenta",
+    "body": "Tekst",
+    "varsHint": "Dostupne varijable: {vars}",
+    "save": "Sačuvaj",
+    "saved": "Predložak sačuvan.",
+    "submitting": "Sačekajte…",
+    "readOnlyHint": "Samo vlasnik uređuje predloške. Kliničko osoblje potpisuje na kartonu pacijenta.",
+    "locales": {
+      "bs": "Bosanski",
+      "en": "Engleski"
+    },
+    "keys": {
+      "general_treatment": "Opći tretman",
+      "data_processing": "Obrada podataka",
+      "radiography": "RTG"
+    },
+    "errors": {
+      "invalid": "Provjerite polja forme.",
+      "unauthorized": "Morate biti prijavljeni.",
+      "forbidden": "Nemate dozvolu za predloške saglasnosti.",
+      "clinicReadonly": "Ordinacija je samo za čitanje.",
+      "clinicPendingDelete": "Ordinacija je označena za brisanje.",
+      "featureDisabled": "Draw-sign saglasnosti nisu uključene u vaš plan.",
+      "saveFailed": "Izmena nije sačuvana.",
+      "templateNotFound": "Predložak nije pronađen."
+    }
+  },
+  "Consent": {
+    "title": "Saglasnosti",
+    "description": "Dokumenti saglasnosti s draw potpisom. Privatni storage i signed URL-ovi.",
+    "upsellTitle": "Saglasnosti nisu uključene",
+    "upsellDescription": "Draw-sign saglasnosti dostupne su na Professional i višim planovima.",
+    "emptySignatures": "Još nema potpisanih saglasnosti.",
+    "newSignatureTitle": "Nova saglasnost",
+    "chooseTemplate": "Predložak",
+    "signaturePadLabel": "Polje za potpis",
+    "signatureHint": "Pacijent ovde crta potpis.",
+    "signatureReady": "Potpis snimljen.",
+    "clearSignature": "Obriši",
+    "signAndSave": "Potpiši i sačuvaj PDF",
+    "signed": "Saglasnost potpisana i sačuvana.",
+    "submitting": "Sačekajte…",
+    "openPdf": "Otvori PDF",
+    "delete": "Obriši",
+    "noTemplates": "Nema predložaka za ovaj jezik. Dodajte ih u postavkama Predlošci saglasnosti.",
+    "errors": {
+      "invalid": "Provjerite polja forme.",
+      "unauthorized": "Morate biti prijavljeni.",
+      "forbidden": "Nemate dozvolu za potpis saglasnosti.",
+      "clinicReadonly": "Ordinacija je samo za čitanje.",
+      "clinicPendingDelete": "Ordinacija je označena za brisanje.",
+      "featureDisabled": "Draw-sign saglasnosti nisu uključene u vaš plan.",
+      "signatureEmpty": "Nacrtajte potpis pre čuvanja.",
+      "patientNotFound": "Pacijent nije pronađen.",
+      "templateNotFound": "Predložak nije pronađen.",
+      "pdfFailed": "PDF nije generisan.",
+      "signFailed": "Potpisana saglasnost nije sačuvana.",
+      "deleteFailed": "Saglasnost nije obrisana.",
+      "notFound": "Saglasnost nije pronađena.",
+      "signedUrlFailed": "PDF nije moguće otvoriti."
+    }
+  },
+  "DemoBanner": {
+    "title": "Ovo je demo ordinacija",
+    "body": "Podaci su izmišljeni. Izmene su onemogućene — registrujte svoju ordinaciju za puni pristup.",
+    "cta": "Registrujte svoju →"
+  },
+  "Locale": {
+    "label": "Jezik",
+    "bs": "Bosanski",
+    "hr": "Hrvatski",
+    "sr": "Srpski",
+    "en": "English"
+  }
+}

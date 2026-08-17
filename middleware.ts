@@ -2,6 +2,7 @@ import createMiddleware from "next-intl/middleware";
 import { type NextRequest, NextResponse } from "next/server";
 import type { User } from "@supabase/supabase-js";
 import { publicLocalePath } from "@/i18n/path";
+import { repairI18nRewrite } from "@/i18n/repair-rewrite";
 import { routing } from "@/i18n/routing";
 import { mfaPath, resolveOwnerMfaGate } from "@/lib/auth/mfa";
 import { resolveOnboardingGate } from "@/lib/onboarding/gate";
@@ -13,6 +14,7 @@ import { OPERATOR_COOKIE } from "@/lib/operators/constants";
 import { isPlatformAdmin } from "@/lib/platform/admin";
 import { readImpersonationCookieFromRequest } from "@/lib/platform/session";
 import { IMPERSONATION_COOKIE } from "@/lib/platform/constants";
+import { isSessionGatedPath } from "@/lib/middleware/session-gated-path";
 import { copyCookies, updateSession } from "@/lib/supabase/middleware";
 
 const handleI18n = createMiddleware(routing);
@@ -84,16 +86,31 @@ function isServerActionRequest(request: NextRequest) {
 }
 
 export async function middleware(request: NextRequest) {
+  const { locale, path } = stripLocale(request.nextUrl.pathname);
+  const gated = isSessionGatedPath(path);
+
   // Never let i18n or auth redirects touch Server Actions — only refresh cookies.
   // Auth gates still apply on the document navigation after the action redirects.
   if (isServerActionRequest(request)) {
+    if (!gated) {
+      return NextResponse.next({ request });
+    }
     const passthrough = NextResponse.next({ request });
     const { response } = await updateSession(request, passthrough);
     return response;
   }
 
-  const i18nResponse = handleI18n(request);
-  const { locale, path } = stripLocale(request.nextUrl.pathname);
+  const i18nResponse = repairI18nRewrite(
+    request,
+    handleI18n(request),
+    locale,
+  );
+  // Marketing/legal crawls: i18n only. getUser() here was ~1.2k Fluid
+  // invocations / 12h with nobody logged in.
+  if (!gated) {
+    return i18nResponse;
+  }
+
   const session = await updateSession(request, i18nResponse);
   const user = session.user;
   const supabase = session.supabase;

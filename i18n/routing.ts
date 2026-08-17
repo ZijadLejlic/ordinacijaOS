@@ -5,8 +5,8 @@ import { defineRouting } from "next-intl/routing";
  * Balkan marketing slugs (bs/hr/sr) are localized (Website-DentOrd §3.1).
  * Public URLs: `/bs/cijene` ↔ `/hr/cijene` ↔ `/sr/cijene` ↔ `/en/pricing`.
  *
- * Content strategy B (D37): hr/sr reuse BS message catalog + BS pathnames
- * until dedicated translations exist (see `i18n/catalog.ts`).
+ * UI copy: dedicated `messages/{bs,hr,sr,en}.json` (D37). Marketing prices:
+ * BS displays KM; HR/SR/EN display EUR.
  *
  * Note: `localePrefix: "as-needed"` (§3.1 unprefixed BS) is blocked by a
  * Next.js 16.2.6+ middleware rewrite→307 bug (vercel/next.js#94342).

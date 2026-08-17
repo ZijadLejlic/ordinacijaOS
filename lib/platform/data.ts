@@ -49,7 +49,7 @@ export async function getPlatformClinicDetail(clinicId: string) {
   const { data: clinic, error } = await service
     .from("clinics")
     .select(
-      "id, name, status, trial_ends_at, timezone, phone_country_default, plan_id, created_at, updated_at, plans(id, code, name), clinic_subscriptions(plan_id, status, stripe_customer_id, stripe_subscription_id, current_period_end)",
+      "id, name, status, trial_ends_at, timezone, phone_country_default, plan_id, created_at, updated_at, plans(id, code, name), clinic_subscriptions(plan_id, status, provider, provider_customer_id, provider_subscription_id, provider_variant_id, payment_method, current_period_end)",
     )
     .eq("id", clinicId)
     .maybeSingle();
@@ -75,8 +75,11 @@ export async function getPlatformClinicDetail(clinicId: string) {
   const subscription = clinic.clinic_subscriptions as {
     plan_id: string;
     status: Database["public"]["Enums"]["subscription_status"];
-    stripe_customer_id: string | null;
-    stripe_subscription_id: string | null;
+    provider: Database["public"]["Enums"]["billing_provider"] | null;
+    provider_customer_id: string | null;
+    provider_subscription_id: string | null;
+    provider_variant_id: string | null;
+    payment_method: Database["public"]["Enums"]["billing_payment_method"] | null;
     current_period_end: string | null;
   } | null;
 

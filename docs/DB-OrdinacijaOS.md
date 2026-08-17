@@ -91,6 +91,8 @@ Platform tabela **bez** `clinic_id`. Kontakt / „Pozovite me“ forma na market
 | `status` | `new` / `contacted` / `closed` |
 | `ip_hash` | SHA-256(IP + salt) za rate limit (5/h); nije raw IP |
 
+Silent drop (nema INSERT, nema Resend): honeypot `website`/`company`, prebrz submit, URL/SEO-index copy, lookalike `*dentord*` mail koji nije `@dentord.com`.
+
 **RLS:** enabled; **nema** policy za `anon`/`authenticated` (deny all). `REVOKE` od API rola; `GRANT` select/insert/update samo `service_role`. Insert + Resend email iz server action (`lib/leads/actions.ts`); čitanje samo platform admin (D41) preko service role — UI lista u `/platform` kasnije.
 
 ### 3.2 Clinic & users
@@ -176,16 +178,28 @@ RPCs (service_role): `peek_clinic_invite`, `accept_clinic_invite`, `revoke_user_
 
 #### `clinic_subscriptions`
 
-Evidencija paketa / budući Stripe (D5). Do 2027 bez charge — i dalje red za plan + trial.
+Evidencija paketa / buduća naplata (D5). Do 2027 bez charge — i dalje red za plan + trial.
 
 **RLS:** `SELECT` + `UPDATE` samo owner (`clinic_subscriptions_select_owner`, `clinic_subscriptions_update_owner`). **Nema `INSERT` policy** — namjerno: red se kreira isključivo kroz `create_clinic_for_owner` (SECURITY DEFINER) ili `service_role` (platform admin D41). Sljedeći developer ne treba dodavati INSERT policy bez eksplicitnog product odluke.
 
 | Kolona | Napomena |
 |---|---|
-| `clinic_id` | |
+| `clinic_id` | unique — jedan red po klinici |
 | `plan_id` | |
-| `status` | trial / active / past_due / … TBD |
-| Stripe ids | NULL dok billing ne krene |
+| `status` | trial / active / past_due / canceled / readonly |
+| `current_period_end` | do kada je plaćeno; puni ga webhook (kartica) ili platform admin (virman) |
+| `provider` | `billing_provider`: `lemonsqueezy` / `paddle` / `manual`. NULL dok billing ne krene |
+| `provider_customer_id` | ID kupca kod providera. NULL do kartice |
+| `provider_subscription_id` | ID pretplate kod providera. Unique zajedno s `provider` kad oba nisu NULL |
+| `provider_variant_id` | Provider price/variant; mapira se na `plans.id` u app configu (D42) |
+| `payment_method` | `billing_payment_method`: `card` / `bank_transfer`. **Nije** invoice enum `payment_method` (cash/card/…) |
+
+**D54/D55 (migracija `20260817220000_clinic_subscriptions_provider_agnostic`).** Naplata ide preko Lemon Squeezyja (Merchant of Record), a ne Stripea, i klinika bira **karticu ili virman**. Kolone su provider-agnostične jer je migracija LS → Stripe Managed Payments / Paddle vjerovatna.
+
+- Mapiranje provider varijante → `plans.id` ide u zasebnu tabelu/config; **entitlements se i dalje čitaju iz `plans` (D42)** — provider nikad ne određuje feature set.
+- Webhook upisuje preko `service_role` (nema INSERT policy — to je namjerno i ostaje tako), uz idempotenciju po provider event ID-ju i zapis u `audit_events`.
+- Virman put ne dira nijednu novu tabelu: platform admin (D41) ažurira `plan_id` / `status` / `current_period_end` (i `provider = manual`, `payment_method = bank_transfer`) na postojećem redu.
+- Status pretplate hrani postojeći lifecycle (D6) — bez paralelnog mehanizma gašenja.
 
 #### `audit_events`
 
@@ -585,6 +599,8 @@ Location create must call `assertCanCreateLocation`; image upload must call `ass
 | 2026-07-14 | Faza 3D: consent_forms / consent_signatures + draw-sign (D20); GDPR + clinic create hooks |
 | 2026-07-14 | Faza 3E: inventory_items + low-stock inventar basic (§6.12 / item 25) |
 | 2026-07-14 | Marketing `leads` (W13): platform tabela, RLS deny-all, service_role only |
+| 2026-08-17 | Lead spam: silent drop URL/SEO-index/lookalike mail (nema schema change) |
 | 2026-07-14 | Marketing demo clinic (W8): `clinics.is_demo`, lifecycle/hard_delete skip, seed script |
 | 2026-07-28 | P3.4/D-22: `revoke_user_sessions(uuid)` — service_role deletes `auth.sessions` for owner force-logout/deactivate |
 | 2026-07-30 | `hard_delete_clinic`: no SQL DELETE on `storage.objects` (Supabase protect_delete); Storage API via `lib/clinic/hard-delete.ts` |
+| 2026-08-17 | D54/D55: `clinic_subscriptions` provider-agnostične kolone (`provider_*`, `billing_provider`, `billing_payment_method`); `stripe_*` renamed |

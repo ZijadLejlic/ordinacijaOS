@@ -6,12 +6,13 @@ import {
   hashIp,
   RATE_LIMIT_PER_HOUR,
 } from "@/lib/leads/rate-limit";
+import { detectLeadSpam, isLeadSubmittedTooFast } from "@/lib/leads/spam";
 import { createServiceClient } from "@/lib/supabase/service";
 import { submitLeadSchema } from "@/lib/validations/lead";
 
 export type LeadActionState = {
   ok?: boolean;
-  error?: "invalid" | "rateLimited" | "failed";
+  error?: "invalid" | "rateLimited" | "failed" | "stale";
 } | null;
 
 function formString(formData: FormData, key: string) {
@@ -24,8 +25,13 @@ export async function submitLeadAction(
   formData: FormData,
 ): Promise<LeadActionState> {
   const honeypot = formString(formData, "website");
-  if (honeypot.length > 0) {
+  const companyHoneypot = formString(formData, "company");
+  if (honeypot.length > 0 || companyHoneypot.length > 0) {
     // Silent success for bots — do not insert or email.
+    return { ok: true };
+  }
+
+  if (isLeadSubmittedTooFast(formString(formData, "formTs"))) {
     return { ok: true };
   }
 
@@ -47,6 +53,11 @@ export async function submitLeadAction(
   }
 
   const data = parsed.data;
+  const spam = detectLeadSpam(data);
+  if (spam) {
+    console.info("[leads] dropped spam", spam.reason);
+    return { ok: true };
+  }
   const ip = await getRequestIp();
   const ipHash = ip ? hashIp(ip) : null;
 

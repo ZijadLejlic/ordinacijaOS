@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { getLocale } from "next-intl/server";
 import { VercelAnalytics } from "@/components/analytics/vercel-analytics";
 import { VercelSpeedInsights } from "@/components/analytics/vercel-speed-insights";
+import { routing } from "@/i18n/routing";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -34,16 +34,17 @@ export const metadata: Metadata = {
   themeColor: "#0B6EF5",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const locale = await getLocale();
-
+  // Do not call getLocale() here — it reads request headers and forces the
+  // whole tree dynamic (Fluid CPU on every marketing crawl). Locale layout
+  // sets `document.documentElement.lang` to the real locale.
   return (
     <html
-      lang={locale}
+      lang={routing.defaultLocale}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">

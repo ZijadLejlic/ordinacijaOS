@@ -309,7 +309,7 @@ describeSecurity(
         expect(rows ?? []).toHaveLength(0);
       });
 
-      it("owner cannot INSERT a second clinic_subscriptions row for a clinic that already has one (simulated Stripe/RPC bypass attempt)", async () => {
+      it("owner cannot INSERT a second clinic_subscriptions row for a clinic that already has one (simulated billing/RPC bypass attempt)", async () => {
         const planId = await resolvePlanId(service, "professional");
         const ownerClient = await signInAs(
           url,
@@ -373,7 +373,7 @@ describeSecurity(
 
         const { data: updated, error } = await doctorClient
           .from("clinic_subscriptions")
-          .update({ stripe_customer_id: `forged-${randomTag()}` })
+          .update({ provider_customer_id: `forged-${randomTag()}` })
           .eq("id", subscriptionId)
           .select("id");
 
@@ -382,10 +382,10 @@ describeSecurity(
 
         const { data: unchanged } = await service
           .from("clinic_subscriptions")
-          .select("stripe_customer_id")
+          .select("provider_customer_id")
           .eq("id", subscriptionId)
           .single();
-        expect(unchanged?.stripe_customer_id).toBeNull();
+        expect(unchanged?.provider_customer_id).toBeNull();
       });
 
       it("bonus: owner CAN UPDATE their own clinic_subscriptions row (positive control — the missing INSERT/DELETE policy isn't masking a broken UPDATE policy too)", async () => {
@@ -395,21 +395,21 @@ describeSecurity(
           clinic.byRole.owner!.email,
           clinic.byRole.owner!.password,
         );
-        const stripeId = `cus_test_${randomTag()}`;
+        const customerId = `cus_test_${randomTag()}`;
 
         const { error } = await ownerClient
           .from("clinic_subscriptions")
-          .update({ stripe_customer_id: stripeId })
+          .update({ provider_customer_id: customerId })
           .eq("id", subscriptionId);
 
         expect(error).toBeNull();
 
         const { data: changed } = await service
           .from("clinic_subscriptions")
-          .select("stripe_customer_id")
+          .select("provider_customer_id")
           .eq("id", subscriptionId)
           .single();
-        expect(changed?.stripe_customer_id).toBe(stripeId);
+        expect(changed?.provider_customer_id).toBe(customerId);
       });
     });
   },

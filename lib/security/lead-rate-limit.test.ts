@@ -12,12 +12,14 @@ import { hashIp, RATE_LIMIT_PER_HOUR } from "@/lib/leads/rate-limit";
  * Closes `MKT-INT-001`; reinforces `MKT-SEC-002` at SA boundary / W13 / T-AVL-01.
  *
  * **Mechanism (grepped, not assumed):**
- * - `submitLeadAction` (`lib/leads/actions.ts`): filled `website` honeypot →
- *   `{ ok: true }` **without** INSERT/email (silent bot success — not Zod
- *   reject; Zod path = `MKT-UNIT-003`). Else service-role count of `leads`
- *   with same `ip_hash` in last hour; if `count >= RATE_LIMIT_PER_HOUR` (5)
- *   → `rateLimited`. IP from `x-forwarded-for` / `x-real-ip` via
- *   `getRequestIp`; stored as `hashIp` only.
+ * - `submitLeadAction` (`lib/leads/actions.ts`): filled `website`/`company`
+ *   honeypot → `{ ok: true }` **without** INSERT/email (silent bot success —
+ *   not Zod reject; Zod path = `MKT-UNIT-003`). SEO/indexing copy and
+ *   lookalike `@search-dentord.com` mail → same silent drop (`detectLeadSpam`,
+ *   `MKT-UNIT-004`). Else service-role count of `leads` with same `ip_hash`
+ *   in last hour; if `count >= RATE_LIMIT_PER_HOUR` (5) → `rateLimited`. IP
+ *   from `x-forwarded-for` / `x-real-ip` via `getRequestIp`; stored as
+ *   `hashIp` only.
  * - Leads table deny-all for anon/auth = `MKT-SEC-001` (already COVERED).
  *
  * Pattern: mock `createServiceClient` + `next/headers` + Resend; real SA.
@@ -51,19 +53,26 @@ vi.mock("@/lib/email/resend", () => ({
 
 import { submitLeadAction } from "@/lib/leads/actions";
 
-function leadForm(opts?: { website?: string; name?: string }): FormData {
+function leadForm(opts?: {
+  website?: string;
+  company?: string;
+  name?: string;
+  email?: string;
+  message?: string;
+}): FormData {
   const tag = randomTag().slice(-6);
   const fd = new FormData();
   fd.set("name", opts?.name ?? `Lead ${tag}`);
   fd.set("clinicName", `Clinic ${tag}`);
   fd.set("phone", "+38761123456");
-  fd.set("email", `lead-${tag}@ordinacijaos.test`);
+  fd.set("email", opts?.email ?? `lead-${tag}@ordinacijaos.test`);
   fd.set("preferredTime", "anytime");
-  fd.set("message", "");
+  fd.set("message", opts?.message ?? "");
   fd.set("gdpr", "on");
   fd.set("locale", "bs");
   fd.set("sourcePage", "contact");
   fd.set("website", opts?.website ?? "");
+  fd.set("company", opts?.company ?? "");
   return fd;
 }
 
@@ -99,6 +108,49 @@ describeSecurity("P5.3 lead rate limit + honeypot (MKT-INT-001/SEC-002)", () => 
     const result = await submitLeadAction(
       null,
       leadForm({ website: "https://bot.example" }),
+    );
+    expect(result).toEqual({ ok: true });
+
+    const after = await service
+      .from("leads")
+      .select("id", { count: "exact", head: true })
+      .eq("ip_hash", ipHash);
+    expect(after.count ?? 0).toBe(before.count ?? 0);
+  }, 30_000);
+
+  it("MKT-SEC-002 SA: company honeypot → silent ok, no lead row", async () => {
+    const before = await service
+      .from("leads")
+      .select("id", { count: "exact", head: true })
+      .eq("ip_hash", ipHash);
+
+    const result = await submitLeadAction(
+      null,
+      leadForm({ company: "Bot Corp" }),
+    );
+    expect(result).toEqual({ ok: true });
+
+    const after = await service
+      .from("leads")
+      .select("id", { count: "exact", head: true })
+      .eq("ip_hash", ipHash);
+    expect(after.count ?? 0).toBe(before.count ?? 0);
+  }, 30_000);
+
+  it("MKT-INT-003: SEO indexing pitch → silent ok, no lead row", async () => {
+    const before = await service
+      .from("leads")
+      .select("id", { count: "exact", head: true })
+      .eq("ip_hash", ipHash);
+
+    const result = await submitLeadAction(
+      null,
+      leadForm({
+        name: "Antonietta",
+        email: "domains@search-dentord.com",
+        message:
+          "Feature dentord.com in Google's Search Index! helpindex.org",
+      }),
     );
     expect(result).toEqual({ ok: true });
 

@@ -1,13 +1,18 @@
 /**
- * Message / content catalog resolution (D37 strategy B).
+ * Message / content catalog resolution (D37).
  *
- * `hr` and `sr` (Serbian Latin) share the Bosnian (`bs`) catalog and MDX.
- * English stays a separate catalog.
- *
- * TODO: Add real `messages/hr.json` + `messages/sr.json` (and `content/blog/{hr,sr}/`)
- * when dedicated HR/SR translations ship — then stop remapping here.
+ * UI catalogs: `messages/{bs,hr,sr,en}.json`.
+ * Blog MDX still only exists under `content/blog/{bs,en}/` — hr/sr reuse BS posts.
  */
-export function catalogLocale(locale: string): "bs" | "en" {
+export type MessageLocale = "bs" | "hr" | "sr" | "en";
+
+export function catalogLocale(locale: string): MessageLocale {
+  if (locale === "en" || locale === "hr" || locale === "sr") return locale;
+  return "bs";
+}
+
+/** MDX blog directories — dedicated hr/sr posts are optional later. */
+export function blogCatalogLocale(locale: string): "bs" | "en" {
   return locale === "en" ? "en" : "bs";
 }
 

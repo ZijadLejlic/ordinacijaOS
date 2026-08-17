@@ -83,7 +83,15 @@ export default async function PlatformClinicPage({ params }: Props) {
                 : "—"}
             </p>
             <p>
-              {t("stripeCustomer")}: {subscription?.stripe_customer_id ?? "—"}
+              {t("billingProvider")}: {subscription?.provider ?? "—"}
+            </p>
+            <p>
+              {t("billingPaymentMethod")}:{" "}
+              {subscription?.payment_method ?? "—"}
+            </p>
+            <p>
+              {t("billingCustomer")}:{" "}
+              {subscription?.provider_customer_id ?? "—"}
             </p>
             <p>
               {t("currentPlan")}: {clinic.plan?.code ?? entitlements.planCode}

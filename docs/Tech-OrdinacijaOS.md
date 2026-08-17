@@ -31,7 +31,7 @@ Zaključati **kako** gradimo DentOrd (stack, patterni, granice), da agent/develo
 | Email | Resend (`dentord.com`) | From `DentOrd <noreply@dentord.com>`; aliases `support@`, `hello@` (D9, D23, D44). Brand constants: `lib/brand/constants.ts` |
 | Errors | Sentry | Tag `clinic_id` gdje je safe |
 | Analytics | PostHog | Bez imena pacijenata (D33) |
-| Billing | Stripe od 1.1.2027 | Do tada bez charge (D4–D5) |
+| Billing | Lemon Squeezy (MoR) + virman od 1.1.2027 | Do tada bez charge (D4–D5). Kartica **ili** virman po izboru klinike (D54–D55); kod provider-agnostičan |
 
 ### Scaffold odluke (zaključano 2026-07-12)
 
@@ -40,7 +40,7 @@ Zaključati **kako** gradimo DentOrd (stack, patterni, granice), da agent/develo
 | Next.js | 16.2.x (App Router) |
 | React | 19.2.x |
 | Package manager | npm |
-| i18n | `next-intl` — locales `bs` (default), `hr`, `sr`, `en`; prefix always; hr/sr load `messages/bs.json` (strategy B) |
+| i18n | `next-intl` — locales `bs` (default), `hr`, `sr`, `en`; prefix always; dedicated `messages/{bs,hr,sr,en}.json` |
 | UI | shadcn/ui preset `base-nova` (`components.json`) |
 | Supabase clients | `@supabase/ssr` + `@supabase/supabase-js` u `lib/supabase/` |
 | Validacija | Zod |
@@ -126,9 +126,10 @@ lib/
   entitlements/
   validations/            # Zod schemas
 messages/
-  bs.json                 # Shared by bs/hr/sr until dedicated HR/SR catalogs
+  bs.json
+  hr.json                 # Croatian (Latin); public prices in EUR
+  sr.json                 # Serbian Latin (ekavian); public prices in EUR
   en.json
-  # TODO: hr.json, sr.json — real translations (see i18n/catalog.ts)
 docs/
   PRD-OrdinacijaOS.md
   Tech-OrdinacijaOS.md
@@ -180,7 +181,7 @@ docs/
 
 | Setting | Default | Decision |
 |---|---|---|
-| Locale UI | `bs` (+ `hr`/`sr` → BS catalog, `en`) | D37 |
+| Locale UI | `bs` / `hr` / `sr` / `en` (dedicated catalogs; HR/SR prices in EUR) | D37 |
 | Timezone | `Europe/Sarajevo` | D47 |
 | Phone country | `+387` | D46 |
 | Valuta prikaza | EUR sa PDV-om | PRD header |
@@ -207,7 +208,61 @@ Iz PRD §10 / Decision Log — posebno u 2026 free MVP:
 
 ---
 
-## 10. Faze implementacije (referenca)
+## 10. Billing arhitektura (Faza 4 — D54/D55)
+
+Ne graditi prije Faze 4. Ovdje samo da sljedeći developer ne izmisli drugačije.
+
+**Pravilo br. 1:** izvor istine za pristup je **naša baza**, ne provider. App nikad ne pita Lemon Squeezy "je li ovaj platio" — čita `clinic_subscriptions` + `plans` (D42).
+
+**Dva ulaza, jedan izlaz.** Kartica (LS webhook) i virman (platform admin akcija) pišu **isti** red u `clinic_subscriptions`. Sve nizvodno — entitlements, lifecycle, UI — ne zna niti smije znati kojim putem je plaćeno.
+
+### Kartica — Lemon Squeezy
+
+| Stavka | Odluka |
+|---|---|
+| Checkout | LS hosted checkout; `custom_data` = `clinic_id` (+ `user_id` za audit), **ne** samo user id (D7) |
+| Webhook | `POST /api/billing/lemonsqueezy/webhook` — izvan `[locale]` routinga, bez CSRF/auth middlewarea |
+| Potpis | HMAC-SHA256 `X-Signature` nad **raw** bodyjem; signing secret iz env-a; odbiti prije parsiranja |
+| Idempotencija | Tabela obrađenih event ID-jeva; LS retry-a evente. Out-of-order zaštita preko provider `updated_at`, ne redoslijeda dolaska |
+| Upis | Service role (RLS bypass je ovdje ispravan — `clinic_subscriptions` namjerno nema INSERT policy); svaki upis u `audit_events` |
+| Plan mapping | LS variant → `plans.id` iz baze/configa. **Nikad hardcode feature seta po variantu** (D42) |
+| Eventi | `subscription_created`, `subscription_updated`, `subscription_cancelled`, `subscription_expired`, `subscription_payment_success`, `subscription_payment_failed` |
+
+### Virman
+
+- Platform admin (`/platform`, D41) postavlja plan / status / `current_period_end` nakon evidentirane uplate; već postoji kao skeleton.
+- Ista audit obaveza kao impersonacija — ko je, kada i koju kliniku produžio.
+- Ne zahtijeva nijedan vanjski servis; može raditi i ako LS integracija nikad ne zaživi.
+- **Ali zahtijeva registrovanu pravnu formu prodavca** (PRD §4.5 / §14). Dok je prodavac fizičko lice, ovaj put se ne nudi u UI-ju — kartica preko MoR-a je jedini put.
+
+### Veza s lifecycleom
+
+`past_due` / `cancelled` / `expired` **ne** gase kliniku direktno. Oni samo mijenjaju status, a gašenje ide kroz postojeći `runClinicLifecycleJob` (D6: 7 dana read-only → export → hard delete). Ne uvoditi drugi put gašenja.
+
+### Preduvjet prije koda
+
+D54 nosi hard preduvjet: verifikovan LS nalog i **potvrđen test payout na BiH račun**. Dok to nije potvrđeno, gradi se samo virman put (koji ne ovisi o provideru).
+
+### Plan: septembar 2026 (implementacija + test), naplata od 1.1.2027
+
+Billing se piše ranije nego što se naplaćuje — namjerno, da odleži prije prvog pravog računa. D5 ostaje netaknut.
+
+| # | Korak | Napomena |
+|---|---|---|
+| 0 | LS nalog verifikovan + test payout sjeo | **Blocker.** Pokrenuti prije koda (PRD §14) |
+| 1 | DB migracija: `provider`, `provider_customer_id`, `provider_subscription_id`, `provider_variant_id`, `payment_method` | **Gotovo (2026-08-17).** `20260817220000_clinic_subscriptions_provider_agnostic`; remote applied. `stripe_*` renamed; `billing_provider` / `billing_payment_method` enums; unique `(provider, provider_subscription_id)` |
+| 2 | Variant → `plans.id` mapping (tabela ili config) | Entitlements i dalje iz `plans` (D42) |
+| 3 | Webhook `POST /api/billing/lemonsqueezy/webhook` | Raw body + `X-Signature`, idempotencija, service-role upis, `audit_events` |
+| 4 | Checkout entry point u appu | `custom_data.clinic_id`; godišnje kao preporučeni default (D48) |
+| 5 | Virman put u `/platform` | Tek kad postoji registrovana pravna forma (PRD §4.5) |
+| 6 | Testovi | Potpis (valid/invalid/replay), variant→plan mapping tamper, oba puta daju identične entitlements, `past_due` ne gasi kliniku odmah nego kroz D6 lifecycle |
+| 7 | LS test mode E2E | Test kartica → webhook → plan se otključa; cancel → vrijedi do `current_period_end` |
+
+**Ne uključivati naplatu u produkciji prije 1.1.2027** — do tada je sve iza LS test moda / platform admina.
+
+---
+
+## 11. Faze implementacije (referenca)
 
 Prati PRD §11. Tech doc se širi po fazama; ne specifikovati Enterprise module ovdje dok Faza 4 ne krene.
 
@@ -216,11 +271,11 @@ Prati PRD §11. Tech doc se širi po fazama; ne specifikovati Enterprise module 
 | 1 | Repo, RLS, auth, entitlements, marketing skeleton, Sentry/PostHog |
 | 2 | Clinical + finance core |
 | 3 | SaaS ops, GDPR, audit, email/CRM |
-| 4 | Stripe, AI, channels, Enterprise |
+| 4 | Billing (LS + virman), AI, channels, Enterprise |
 
 ---
 
-## 11. Changelog
+## 12. Changelog
 
 | Datum | Promjena |
 |---|---|
@@ -270,3 +325,9 @@ Prati PRD §11. Tech doc se širi po fazama; ne specifikovati Enterprise module 
 | 2026-07-30 | Forgot-password sends via Auth Admin `generateLink` + Resend (Supabase built-in mailer hit Free rate limits) |
 | 2026-07-30 | Recovery emails use `/auth/confirm` + `token_hash`/`verifyOtp` (not Supabase `action_link` hash redirect) |
 | 2026-07-30 | Password reset with MFA: AAL1 recovery → `/mfa/verify?next=/reset-password` → AAL2 → update password |
+| 2026-08-17 | D37: dedicated `messages/hr.json` + `messages/sr.json`; HR/SR public prices in EUR; stale Server Action deploy-skew dropped in Sentry |
+| 2026-08-17 | Marketing Fluid CPU: static marketing layout; middleware skips `getUser()` on public routes; OG Cache-Control; lead SEO-spam silent drop |
+| 2026-08-17 | D54/D55 (mijenja D5): billing provider = Lemon Squeezy (MoR, Stripe nedostupan u BiH); pretplata se plaća karticom **ili** virmanom po izboru klinike; §10 billing arhitektura; DB kolone se u Fazi 4 preimenuju u provider-agnostične |
+| 2026-08-17 | D55 pojašnjenje: virman put traži registrovanu pravnu formu prodavca; dok je prodavac freelance, MoR kartica je jedini dostupni put |
+| 2026-08-17 | Billing povučen naprijed: implementacija + test u septembru 2026 (LS test mode), produkcijska naplata i dalje od 1.1.2027 (D5 nepromijenjen); §10 plan koraka |
+| 2026-08-17 | Korak 1 billing plana: `clinic_subscriptions` provider-agnostične kolone (`provider_*`, `billing_provider`, `billing_payment_method`); Stripe nazivi uklonjeni |

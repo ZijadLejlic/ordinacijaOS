@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
@@ -17,8 +17,23 @@ import {
   submitLeadAction,
   type LeadActionState,
 } from "@/lib/leads/actions";
+import { isStaleServerActionError } from "@/lib/observability/sentry-privacy";
 import { leadPreferredTimes } from "@/lib/validations/lead";
 import { cn } from "@/lib/utils";
+
+async function submitLeadWithRecovery(
+  prev: LeadActionState,
+  formData: FormData,
+): Promise<LeadActionState> {
+  try {
+    return await submitLeadAction(prev, formData);
+  } catch (error) {
+    if (isStaleServerActionError(error)) {
+      return { error: "stale" };
+    }
+    throw error;
+  }
+}
 
 const inputClass =
   "h-10 rounded-[10px] border-[color-mix(in_oklab,var(--marketing-ink)_18%,transparent)] bg-[var(--marketing-surface)] text-[var(--marketing-ink)] placeholder:text-[color-mix(in_oklab,var(--marketing-ink)_40%,transparent)] focus-visible:border-[var(--marketing-accent)] focus-visible:ring-[var(--marketing-accent)]/25";
@@ -26,10 +41,15 @@ const inputClass =
 export function ContactLeadForm() {
   const t = useTranslations("Marketing.contact.form");
   const locale = useLocale();
+  const [formTs, setFormTs] = useState("");
   const [state, formAction, pending] = useActionState<
     LeadActionState,
     FormData
-  >(submitLeadAction, null);
+  >(submitLeadWithRecovery, null);
+
+  useEffect(() => {
+    setFormTs(String(Date.now()));
+  }, []);
 
   if (state?.ok) {
     return (
@@ -68,6 +88,7 @@ export function ContactLeadForm() {
 
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="sourcePage" value="contact" />
+      <input type="hidden" name="formTs" value={formTs} />
 
       {/* Honeypot — hidden from users, bots often fill it. */}
       <div aria-hidden className="absolute -left-[9999px] top-auto h-0 w-0 overflow-hidden">
@@ -75,6 +96,14 @@ export function ContactLeadForm() {
         <input
           id="lead-website"
           name="website"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+        />
+        <label htmlFor="lead-company">{t("honeypot")}</label>
+        <input
+          id="lead-company"
+          name="company"
           type="text"
           tabIndex={-1}
           autoComplete="off"
@@ -189,7 +218,18 @@ export function ContactLeadForm() {
           </FieldLabel>
         </Field>
 
-        {state?.error ? (
+        {state?.error === "stale" ? (
+          <FieldError>
+            {t("errors.stale")}{" "}
+            <button
+              type="button"
+              className="font-medium text-[var(--marketing-accent)] underline-offset-2 hover:underline"
+              onClick={() => window.location.reload()}
+            >
+              {t("errors.staleReload")}
+            </button>
+          </FieldError>
+        ) : state?.error ? (
           <FieldError>{t(`errors.${state.error}`)}</FieldError>
         ) : null}
 

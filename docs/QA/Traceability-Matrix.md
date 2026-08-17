@@ -13,7 +13,7 @@
 | D2 | MVP paket | Professional (25€/mj) + branding | `PLAN-UNIT-001`, `MKT-UNIT-001` | COVERED | Marketing prices + entitlements unit; Stripe charge N/A until Faza 4 |
 | D3 | Van MVP free | No AI / SMS / WhatsApp / patient portal | `PLAN-UNIT-002`, `PLAN-INT-011` | COVERED | Free-period override unit + Pro SA feature INT; optional free-period INT `PLAN-INT-010` never catalogued |
 | D4 | Free trial | Self-signup; trial_ends_at ≤ 2026-12-31 | `AUTH-E2E-001`, `AUTH-INT-001` | COVERED | Signup E2E + trial/defaults INT COVERED |
-| D5 | Billing start | Stripe from 2027-01-01 | `PLAN-UNIT-002` | COVERED | Free-period / 2027 date constant unit; Stripe charge N/A until Faza 4 |
+| D5 | Billing start | Online billing from 2027-01-01 (provider/methods per D54–D55) | `PLAN-UNIT-002` | COVERED | Free-period / 2027 date constant unit; charge paths N/A until Faza 4 |
 | D6 | After free | 7d read-only → export → delete | `LIFE-RLS-001`, `LIFE-INT-001`, `LIFE-INT-002`, `LIFE-API-001` | COVERED | Writable + closure + grace→pending_delete + cron gate + SA write-block across modules COVERED |
 | D7 | Tenant model | 1 user = 1 clinic; owner sees all locations | `TEN-RLS-001..002`, `TEN-RLS-007..015`, `TEN-E2E-001`, `TEN-SEC-002` | COVERED | All clinic-scoped tables + forged-`clinic_id` + UI IDOR (P1.1); IDs 003–006 never assigned |
 | D8 | Pro limits | ≤5 doctors, ≤10 users, ≤2 locations; hard block | `PLAN-DB-001`, `PLAN-DB-002`, `PLAN-DB-003` | COVERED | Invite + location + 6th-doctor seat triggers COVERED |
@@ -60,6 +60,8 @@
 | D49 | Buyer | Clinic owner | — | N/A | Persona |
 | D50 | Security stance | Tool for records; doctor decides | — | N/A | Disclaimer / legal |
 | D51 | Cross-clinic | v1 = 1 user 1 clinic | `TEN-SEC-001` | GAP | Negative: no membership switcher |
+| D54 | Billing provider | Lemon Squeezy (MoR), provider-agnostic columns | — | N/A | Build + test **Sept 2026**, charge from 2027-01-01. Must be covered before prod: webhook signature (valid/invalid/replay), idempotency, service-role write + audit (`BILL-SEC-*`) |
+| D55 | Payment methods | Card (LS checkout) **or** bank transfer (admin-activated), clinic's choice | — | N/A | Same window. Both paths must produce identical entitlements/lifecycle — assert no method-dependent branching downstream; bank-transfer path gated on seller being a registered entity |
 
 ---
 
@@ -182,7 +184,7 @@ Existing Vitest coverage for RBAC matrix (finances, clinical, front desk, owner-
 | Locales BS/HR/SR/EN + hreflang | `MKT-E2E-001` | COVERED |
 | Pages (home, pricing, features, FAQ, contact, legal, blog) | `MKT-E2E-002` | COVERED |
 | CTA → signup | `MKT-E2E-002` | COVERED |
-| Lead form (honeypot + rate limit) | `MKT-UNIT-003`, `MKT-INT-001`, `MKT-SEC-001`, `MKT-SEC-002` | COVERED |
+| Lead form (honeypot + rate limit + spam copy) | `MKT-UNIT-003`, `MKT-UNIT-004`, `MKT-INT-001`, `MKT-INT-003`, `MKT-SEC-001`, `MKT-SEC-002` | COVERED |
 | Cookie consent gates PostHog | `PII-UNIT-002`, `MKT-E2E-004` | COVERED |
 | Demo clinic open | `MKT-INT-002` | GAP |
 | OG image `/api/og` | `MKT-API-001` | COVERED |
@@ -243,7 +245,7 @@ Existing Vitest coverage for RBAC matrix (finances, clinical, front desk, owner-
 | `lib/security/non-image-upload.test.ts` | `FILE-INT-001` | non-image / spoofed MIME → rejected (no patient_images row) |
 | `lib/security/session-ttl-config.test.ts` | `AUTH-INT-021` | config.toml jwt_expiry + sessions timebox = 7d |
 | `lib/security/lockout-email-enumeration.test.ts` | `AUTH-SEC-003` | lockout RPC unknown ≡ unlocked; locked message generic |
-| `lib/security/lead-rate-limit.test.ts` | `MKT-INT-001`, `MKT-SEC-002` | 5/hour IP cap; honeypot silent ok no INSERT |
+| `lib/security/lead-rate-limit.test.ts` | `MKT-INT-001`, `MKT-INT-003`, `MKT-SEC-002` | 5/hour IP cap; honeypot + SEO-spam silent ok no INSERT |
 | `lib/security/invite-force-logout-deactivate.test.ts` | `AUTH-INT-010`, `AUTH-INT-020` | invite seat + force logout + deactivate |
 | `lib/security/plan-feature-assert-sa.test.ts` | `PLAN-INT-011`, `CAL-INT-005` | Pro SA assertFeature; DnD/reschedule `calendar_advanced` (same path, no duplicate) |
 | `lib/security/shared-pricelist.test.ts` | `PLAN-INT-020` | Shared pricelist toggle clears `services.location_id` |
@@ -315,7 +317,7 @@ Existing Vitest coverage for RBAC matrix (finances, clinical, front desk, owner-
 
 ### 10.5 Out of MVP (track as N/A until Faza 4)
 
-D26, D27, D31, D32, D48, patient portal, online booking, mini site, Stripe charge paths, metered billing UI.
+D26, D27, D31, D32, D48, D54, D55, patient portal, online booking, mini site, subscription charge paths (Lemon Squeezy webhook + manual/bank-transfer activation), metered billing UI.
 
 ---
 

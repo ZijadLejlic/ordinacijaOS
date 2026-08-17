@@ -23,6 +23,9 @@ type Props = {
   params: Promise<{ locale: string }>;
 };
 
+/** Public marketing is CDN-static — crawlers must not invoke Node per request. */
+export const dynamic = "force-static";
+
 export default async function MarketingLayout({ children, params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);

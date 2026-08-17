@@ -67,7 +67,7 @@ function dpaBs(): LegalDocument {
         id: "podobradaitelji",
         title: "7. Lista podobradaitelja",
         paragraphs: [
-          "Trenutni podobradaitelji uključuju: Supabase, Vercel, Resend, Sentry, PostHog (bez imena pacijenata u analytics), te Stripe od naplate.",
+          "Trenutni podobradaitelji uključuju: Supabase, Vercel, Resend, Sentry, PostHog (bez imena pacijenata u analytics), te Lemon Squeezy od početka naplate pretplate karticom.",
           "O izmjeni materijalnih podobradaitelja Controller će biti obaviješten u razumnom roku i imati pravo prigovora u skladu s primjenjivim propisima.",
         ],
       },
@@ -177,7 +177,7 @@ function dpaEn(): LegalDocument {
         id: "subprocessors",
         title: "7. Sub-processors",
         paragraphs: [
-          "Current sub-processors include: Supabase, Vercel, Resend, Sentry, PostHog (no patient names in analytics), and Stripe once billing starts.",
+          "Current sub-processors include: Supabase, Vercel, Resend, Sentry, PostHog (no patient names in analytics), and Lemon Squeezy once card subscription billing starts.",
           "Material sub-processor changes will be notified to the Controller within a reasonable time, with a right to object under applicable law.",
         ],
       },

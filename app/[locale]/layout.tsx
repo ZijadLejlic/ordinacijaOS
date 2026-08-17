@@ -1,6 +1,7 @@
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { HtmlLang } from "@/components/i18n/html-lang";
 import { routing } from "@/i18n/routing";
 import { marketingMessages } from "@/lib/i18n/client-messages";
 
@@ -41,6 +42,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   // (dashboard) instead. Vercel Analytics / Speed Insights stay in root.
   return (
     <NextIntlClientProvider messages={marketingMessages(messages)}>
+      <HtmlLang locale={locale} />
       <div className="flex min-h-full flex-1 flex-col">{children}</div>
     </NextIntlClientProvider>
   );

@@ -406,10 +406,15 @@ export type Database = {
           created_at: string
           current_period_end: string | null
           id: string
+          payment_method:
+            | Database["public"]["Enums"]["billing_payment_method"]
+            | null
           plan_id: string
+          provider: Database["public"]["Enums"]["billing_provider"] | null
+          provider_customer_id: string | null
+          provider_subscription_id: string | null
+          provider_variant_id: string | null
           status: Database["public"]["Enums"]["subscription_status"]
-          stripe_customer_id: string | null
-          stripe_subscription_id: string | null
           updated_at: string
         }
         Insert: {
@@ -417,10 +422,15 @@ export type Database = {
           created_at?: string
           current_period_end?: string | null
           id?: string
+          payment_method?:
+            | Database["public"]["Enums"]["billing_payment_method"]
+            | null
           plan_id: string
+          provider?: Database["public"]["Enums"]["billing_provider"] | null
+          provider_customer_id?: string | null
+          provider_subscription_id?: string | null
+          provider_variant_id?: string | null
           status?: Database["public"]["Enums"]["subscription_status"]
-          stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -428,10 +438,15 @@ export type Database = {
           created_at?: string
           current_period_end?: string | null
           id?: string
+          payment_method?:
+            | Database["public"]["Enums"]["billing_payment_method"]
+            | null
           plan_id?: string
+          provider?: Database["public"]["Enums"]["billing_provider"] | null
+          provider_customer_id?: string | null
+          provider_subscription_id?: string | null
+          provider_variant_id?: string | null
           status?: Database["public"]["Enums"]["subscription_status"]
-          stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -2281,6 +2296,8 @@ export type Database = {
         | "completed"
         | "cancelled"
         | "no_show"
+      billing_payment_method: "card" | "bank_transfer"
+      billing_provider: "lemonsqueezy" | "paddle" | "manual"
       clinic_status: "active" | "readonly" | "pending_delete"
       expense_category:
         | "supplies"
@@ -2465,6 +2482,8 @@ export const Constants = {
         "cancelled",
         "no_show",
       ],
+      billing_payment_method: ["card", "bank_transfer"],
+      billing_provider: ["lemonsqueezy", "paddle", "manual"],
       clinic_status: ["active", "readonly", "pending_delete"],
       expense_category: [
         "supplies",

@@ -8,19 +8,11 @@ alwaysApply: false
 
 - Locales: `bs` (default), `hr`, `sr` (Serbian Latin), `en`.
 - Route under `[locale]` (`/bs/...`, `/hr/...`, `/sr/...`, `/en/...`); do not hardcode locale-less user-facing strings in UI.
-- **Content strategy B (D37):** `hr`/`sr` load the `bs` message catalog via `catalogLocale()` in `i18n/catalog.ts` + `i18n/request.ts`. Do **not** maintain parallel full catalogs until dedicated translations ship.
-- English stays a separate catalog (`messages/en.json`).
+- Dedicated catalogs: `messages/bs.json`, `messages/hr.json`, `messages/sr.json`, `messages/en.json` loaded from `i18n/request.ts`.
+- When adding UI text, update **all four** catalogs (or regenerate hr/sr from bs via `python3 scripts/adapt-hr-sr-from-bs.py` then re-check wording).
 - Balkan marketing pathnames (`/cijene`, `/funkcije`, `/kontakt`, …) are shared by `bs`/`hr`/`sr` in `i18n/routing.ts`.
-- Put copy in message catalogs; when adding UI text, update `bs` + `en` (hr/sr inherit bs until real translations).
+- Public prices: BS displays KM; **HR / SR / EN display EUR** (`lib/money/format.ts`).
+- Blog MDX: `content/blog/{bs,en}/` — hr/sr reuse BS posts (`blogCatalogLocale()`).
 - Locale switcher labels live under `Locale.*` (not hardcoded in components).
 - Dates/times: respect clinic timezone (default `Europe/Sarajevo`).
 - Phone inputs: default country `+387` unless clinic setting overrides.
-
-## TODO — dedicated HR / SR translations
-
-When shipping real Croatian and Serbian (Latin) copy:
-
-1. Add `messages/hr.json` and `messages/sr.json` (start from `bs.json` and adapt).
-2. Stop remapping in `catalogLocale()` / `i18n/request.ts` (load per-locale files).
-3. Optionally add `content/blog/{hr,sr}/` instead of BS MDX fallback.
-4. Update this rule, PRD D37, and Website-DentOrd §3.1.

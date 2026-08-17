@@ -36,7 +36,7 @@
 | W14 | Animacije: **suptilne** (fade/slide na scroll, hover mikrointerakcije) |
 | W15 | Ikonice: **Lucide** svugdje, konzistentno s appom |
 | W16 | Imagery: **samo UI screenshoti + brand grafika** — bez stock fotki ljudi |
-| W17 | SEO: **BiH primarno**, regija (HR/SRB/CG) sekundarno kroz isti BS sadržaj |
+| W17 | SEO: **BiH primarno**, regija (HR/SRB/CG) sekundarno kroz HR/SR kataloge + dijeljene Balkan slugove |
 | W18 | Analytics: **PostHog + cookie consent banner** (D33 — bez ličnih podataka) |
 | W19 | **Samo light tema** na marketing siteu |
 | W20 | Dokument sadrži **gotov copy draft BS + EN** za sve sekcije |
@@ -182,7 +182,7 @@ Pravila:
 
 Public route group u istom projektu: `app/[locale]/(marketing)/`. Locales: **`bs`** (default), **`hr`**, **`sr`** (latinica), **`en`** — svi sa prefixom (`localePrefix: "always"`; unprefixed BS blokiran Next.js rewrite bugom — vidi `i18n/routing.ts`).
 
-**Sadržaj (strategija B / D37):** `hr` i `sr` dijele BS message katalog i BS marketing slugove (`i18n/catalog.ts`). Engleski je zaseban katalog. **TODO:** pravi `messages/hr.json` + `messages/sr.json` kad bude prevod.
+**Sadržaj (D37):** zasebni katalozi `messages/{bs,hr,sr,en}.json`. Marketing slugovi (`/cijene`, `/funkcije`, `/kontakt`, …) ostaju dijeljeni za bs/hr/sr. Javne cijene: BS u KM, HR/SR/EN u EUR.
 
 | Ruta (BS / HR / SR) | Ruta (EN) | Stranica |
 |---|---|---|
@@ -230,7 +230,7 @@ Public route group u istom projektu: `app/[locale]/(marketing)/`. Locales: **`bs
 
 ## 4. Stranice — struktura sekcija i copy
 
-> Copy je draft (W20): BS je primarni katalog; HR/SR trenutno dijele BS (strategija B); EN prevod. Realizacija smješta stringove u `messages/bs.json` / `messages/en.json` pod namespace `Marketing.*`. **TODO:** zasebni HR/SR katalozi.
+> Copy je draft (W20): BS je primarni katalog; HR i SR imaju zasebne prijevode (`messages/hr.json`, `messages/sr.json`) uz cijene u EUR; EN je zaseban katalog. Stringovi žive pod namespace `Marketing.*`.
 
 ### 4.1 Home (`/`)
 
@@ -369,7 +369,7 @@ Redoslijed sekcija:
 | Poruka | textarea | optional, max 1000 |
 | GDPR checkbox | BS: *"Saglasan/na sam da me DentOrd kontaktira povodom mog upita."* | required |
 
-3. **Backend (W13)**: server action → (a) insert u novu tabelu `public.leads` (`id, created_at, name, clinic_name, phone, email, preferred_time, message, locale, source_page, status`), RLS: **insert preko server-side klijenta, čitanje samo super-admin** (`/platform`, D41 — nema `clinic_id`, platformski podatak); (b) Resend email na `EMAIL_SUPPORT` sa sadržajem; (c) rate limit (IP, npr. 5/h) + honeypot polje protiv spama. Detalje tabele dokumentovati u `docs/DB-OrdinacijaOS.md` pri implementaciji.
+3. **Backend (W13)**: server action → (a) insert u novu tabelu `public.leads` (`id, created_at, name, clinic_name, phone, email, preferred_time, message, locale, source_page, status`), RLS: **insert preko server-side klijenta, čitanje samo super-admin** (`/platform`, D41 — nema `clinic_id`, platformski podatak); (b) Resend email na `EMAIL_SUPPORT` sa sadržajem; (c) rate limit (IP, npr. 5/h) + honeypot + filter SEO/index spama (helpindex, lookalike `*dentord*` mail). Detalje tabele dokumentovati u `docs/DB-OrdinacijaOS.md` pri implementaciji.
 4. Success state: inline potvrda — BS: *"Hvala! Nazvat ćemo vas u izabranom terminu."* + sekundarni CTA na tour.
 5. **FinalCta** (varijanta: "Ne želite čekati poziv? Registrujte se sami za 5 minuta.").
 

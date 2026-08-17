@@ -62,6 +62,19 @@ describe("Sentry privacy / expected-error filters (D33)", () => {
     ).toBeNull();
   });
 
+  it("treats stale Server Action deploy skew as expected", () => {
+    const err = new Error(
+      "Failed to find Server Action. This request might be from an older or newer deployment.",
+    );
+    expect(isExpectedBusinessError(err)).toBe(true);
+    expect(
+      sanitizeSentryEvent(
+        { type: undefined, message: err.message } as never,
+        { originalException: err } as never,
+      ),
+    ).toBeNull();
+  });
+
   it("drops intentional Sentry smoke tests and undefined rejection noise", () => {
     expect(
       sanitizeSentryEvent(

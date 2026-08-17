@@ -97,7 +97,7 @@ test.describe("Marketing smoke (MKT-E2E)", () => {
       expect(response?.status(), url).toBe(200);
     }
 
-    // Spot-check hr/sr share Balkan pricing slug (strategy B).
+    // Spot-check hr/sr share Balkan pricing slug.
     for (const locale of ["hr", "sr"] as const) {
       const response = await page.goto(`/${locale}/cijene`, {
         waitUntil: "domcontentloaded",
