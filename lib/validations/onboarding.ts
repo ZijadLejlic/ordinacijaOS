@@ -37,6 +37,7 @@ export const onboardingClinicSchema = z.object({
     .trim()
     .regex(/^\+\d{1,4}$/),
   workingHours: workingHoursSchema,
+  practicesAsDoctor: z.boolean(),
 });
 
 export const onboardingServiceSchema = z.object({

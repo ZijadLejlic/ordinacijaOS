@@ -17,7 +17,7 @@ import {
  *
  * **Mechanism (read, not invented):**
  * `uploadImageAction` (`lib/patients/actions.ts`):
- *   1. MIME must `startsWith("image/")` else `imageMustBeImage`
+ *   1. MIME/extension allowlist (`isAllowedPatientImageFile`) else `imageMustBeImage`
  *   2. `convertImageToWebp` via sharp (`lib/patients/storage.ts`) — corrupt /
  *      non-raster bytes → catch → `imageConvertFailed`
  *   No path stores raw exe bytes; conversion is mandatory before storage.

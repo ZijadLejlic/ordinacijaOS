@@ -162,23 +162,29 @@ export function AppointmentForm({
 
       <FieldGroup>
         {canPickDoctor ? (
-          <Field>
-            <FieldLabel htmlFor="doctorId">{t("doctor")}</FieldLabel>
-            <select
-              id="doctorId"
-              name="doctorId"
-              className="border-input bg-background h-8 w-full rounded-lg border px-2 text-sm"
-              value={doctorId}
-              onChange={(e) => setDoctorId(e.target.value)}
-              required
-            >
-              {doctors.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.fullName}
-                </option>
-              ))}
-            </select>
-          </Field>
+          doctors.length === 0 ? (
+            <p className="text-muted-foreground text-sm">
+              {t("noBookableDoctors")}
+            </p>
+          ) : (
+            <Field>
+              <FieldLabel htmlFor="doctorId">{t("doctor")}</FieldLabel>
+              <select
+                id="doctorId"
+                name="doctorId"
+                className="border-input bg-background h-8 w-full rounded-lg border px-2 text-sm"
+                value={doctorId}
+                onChange={(e) => setDoctorId(e.target.value)}
+                required
+              >
+                {doctors.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.fullName}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          )
         ) : null}
 
         <Field>
@@ -295,7 +301,7 @@ export function AppointmentForm({
       ) : null}
 
       <div className="flex flex-wrap gap-2">
-        <Button type="submit" disabled={pending || !patientId}>
+        <Button type="submit" disabled={pending || !patientId || (canPickDoctor && !doctorId)}>
           {pending
             ? t("submitting")
             : mode === "create"

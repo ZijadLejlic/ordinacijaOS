@@ -12,11 +12,14 @@ import {
 } from "@/lib/entitlements";
 import { canAccessPatients, canWritePatients } from "@/lib/patients/rbac";
 import {
+  isAllowedPatientImageFile,
+  MAX_IMAGE_SIZE_BYTES,
+} from "@/lib/patients/image-type";
+import {
   MAX_DOCUMENT_SIZE_BYTES,
   PATIENT_FILES_BUCKET,
   SIGNED_URL_TTL_SECONDS,
   convertImageToWebp,
-  MAX_IMAGE_SIZE_BYTES,
   asUploadBlob,
   documentPath,
   imagePath,
@@ -522,7 +525,7 @@ export async function uploadImageAction(
   if (!parsed.success || !(file instanceof File) || file.size === 0) {
     return { error: "invalid" };
   }
-  if (!file.type.startsWith("image/")) {
+  if (!isAllowedPatientImageFile(file)) {
     return { error: "imageMustBeImage" };
   }
   if (file.size > MAX_IMAGE_SIZE_BYTES) {

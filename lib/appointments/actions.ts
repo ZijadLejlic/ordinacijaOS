@@ -13,6 +13,7 @@ import {
   canWriteCalendar,
   canWriteWaitlist,
 } from "@/lib/calendar/rbac";
+import { isBookableDoctor } from "@/lib/staff/bookable";
 import { getClinicWriteBlock } from "@/lib/clinic/writable";
 import { assertFeature, clinicHasFeature } from "@/lib/entitlements";
 import { createClient } from "@/lib/supabase/server";
@@ -134,12 +135,12 @@ async function requireActiveDoctor(
 ) {
   const { data: doctor } = await supabase
     .from("profiles")
-    .select("id, role, is_active")
+    .select("id, role, is_active, practices_as_doctor")
     .eq("id", doctorId)
     .eq("clinic_id", clinicId)
     .maybeSingle();
 
-  if (!doctor || doctor.role !== "doctor" || !doctor.is_active) {
+  if (!doctor || !doctor.is_active || !isBookableDoctor(doctor)) {
     return { error: "doctorNotFound" as const };
   }
   return { error: null, doctor };
@@ -658,6 +659,15 @@ export async function addWaitlistAction(
     parsed.data.preferredTo < parsed.data.preferredFrom
   ) {
     return { error: "invalid" };
+  }
+
+  if (parsed.data.doctorId) {
+    const doctorCheck = await requireActiveDoctor(
+      supabase,
+      profile.clinic_id,
+      parsed.data.doctorId,
+    );
+    if (doctorCheck.error) return { error: doctorCheck.error };
   }
 
   const { data: row, error } = await supabase

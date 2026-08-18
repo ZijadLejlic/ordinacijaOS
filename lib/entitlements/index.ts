@@ -17,6 +17,7 @@ export {
 export {
   parseLimitsJson,
   assertCanInviteStaff,
+  assertCanEnablePracticesAsDoctor,
   assertCanCreateLocation,
   assertCanAddPatientImage,
   getClinicLimits,

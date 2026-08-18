@@ -1,11 +1,18 @@
 "use client";
 
-import { useActionState, useState, useTransition } from "react";
+import { useState, useTransition, type ChangeEvent, type FormEvent } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Field, FieldGroup, FieldLabel, FieldError } from "@/components/ui/field";
+import {
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+  FieldError,
+} from "@/components/ui/field";
 import {
   createSignedFileUrlAction,
   deleteDocumentAction,
@@ -14,6 +21,11 @@ import {
   uploadImageAction,
   type PatientActionState,
 } from "@/lib/patients/actions";
+import {
+  canAttemptPatientImageDecode,
+  PATIENT_IMAGE_ACCEPT,
+} from "@/lib/patients/image-type";
+import { preparePatientImageForUpload } from "@/lib/patients/rasterize-client";
 
 const KNOWN_ERRORS = [
   "invalid",
@@ -34,6 +46,7 @@ const KNOWN_ERRORS = [
   "imageConvertFailed",
   "imageNotFound",
   "uploadFailed",
+  "uploadInterrupted",
   "signedUrlFailed",
 ] as const;
 
@@ -95,14 +108,32 @@ function useSignedView() {
 
 export function DocumentUploadForm({ patientId }: { patientId: string }) {
   const t = useTranslations("Patients");
-  const [state, formAction, pending] = useActionState(
-    uploadDocumentAction.bind(null, patientId),
-    null,
-  );
+  const router = useRouter();
+  const [state, setState] = useState<PatientActionState>(null);
+  const [pending, startTransition] = useTransition();
   const error = mapStateError(t, state);
 
+  function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    setState(null);
+    startTransition(async () => {
+      try {
+        const result = await uploadDocumentAction(patientId, null, formData);
+        setState(result);
+        if (result?.message === "documentUploaded") {
+          form.reset();
+          router.refresh();
+        }
+      } catch {
+        setState({ error: "uploadInterrupted" });
+      }
+    });
+  }
+
   return (
-    <form action={formAction} className="space-y-3">
+    <form onSubmit={onSubmit} className="space-y-3">
       <FieldGroup className="grid gap-3 sm:grid-cols-[2fr_2fr]">
         <Field>
           <FieldLabel htmlFor="documentTitle">{t("documentTitle")}</FieldLabel>
@@ -202,14 +233,74 @@ export function DocumentsList({
 
 export function ImageUploadForm({ patientId }: { patientId: string }) {
   const t = useTranslations("Patients");
-  const [state, formAction, pending] = useActionState(
-    uploadImageAction.bind(null, patientId),
-    null,
-  );
+  const router = useRouter();
+  const [state, setState] = useState<PatientActionState>(null);
+  const [pending, startTransition] = useTransition();
   const error = mapStateError(t, state);
 
+  function onFileChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.currentTarget.files?.[0];
+    if (!file) {
+      setState(null);
+      return;
+    }
+    if (!canAttemptPatientImageDecode(file)) {
+      setState({ error: "imageMustBeImage" });
+      event.currentTarget.value = "";
+      return;
+    }
+    setState(null);
+  }
+
+  function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const submitted = new FormData(form);
+    const file = submitted.get("file");
+    const title = String(submitted.get("title") ?? "");
+
+    if (!(file instanceof File) || file.size === 0) {
+      setState({ error: "invalid" });
+      return;
+    }
+    if (!canAttemptPatientImageDecode(file)) {
+      setState({ error: "imageMustBeImage" });
+      return;
+    }
+
+    setState(null);
+    startTransition(async () => {
+      try {
+        let uploadFile: File;
+        try {
+          uploadFile = await preparePatientImageForUpload(file);
+        } catch (prepareError) {
+          const code =
+            prepareError instanceof Error ? prepareError.message : "";
+          setState({
+            error:
+              code === "imageTooLarge" ? "imageTooLarge" : "imageMustBeImage",
+          });
+          return;
+        }
+
+        const formData = new FormData();
+        formData.set("title", title);
+        formData.set("file", uploadFile);
+        const result = await uploadImageAction(patientId, null, formData);
+        setState(result);
+        if (result?.message === "imageUploaded") {
+          form.reset();
+          router.refresh();
+        }
+      } catch {
+        setState({ error: "uploadInterrupted" });
+      }
+    });
+  }
+
   return (
-    <form action={formAction} className="space-y-3">
+    <form onSubmit={onSubmit} className="space-y-3">
       <FieldGroup className="grid gap-3 sm:grid-cols-[2fr_2fr]">
         <Field>
           <FieldLabel htmlFor="imageTitle">{t("imageTitle")}</FieldLabel>
@@ -221,9 +312,11 @@ export function ImageUploadForm({ patientId }: { patientId: string }) {
             id="imageFile"
             name="file"
             type="file"
-            accept="image/*"
+            accept={PATIENT_IMAGE_ACCEPT}
             required
+            onChange={onFileChange}
           />
+          <FieldDescription>{t("imageFormatHint")}</FieldDescription>
         </Field>
       </FieldGroup>
       {error ? <FieldError>{error}</FieldError> : null}

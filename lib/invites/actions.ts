@@ -8,7 +8,10 @@ import {
   authEmailRedirectUrl,
   authRecoveryConfirmUrl,
 } from "@/lib/auth/app-url";
-import { assertCanInviteStaff } from "@/lib/entitlements/limits";
+import {
+  assertCanEnablePracticesAsDoctor,
+  assertCanInviteStaff,
+} from "@/lib/entitlements/limits";
 import {
   sendPasswordResetEmail,
   sendStaffInviteEmail,
@@ -584,4 +587,54 @@ export async function peekInvite(token: string): Promise<PeekedInvite> {
   } catch {
     return null;
   }
+}
+
+/** D56 — owner marks themselves as a bookable doctor without a second account. */
+export async function setOwnerPracticesAsDoctorAction(
+  enabled: boolean,
+): Promise<InviteActionState> {
+  const owner = await requireOwnerProfile();
+  if (owner.error || !owner.profile) {
+    return { error: owner.error ?? "forbidden" };
+  }
+
+  const { supabase, user, profile } = owner;
+  const locale = await getLocale();
+
+  if (enabled) {
+    const limit = await assertCanEnablePracticesAsDoctor(
+      supabase,
+      profile.clinic_id,
+    );
+    if (!limit.ok) return { error: limit.code };
+  }
+
+  const { data: updated, error } = await supabase
+    .from("profiles")
+    .update({ practices_as_doctor: enabled })
+    .eq("id", profile.id)
+    .eq("clinic_id", profile.clinic_id)
+    .eq("role", "owner")
+    .select("id")
+    .maybeSingle();
+
+  if (error) {
+    const msg = (error.message ?? "").toLowerCase();
+    if (msg.includes("plan_limit_doctors")) return { error: "doctorLimit" };
+    return { error: "saveFailed" };
+  }
+  if (!updated) return { error: "userNotFound" };
+
+  await supabase.from("audit_events").insert({
+    clinic_id: profile.clinic_id,
+    actor_user_id: user!.id,
+    event_name: "profile.practices_as_doctor_updated",
+    payload_json: { enabled },
+  });
+
+  revalidatePath(`/${locale}/settings/users`);
+  revalidatePath(`/${locale}/calendar`);
+  revalidatePath(`/${locale}/invoices`);
+  revalidatePath(`/${locale}/dashboard`);
+  return { message: "practicesAsDoctorSaved" };
 }

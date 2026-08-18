@@ -46,19 +46,19 @@ Zaključati **kako** gradimo DentOrd (stack, patterni, granice), da agent/develo
 | Validacija | Zod |
 | Deploy target | Vercel — `dentord.com` / `www.dentord.com` (ops: `docs/Production-Ops.md`) |
 | Auth (Faza 1) | Email/password signup+login; forgot/reset password (`/forgot-password` → Auth Admin `generateLink` + Resend → `/auth/callback` → `/reset-password`; bypasses Supabase built-in mailer rate limits); `emailRedirectTo` → `/auth/callback` (PKCE); `create_clinic_for_owner` RPC; owner TOTP MFA (D11); staff invites D9 (`/settings/users`, `/invite/[token]`); PIN operators D10 (`/pin`, bcrypt via pgcrypto RPCs); Resend; plan limit hard-block via `lib/entitlements/`. Hosted Supabase Site URL must be production (`docs/Production-Ops.md`) |
-| Entitlements (Faza 1) | `lib/entitlements/` — `getClinicEntitlements` / `assertFeature` from `plan_entitlements`; free-2026 override (SMS/AI/portal off); `assertCanInviteStaff`, `assertCanCreateLocation`, `assertCanAddPatientImage` |
+| Entitlements (Faza 1) | `lib/entitlements/` — `getClinicEntitlements` / `assertFeature` from `plan_entitlements`; free-2026 override (SMS/AI/portal off); `assertCanInviteStaff`, `assertCanEnablePracticesAsDoctor`, `assertCanCreateLocation`, `assertCanAddPatientImage` |
 | Platform admin (Faza 1) | `(platform)/platform` — gate via `app_metadata.is_platform_admin` (never `user_metadata`); service-role clinic list/detail; plan + clinic/subscription status updates; owner impersonation with `audit_events` (D41) |
 | Clinic app shell (Faza 2A) | `(dashboard)/layout.tsx` + `components/dashboard/app-shell.tsx` — sidebar/mobile nav (RBAC: patients/services/settings), logout + PIN operator switch, impersonation banner |
 | Patients UI (Faza 2A) | `/patients` lista+search, `/patients/new`, `/patients/[id]` karton (alergije, PDF docs, WebP images + plan limit, FDI odontogram); storage bucket `patient-files`, signed URLs (D21) |
 | Services UI (Faza 2A) | `/services` — lista + search/status; owner CRUD (create/edit/activate); D16 `shared_pricelist_across_locations` → optional `location_id`; staff read-only |
 | Treatment plans (Faza 2B) | Na `/patients/[id]` — plan + stavke (usluga, opcionalni FDI, status planned/in_progress/done/cancelled, procjena EUR); RBAC kao odontogram; feature `treatment_plan` |
-| Calendar (Faza 2C) | `/calendar` — day/week/month; CRUD termina; hard overlap (DB EXCLUDE); DnD uz `calendar_advanced`; waitlist + auto-predlog na cancel uz `waitlist_auto`; `date-fns` + `date-fns-tz` (Europe/Sarajevo); custom grid (bez FullCalendar) |
+| Calendar (Faza 2C) | `/calendar` — day/week/month; CRUD termina; hard overlap (DB EXCLUDE); DnD uz `calendar_advanced`; waitlist + auto-predlog na cancel uz `waitlist_auto`; `date-fns` + `date-fns-tz` (Europe/Sarajevo); custom grid (bez FullCalendar). Bookable doktor = `role=doctor` ili owner + `practices_as_doctor` (D56) |
 | Invoices (Faza 2D) | `/invoices` + `/invoices/[id]` — create/void, payments (cash/card/transfer/other), debts filter, installment plans (`installments_calculator`); PDF via `@react-pdf/renderer` stored on issue; download `GET /api/invoices/[id]/pdf`; RBAC owner/accountant; feature `invoices`. Number allocate: `allocate_invoice_number` RPC only (Sarajevo year, row lock; ON CONFLICT ON CONSTRAINT after `20260728010000_fix_allocate_invoice_number_on_conflict`) |
 | Expenses + KPI + Excel (Faza 2E) | `/expenses` CRUD/void + profit; Excel `GET /api/reports/excel` (`exceljs`); dashboard KPI (today appts/revenue/patients, revenue by doctor, monthly trend); RBAC §3.2; feature `expenses_reports_excel` (Pro+); doctor payment aggregates via `dashboard_payment_stats` RPC (D17) |
 | Locations (Faza 2F) | `/settings/locations` — owner CRUD (soft deactivate); D8 hard-block via `assertCanCreateLocation` + DB trigger (active-only count); D16 `settings_json.shared_pricelist_across_locations` toggle (enabling clears `services.location_id`) |
 | Branding (Faza 2G) | `/settings/branding` — owner logo + colors (`branding_json`); feature `branding_custom` (Pro+); private bucket `clinic-branding`; applied in AppShell + invoice PDF |
 | CSV import (Faza 2H) | `/settings/import` — dry-run preview + commit; patients (owner); services (owner/accountant); CSV parse+Zod; max 500 rows / 1 MB; audit `*_csv_imported` (count only) |
-| Onboarding (Faza 2I) | `/onboarding` — owner 3-step wizard (clinic+hours → services/CSV → invite doctor|reception); `settings_json.onboarding` + `working_hours`; middleware force redirect; skip invite allowed |
+| Onboarding (Faza 2I) | `/onboarding` — owner 3-step wizard (clinic+hours+owner-as-doctor → services/CSV → invite doctor or reception); `settings_json.onboarding` + `working_hours`; middleware force redirect; skip invite allowed |
 | Email (Faza 3A) | `/settings/email` — BS/EN templates (`appointment_reminder` + CRM keys); owner edit; reception read/send; **doctor sends reminder from own calendar only (D52)**; `outbound_messages` log; feature `email_reminders` |
 | CRM light (Faza 3B) | `/crm` inbox — birthday (7d) / recall (180d) / control (`next_control_at`); reception/owner send email or dismiss; nav badge; feature `crm_light`; audit `crm.notification_*` |
 | Audit log (Faza 3C) | `/settings/audit` — owner-only; `audit_events` SELECT RLS owner; filter + pagination; payload old/new when present |
@@ -173,7 +173,7 @@ docs/
 - Consents (Faza 3D / D20): `{clinic_id}/{patient_id}/consents/{id}.pdf` + `{id}.sig.png`; PDF via `@react-pdf/renderer` + canvas draw-sign.
 - Invoice PDF (Faza 2D): `{clinic_id}/{patient_id}/invoices/{invoice_id}.pdf` — immutable copy snimljen pri issue; Route Handler streamuje stored file (ne regeneriše template).
 - Clinic branding (Faza 2G): bucket `clinic-branding`, path `{clinic_id}/logo.webp`; `branding_json.logo_path` + `colors.{background,text,accent}`; signed URL TTL 3600s za shell; invoice PDF downloada logo kao data URI.
-- Upload: PDF max 20MB za dokumente; slike (bilo koji format) konvertovane u WebP (`sharp`, quality ~82, max width 2400) prije upload-a; broj slika po pacijentu limitiran planom (`assertCanAddPatientImage`).
+- Upload: PDF max 20MB za dokumente; slike (JPEG/PNG/WebP/HEIC/TIFF) klijent rasterizuje u JPEG (iOS HEIC), zatim server u WebP (`sharp`, quality ~82, max width 2400); broj slika po pacijentu limitiran planom (`assertCanAddPatientImage`). File upload ide programatski (ne nativni form action) da iOS Safari ne sruši karton na `Unexpected end of form`.
 
 ---
 
@@ -330,4 +330,5 @@ Prati PRD §11. Tech doc se širi po fazama; ne specifikovati Enterprise module 
 | 2026-08-17 | D54/D55 (mijenja D5): billing provider = Lemon Squeezy (MoR, Stripe nedostupan u BiH); pretplata se plaća karticom **ili** virmanom po izboru klinike; §10 billing arhitektura; DB kolone se u Fazi 4 preimenuju u provider-agnostične |
 | 2026-08-17 | D55 pojašnjenje: virman put traži registrovanu pravnu formu prodavca; dok je prodavac freelance, MoR kartica je jedini dostupni put |
 | 2026-08-17 | Billing povučen naprijed: implementacija + test u septembru 2026 (LS test mode), produkcijska naplata i dalje od 1.1.2027 (D5 nepromijenjen); §10 plan koraka |
-| 2026-08-17 | Korak 1 billing plana: `clinic_subscriptions` provider-agnostične kolone (`provider_*`, `billing_provider`, `billing_payment_method`); Stripe nazivi uklonjeni |
+| 2026-08-18 | Patient image upload: client JPEG rasterize (iOS HEIC), format hint + `imageMustBeImage` instead of page crash; drop `Unexpected end of form` in Sentry |
+| 2026-08-18 | D56: owner `practices_as_doctor` — same account is bookable doctor; counts as a doctor seat; Settings → Users + onboarding checkbox |

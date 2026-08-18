@@ -20,6 +20,7 @@ import {
 import { getClinicEntitlements } from "@/lib/entitlements";
 import { getClinicContext } from "@/lib/supabase/clinic-context";
 import { createClient } from "@/lib/supabase/server";
+import { toDoctorOptions } from "@/lib/staff/bookable";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -79,10 +80,10 @@ export default async function CalendarPage({ params, searchParams }: Props) {
       appointmentsQuery,
       supabase
         .from("profiles")
-        .select("id, full_name")
+        .select("id, full_name, role, practices_as_doctor")
         .eq("clinic_id", clinicProfile.clinic_id)
-        .eq("role", "doctor")
         .eq("is_active", true)
+        .in("role", ["doctor", "owner"])
         .order("full_name", { ascending: true }),
     ]);
 
@@ -156,8 +157,10 @@ export default async function CalendarPage({ params, searchParams }: Props) {
 
   const { data: waitlistRows } = await waitlistPromise;
 
+  const doctorRows = doctors ?? [];
+  const bookableDoctors = toDoctorOptions(doctorRows);
   const doctorNameById = new Map(
-    (doctors ?? []).map((d) => [d.id, d.full_name]),
+    doctorRows.map((d) => [d.id, d.full_name]),
   );
 
   const mappedAppointments = (appointments ?? []).map((row) => {
@@ -209,10 +212,7 @@ export default async function CalendarPage({ params, searchParams }: Props) {
         initialDoctorId={doctorFilter}
         appointments={mappedAppointments}
         waitlist={mappedWaitlist}
-        doctors={(doctors ?? []).map((d) => ({
-          id: d.id,
-          fullName: d.full_name,
-        }))}
+        doctors={bookableDoctors}
         formOptionsPromise={formOptionsPromise}
         canWrite={canWriteCalendar(clinicProfile.role)}
         canPickDoctor={canPickDoctor}

@@ -94,9 +94,11 @@ describeSecurity("P3.2 doctor calendar peer scope (CAL-INT-004 / RBAC-INT-005)",
   let doctorA: TestUser;
   let doctorB: TestUser;
   let reception: TestUser;
+  let owner: TestUser;
   let doctorAClient: DbClient;
   let doctorBClient: DbClient;
   let receptionClient: DbClient;
+  let ownerClient: DbClient;
   const created: TestUser[] = [];
 
   beforeAll(async () => {
@@ -121,6 +123,7 @@ describeSecurity("P3.2 doctor calendar peer scope (CAL-INT-004 / RBAC-INT-005)",
     doctorA = doctors[0]!;
     doctorB = doctors[1]!;
     reception = clinic.byRole.reception!;
+    owner = clinic.byRole.owner!;
 
     const patient = await createPatient(service, clinicId, {
       firstName: "Scope",
@@ -136,6 +139,7 @@ describeSecurity("P3.2 doctor calendar peer scope (CAL-INT-004 / RBAC-INT-005)",
       reception.email,
       reception.password,
     );
+    ownerClient = await signInAs(url, anonKey, owner.email, owner.password);
   }, 90_000);
 
   afterAll(async () => {
@@ -323,5 +327,52 @@ describeSecurity("P3.2 doctor calendar peer scope (CAL-INT-004 / RBAC-INT-005)",
       .select("id");
     expect(error).toBeNull();
     expect(updated ?? []).toHaveLength(1);
+  });
+
+  it("D56: owner without practices_as_doctor cannot book themselves", async () => {
+    activeActionClient = ownerClient;
+    const result = await createAppointmentAction(
+      null,
+      slotForm({
+        doctorId: owner.userId,
+        patientId,
+        dayOffset: 28,
+        hour: 8,
+      }),
+    );
+    expect(result?.error).toBe("doctorNotFound");
+  });
+
+  it("D56: practicing owner can book themselves and still book another doctor", async () => {
+    const { error: flagError } = await service
+      .from("profiles")
+      .update({ practices_as_doctor: true })
+      .eq("id", owner.userId);
+    expect(flagError).toBeNull();
+
+    activeActionClient = ownerClient;
+    const self = await createAppointmentAction(
+      null,
+      slotForm({
+        doctorId: owner.userId,
+        patientId,
+        dayOffset: 29,
+        hour: 8,
+      }),
+    );
+    expect(self?.error).toBeUndefined();
+    expect(self?.message).toBe("appointmentCreated");
+
+    const forPeer = await createAppointmentAction(
+      null,
+      slotForm({
+        doctorId: doctorA.userId,
+        patientId,
+        dayOffset: 29,
+        hour: 10,
+      }),
+    );
+    expect(forPeer?.error).toBeUndefined();
+    expect(forPeer?.message).toBe("appointmentCreated");
   });
 });

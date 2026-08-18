@@ -1898,6 +1898,7 @@ export type Database = {
           locked_until: string | null
           pin_failed_count: number
           pin_locked_until: string | null
+          practices_as_doctor: boolean
           role: Database["public"]["Enums"]["app_role"]
           updated_at: string
         }
@@ -1911,6 +1912,7 @@ export type Database = {
           locked_until?: string | null
           pin_failed_count?: number
           pin_locked_until?: string | null
+          practices_as_doctor?: boolean
           role: Database["public"]["Enums"]["app_role"]
           updated_at?: string
         }
@@ -1924,6 +1926,7 @@ export type Database = {
           locked_until?: string | null
           pin_failed_count?: number
           pin_locked_until?: string | null
+          practices_as_doctor?: boolean
           role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string
         }

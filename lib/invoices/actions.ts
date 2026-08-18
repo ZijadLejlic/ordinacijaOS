@@ -12,6 +12,7 @@ import { CLINIC_BRANDING_BUCKET } from "@/lib/branding/storage";
 import { getClinicWriteBlock } from "@/lib/clinic/writable";
 import { assertFeature, clinicHasFeature } from "@/lib/entitlements";
 import { canWriteInvoices } from "@/lib/invoices/rbac";
+import { isBookableDoctor } from "@/lib/staff/bookable";
 import { allocateInvoiceNumber } from "@/lib/invoices/allocate-number";
 import {
   formatInvoiceNumber,
@@ -180,11 +181,11 @@ export async function createInvoiceAction(
   if (parsed.data.doctorId) {
     const { data: doctor } = await supabase
       .from("profiles")
-      .select("id, role, is_active")
+      .select("id, role, is_active, practices_as_doctor")
       .eq("id", parsed.data.doctorId)
       .eq("clinic_id", profile.clinic_id)
       .maybeSingle();
-    if (!doctor?.is_active || doctor.role !== "doctor") {
+    if (!doctor?.is_active || !isBookableDoctor(doctor)) {
       return { error: "invalid" };
     }
   }

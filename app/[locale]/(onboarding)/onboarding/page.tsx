@@ -29,7 +29,7 @@ export default async function OnboardingPage({ params }: Props) {
   const { data: profile } = await supabase
     .from("profiles")
     .select(
-      "role, clinic_id, clinics(name, timezone, phone_country_default, settings_json)",
+      "role, clinic_id, practices_as_doctor, clinics(name, timezone, phone_country_default, settings_json)",
     )
     .eq("id", user!.id)
     .maybeSingle();
@@ -70,6 +70,9 @@ export default async function OnboardingPage({ params }: Props) {
         workingHours={parseWorkingHours(clinic!.settings_json)}
         onboarding={onboarding}
         serviceCount={count ?? 0}
+        practicesAsDoctor={
+          profile!.practices_as_doctor || !onboarding.steps.clinic
+        }
       />
     </div>
   );

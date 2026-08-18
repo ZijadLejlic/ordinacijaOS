@@ -92,7 +92,7 @@ export async function GET(request: Request) {
         .from("profiles")
         .select("id, full_name")
         .eq("clinic_id", profile.clinic_id)
-        .eq("role", "doctor"),
+        .in("role", ["doctor", "owner"]),
     ]);
 
   const doctorName = new Map((doctors ?? []).map((d) => [d.id, d.full_name]));

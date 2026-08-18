@@ -79,6 +79,7 @@ export type OnboardingWizardProps = {
   workingHours: WorkingHours;
   onboarding: OnboardingState;
   serviceCount: number;
+  practicesAsDoctor: boolean;
 };
 
 export function OnboardingWizard({
@@ -88,6 +89,7 @@ export function OnboardingWizard({
   workingHours,
   onboarding,
   serviceCount,
+  practicesAsDoctor,
 }: OnboardingWizardProps) {
   const t = useTranslations("Onboarding");
   const [step, setStep] = useState<1 | 2 | 3>(
@@ -142,6 +144,7 @@ export function OnboardingWizard({
           timezone={timezone}
           phoneCountryDefault={phoneCountryDefault}
           workingHours={workingHours}
+          practicesAsDoctor={practicesAsDoctor}
           onAdvanced={() => setStep(2)}
         />
       ) : null}
@@ -164,12 +167,14 @@ function StepClinic({
   timezone,
   phoneCountryDefault,
   workingHours,
+  practicesAsDoctor,
   onAdvanced,
 }: {
   clinicName: string;
   timezone: string;
   phoneCountryDefault: string;
   workingHours: WorkingHours;
+  practicesAsDoctor: boolean;
   onAdvanced: () => void;
 }) {
   const t = useTranslations("Onboarding");
@@ -237,6 +242,22 @@ function StepClinic({
               </select>
             </Field>
           </FieldGroup>
+
+          <label className="flex items-start gap-3 text-sm">
+            <input
+              type="checkbox"
+              name="practicesAsDoctor"
+              value="on"
+              defaultChecked={practicesAsDoctor}
+              className="mt-0.5 size-4 rounded border"
+            />
+            <span>
+              <span className="font-medium">{t("practicesAsDoctor")}</span>
+              <span className="text-muted-foreground mt-1 block">
+                {t("practicesAsDoctorHint")}
+              </span>
+            </span>
+          </label>
 
           <div className="space-y-3">
             <p className="text-sm font-medium">{t("workingHours")}</p>

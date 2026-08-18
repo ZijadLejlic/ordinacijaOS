@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database, Json } from "@/lib/supabase/database.types";
+import { countDoctorSeats } from "@/lib/staff/bookable";
 
 type Client = SupabaseClient<Database>;
 type AppRole = Database["public"]["Enums"]["app_role"];
@@ -100,7 +101,7 @@ export async function assertCanInviteStaff(
   const [{ data: profiles }, { data: invites }] = await Promise.all([
     supabase
       .from("profiles")
-      .select("role, is_active")
+      .select("role, is_active, practices_as_doctor")
       .eq("clinic_id", clinicId),
     supabase
       .from("clinic_invites")
@@ -114,9 +115,7 @@ export async function assertCanInviteStaff(
 
   const users =
     activeProfiles.length + pendingInvites.length;
-  const doctors =
-    activeProfiles.filter((p) => p.role === "doctor").length +
-    pendingInvites.filter((i) => i.role === "doctor").length;
+  const doctors = countDoctorSeats(activeProfiles, pendingInvites);
 
   const usage = { users, doctors };
 
@@ -133,6 +132,17 @@ export async function assertCanInviteStaff(
   }
 
   return { ok: true, limits, usage };
+}
+
+/**
+ * Hard-block doctor seat when owner turns on practices_as_doctor (D8 / D56).
+ * Same reserved-seat count as inviting a doctor (owner is not yet counted).
+ */
+export async function assertCanEnablePracticesAsDoctor(
+  supabase: Client,
+  clinicId: string,
+): Promise<LimitCheck> {
+  return assertCanInviteStaff(supabase, clinicId, "doctor");
 }
 
 /**

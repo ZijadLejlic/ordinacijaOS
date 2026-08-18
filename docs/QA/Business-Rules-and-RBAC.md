@@ -63,7 +63,7 @@ A rule is **hard** only if DB-C/DB-T/DB-F/RLS enforce it. SA/API alone are bypas
 | BR-P02 | Free period disables `sms_whatsapp`, `ai_copilot`, `patient_portal` | SA `applyFreePeriodOverrides` | Soft (app) |
 | BR-P03 | Feature access from `plan_entitlements` (D42) | SA `assertFeature` / `getClinicEntitlements` | Soft (app) |
 | BR-P04 | User seat limit: active profiles + pending invites | DB-T `enforce_invite_limits` + SA | Yes |
-| BR-P05 | Doctor seat limit: active doctors + pending doctor invites | DB-T same | Yes |
+| BR-P05 | Doctor seat limit: active bookable doctors (`role=doctor` or practicing owner) + pending doctor invites | DB-T same | Yes |
 | BR-P06 | Location limit: **active** locations only | DB-T `enforce_location_limits` + SA | Yes |
 | BR-P07 | Images per patient by plan | SA `assertCanAddPatientImage` only | **No** (app-only) |
 | BR-P08 | Exceeding limit → hard block + upsell, not soft warn | SA error codes + UI | Intent |

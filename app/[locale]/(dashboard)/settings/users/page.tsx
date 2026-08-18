@@ -11,6 +11,7 @@ import {
   InviteStaffForm,
   InvitesTable,
   MembersTable,
+  OwnerPracticesAsDoctorCard,
 } from "@/components/settings/users-forms";
 import {
   CreateOperatorForm,
@@ -51,7 +52,7 @@ export default async function SettingsUsersPage({ params }: Props) {
     await Promise.all([
       supabase
         .from("profiles")
-        .select("id, full_name, role, is_active")
+        .select("id, full_name, role, is_active, practices_as_doctor")
         .eq("clinic_id", clinicId)
         .order("created_at", { ascending: true }),
       supabase
@@ -66,6 +67,7 @@ export default async function SettingsUsersPage({ params }: Props) {
         .order("created_at", { ascending: true }),
     ]);
 
+  const ownerMember = (members ?? []).find((m) => m.role === "owner");
   const deskMembers = (members ?? []).filter(
     (m) =>
       m.is_active && (m.role === "reception" || m.role === "assistant"),
@@ -77,6 +79,20 @@ export default async function SettingsUsersPage({ params }: Props) {
         <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
         <p className="text-muted-foreground text-sm">{t("subtitle")}</p>
       </div>
+
+      {ownerMember ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("practicesAsDoctorTitle")}</CardTitle>
+            <CardDescription>{t("practicesAsDoctorDescription")}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <OwnerPracticesAsDoctorCard
+              enabled={ownerMember.practices_as_doctor}
+            />
+          </CardContent>
+        </Card>
+      ) : null}
 
       <Card>
         <CardHeader>
@@ -100,6 +116,7 @@ export default async function SettingsUsersPage({ params }: Props) {
               fullName: m.full_name,
               role: m.role,
               isActive: m.is_active,
+              practicesAsDoctor: m.practices_as_doctor,
             }))}
           />
         </CardContent>

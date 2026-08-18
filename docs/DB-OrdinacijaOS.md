@@ -124,6 +124,7 @@ Silent drop (nema INSERT, nema Resend): honeypot `website`/`company`, prebrz sub
 | `role` | `owner` \| `doctor` \| `assistant` \| `reception` \| `accountant` \| (`technician` Enterprise) |
 | `full_name` | |
 | `is_active` | |
+| `practices_as_doctor` | Owner-only (D56). Kad je true, owner je bookable doktor (termini/fakture) i broji se u doctor seat limit. CHECK: samo `role=owner` smije biti true. |
 | MFA / lockout fields | Owner TOTP preko Supabase Auth MFA (`auth.mfa_factors`); app gate + `owner_mfa_ok()` RLS (D11). Auth login lockout (D13): `check_login_lockout` / `record_failed_login` / `clear_login_lockout` RPC + `loginAction`. |
 | `pin_failed_count` / `pin_locked_until` | D10 desk PIN lock (5 fails → 15 min) |
 
@@ -563,7 +564,7 @@ Location create must call `assertCanCreateLocation`; image upload must call `ass
 | `phase3d_consent_draw_sign` | `consent_forms` / `consent_signatures` + RLS + seed (D20) |
 | `phase3d_consent_hooks` | clinic create seed + GDPR erase consents |
 | `phase3e_inventory_basic` | `inventory_items` + RLS + `can_access/write_inventory` (§6.12) |
-| `marketing_demo_clinic` | `clinics.is_demo` + lifecycle/hard_delete skip (W8) |
+| `owner_practices_as_doctor` | D56: `profiles.practices_as_doctor`; `clinic_doctor_seat_count`; invite + owner-toggle doctor-seat triggers |
 
 ---
 
@@ -604,3 +605,4 @@ Location create must call `assertCanCreateLocation`; image upload must call `ass
 | 2026-07-28 | P3.4/D-22: `revoke_user_sessions(uuid)` — service_role deletes `auth.sessions` for owner force-logout/deactivate |
 | 2026-07-30 | `hard_delete_clinic`: no SQL DELETE on `storage.objects` (Supabase protect_delete); Storage API via `lib/clinic/hard-delete.ts` |
 | 2026-08-17 | D54/D55: `clinic_subscriptions` provider-agnostične kolone (`provider_*`, `billing_provider`, `billing_payment_method`); `stripe_*` renamed |
+| 2026-08-18 | D56: owner `practices_as_doctor`; doctor seats include practicing owners |

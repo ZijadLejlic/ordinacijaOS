@@ -39,6 +39,7 @@ SDK: `@sentry/nextjs` (Next.js 16). Environments: `development` | `preview` | `p
 - Session Replay: `maskAllText` + `blockAllMedia`
 - Expected business errors (credentials, validation, overlap, 401/403) not reported
 - Stale Server Action after deploy (`Failed to find Server Action`) dropped as deploy skew
+- Truncated iOS file upload (`Unexpected end of form`) dropped — UI shows a form error instead of crashing
 
 ## Sampling
 

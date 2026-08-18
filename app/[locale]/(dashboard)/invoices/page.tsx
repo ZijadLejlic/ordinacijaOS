@@ -17,6 +17,7 @@ import { canAccessInvoices, canWriteInvoices } from "@/lib/invoices/rbac";
 import { formatInvoiceNumber, roundMoney } from "@/lib/invoices/money";
 import { getClinicContext } from "@/lib/supabase/clinic-context";
 import { createClient } from "@/lib/supabase/server";
+import { toDoctorOptions } from "@/lib/staff/bookable";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -91,11 +92,18 @@ export default async function InvoicesPage({ params, searchParams }: Props) {
     canWrite
       ? supabase
           .from("profiles")
-          .select("id, full_name")
+          .select("id, full_name, role, practices_as_doctor")
           .eq("clinic_id", profile.clinic_id)
-          .eq("role", "doctor")
           .eq("is_active", true)
-      : Promise.resolve({ data: [] as { id: string; full_name: string }[] }),
+          .in("role", ["doctor", "owner"])
+      : Promise.resolve({
+          data: [] as {
+            id: string;
+            full_name: string;
+            role: "doctor" | "owner";
+            practices_as_doctor: boolean;
+          }[],
+        }),
     canWrite
       ? supabase
           .from("clinic_locations")
@@ -212,9 +220,9 @@ export default async function InvoicesPage({ params, searchParams }: Props) {
                 priceEur: Number(s.price_eur),
                 vatRate: Number(s.vat_rate),
               }))}
-              doctors={(doctors ?? []).map((d) => ({
+              doctors={toDoctorOptions(doctors ?? []).map((d) => ({
                 id: d.id,
-                name: d.full_name,
+                name: d.fullName,
               }))}
               locations={(locations ?? []).map((l) => ({
                 id: l.id,

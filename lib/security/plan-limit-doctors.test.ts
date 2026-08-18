@@ -130,4 +130,15 @@ describeSecurity("plan limit doctors DB hard gate (D8 / PLAN-DB-003)", () => {
 
     expect(error).toBeNull();
   }, 60_000);
+
+  it("D56: owner cannot turn on practices_as_doctor when doctor seats are at cap", async () => {
+    const ownerClient = await signInAs(url, anonKey, owner.email, owner.password);
+    const { error } = await ownerClient
+      .from("profiles")
+      .update({ practices_as_doctor: true })
+      .eq("id", owner.userId);
+
+    expect(error).not.toBeNull();
+    expect(error?.message.toLowerCase()).toContain("plan_limit_doctors");
+  }, 60_000);
 });

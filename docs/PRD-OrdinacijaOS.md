@@ -86,6 +86,7 @@ Odluke su finalne za v1 planiranje. Agent/developer **ne nagađa** mimo ovog log
 | D53 | Invoice issue by doctor | Doktor može **izdati fakturu**, PDF i uplate (kao accountant); rashodi/Excel i legal settings ostaju owner/accountant |
 | D54 | Billing provider (mijenja D5) | **Lemon Squeezy** (Merchant of Record) umjesto Stripea — Stripe nije dostupan za prodavce iz BiH. LS vodi checkout, recurring i PDV/VAT, isplata na BiH račun. Kolone/kod ostaju **provider-agnostični** (LS → Stripe Managed Payments je vjerovatna migracija). **Preduvjet prije implementacije:** verifikovan LS nalog + potvrđen test payout na BiH račun; ako padne, fallback je Paddle (vidi §4.5) |
 | D55 | Načini plaćanja pretplate | Klinika bira: **(a) kartica** — self-serve LS checkout, ili **(b) virman** — DentOrd izda domaći račun, platform admin (D41) aktivira/produži pretplatu. Oba puta pišu **isti** `clinic_subscriptions` red; entitlements (D42) i lifecycle (D6) su identični bez obzira na način plaćanja. **Virman zahtijeva registrovanu pravnu formu prodavca** (§4.5); dok je prodavac freelance/fizičko lice, dostupna je samo kartica preko MoR-a |
+| D56 | Owner as doctor | Owner može **isti nalog** koristiti i kao doktora (`profiles.practices_as_doctor`). Pojavljuje se u kalendaru/fakturama; broji se kao 1 doctor seat (D8). Nema dual-role niza i nema drugog emaila za solo ordinaciju. |
 
 ---
 
@@ -146,7 +147,7 @@ Razlikovanje od postojećih rješenja (alpinDent i slični):
 
 | Rola | Opis | Paket |
 |---|---|---|
-| `owner` | Vlasnik; finansije, useri, settings, branding, GDPR approve | Svi |
+| `owner` | Vlasnik; finansije, useri, settings, branding, GDPR approve. **Opciono i doktor** na istom nalogu (D56 `practices_as_doctor`) | Svi |
 | `doctor` | Pacijenti, karton, odontogram, plan terapije, svoji termini, tretmani, **podsjetnik na svoj termin**, **fakture/uplate** | Svi |
 | `assistant` | Raspored, priprema pacijenata; shared + PIN | Pro+ |
 | `reception` | Termini, osnovni podaci, slanje reminder/CRM poruka; shared + PIN | Svi |
@@ -375,7 +376,7 @@ Detaljna schema, indeksi i RLS → budući `DB-OrdinacijaOS.md`.
 
 **In-app onboarding (3 stepa):**
 
-1. Osnovni podaci ordinacije + radno vrijeme
+1. Osnovni podaci ordinacije + radno vrijeme + **checkbox „Ja radim s pacijentima“** (D56; default uključeno za prvi prolaz)
 2. Dodaj prve usluge (ili CSV import)
 3. Pozovi barem jednog doktora ili recepciju
 
@@ -404,7 +405,7 @@ PDF/video tutorijali: kasnije.
 
 ### 6.5 Kalendar
 
-- Veza: **doktor** (+ lokacija ako ih ima više)
+- Veza: **doktor** (+ lokacija ako ih ima više). Bookable = `role=doctor` ili owner s `practices_as_doctor` (D56)
 - View: dan / sedmica / mjesec
 - Default trajanje iz usluge; korekcija dozvoljena
 - Statusi: npr. `pending_confirmation`, `confirmed`, `completed`, `cancelled`, `no_show`

@@ -4,7 +4,10 @@ import { getLocale } from "next-intl/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "@/i18n/navigation";
 import { writeAuditEvent } from "@/lib/audit/log";
-import { assertCanInviteStaff } from "@/lib/entitlements";
+import {
+  assertCanEnablePracticesAsDoctor,
+  assertCanInviteStaff,
+} from "@/lib/entitlements";
 import {
   createInviteToken,
   hashInviteToken,
@@ -127,6 +130,7 @@ export async function saveOnboardingClinicAction(
     timezone: formData.get("timezone"),
     phoneCountryDefault: formData.get("phoneCountryDefault"),
     workingHours,
+    practicesAsDoctor: formData.get("practicesAsDoctor") === "on",
   });
   if (!parsed.success) return { error: "invalid" };
 
@@ -151,6 +155,26 @@ export async function saveOnboardingClinicAction(
     steps: { ...onboarding.steps, clinic: true },
   };
 
+  if (parsed.data.practicesAsDoctor) {
+    const limit = await assertCanEnablePracticesAsDoctor(
+      supabase,
+      profile.clinic_id,
+    );
+    if (!limit.ok) return { error: limit.code };
+  }
+
+  const { error: practiceError } = await supabase
+    .from("profiles")
+    .update({ practices_as_doctor: parsed.data.practicesAsDoctor })
+    .eq("id", profile.id)
+    .eq("clinic_id", profile.clinic_id);
+
+  if (practiceError) {
+    const msg = (practiceError.message ?? "").toLowerCase();
+    if (msg.includes("plan_limit_doctors")) return { error: "doctorLimit" };
+    return { error: "saveFailed" };
+  }
+
   const { error } = await supabase
     .from("clinics")
     .update({
@@ -170,7 +194,10 @@ export async function saveOnboardingClinicAction(
     clinicId: profile.clinic_id,
     actorUserId: user.id,
     eventName: "onboarding.step1_completed",
-    payload: { step: 1 },
+    payload: {
+      step: 1,
+      practices_as_doctor: parsed.data.practicesAsDoctor,
+    },
   });
 
   revalidateOnboarding(locale);

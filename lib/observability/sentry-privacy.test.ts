@@ -75,6 +75,17 @@ describe("Sentry privacy / expected-error filters (D33)", () => {
     ).toBeNull();
   });
 
+  it("drops truncated iOS multipart uploads (Unexpected end of form)", () => {
+    const err = new Error("Unexpected end of form");
+    expect(isExpectedBusinessError(err)).toBe(true);
+    expect(
+      sanitizeSentryEvent(
+        { type: undefined, message: err.message } as never,
+        { originalException: err } as never,
+      ),
+    ).toBeNull();
+  });
+
   it("drops intentional Sentry smoke tests and undefined rejection noise", () => {
     expect(
       sanitizeSentryEvent(

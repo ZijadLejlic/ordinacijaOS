@@ -25,6 +25,7 @@ import {
   resendInviteAction,
   resetUserPasswordAction,
   revokeInviteAction,
+  setOwnerPracticesAsDoctorAction,
   type InviteActionState,
 } from "@/lib/invites/actions";
 import { staffInviteRoles } from "@/lib/validations/invite";
@@ -38,6 +39,7 @@ export type UsersPageMember = {
   fullName: string;
   role: AppRole;
   isActive: boolean;
+  practicesAsDoctor: boolean;
 };
 
 export type UsersPageInvite = {
@@ -70,6 +72,7 @@ function mapInviteError(
     "userNotFound",
     "missingAppUrl",
     "resetFailed",
+    "saveFailed",
   ] as const;
   if ((known as readonly string[]).includes(state.error)) {
     return t(`errors.${state.error as (typeof known)[number]}`);
@@ -138,6 +141,59 @@ function RowActions({
   return <div className="flex flex-wrap justify-end gap-2">{children}</div>;
 }
 
+export function OwnerPracticesAsDoctorCard({
+  enabled,
+}: {
+  enabled: boolean;
+}) {
+  const t = useTranslations("Users");
+  const [pending, startTransition] = useTransition();
+  const [checked, setChecked] = useState(enabled);
+  const [flash, setFlash] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  function onToggle(next: boolean) {
+    setFlash(null);
+    setError(null);
+    setChecked(next);
+    startTransition(async () => {
+      const result = await setOwnerPracticesAsDoctorAction(next);
+      if (result?.error) {
+        setChecked(!next);
+        setError(mapInviteError(t, result) ?? result.error);
+        return;
+      }
+      if (result?.message === "practicesAsDoctorSaved") {
+        setFlash(t("practicesAsDoctorSaved"));
+      }
+    });
+  }
+
+  return (
+    <div className="space-y-3">
+      <label className="flex items-start gap-3 text-sm">
+        <input
+          type="checkbox"
+          className="mt-0.5 size-4 rounded border"
+          checked={checked}
+          disabled={pending}
+          onChange={(e) => onToggle(e.target.checked)}
+        />
+        <span>
+          <span className="font-medium">{t("practicesAsDoctor")}</span>
+          <span className="text-muted-foreground mt-1 block">
+            {t("practicesAsDoctorHint")}
+          </span>
+        </span>
+      </label>
+      {flash ? (
+        <p className="text-sm text-green-700 dark:text-green-400">{flash}</p>
+      ) : null}
+      {error ? <FieldError>{error}</FieldError> : null}
+    </div>
+  );
+}
+
 export function MembersTable({ members }: { members: UsersPageMember[] }) {
   const t = useTranslations("Users");
   const [pending, startTransition] = useTransition();
@@ -181,7 +237,12 @@ export function MembersTable({ members }: { members: UsersPageMember[] }) {
           {members.map((member) => (
             <TableRow key={member.id}>
               <TableCell>{member.fullName}</TableCell>
-              <TableCell>{t(`roles.${member.role}`)}</TableCell>
+              <TableCell>
+                {t(`roles.${member.role}`)}
+                {member.role === "owner" && member.practicesAsDoctor
+                  ? ` + ${t("roles.doctor")}`
+                  : null}
+              </TableCell>
               <TableCell>
                 {member.isActive ? t("active") : t("inactive")}
               </TableCell>

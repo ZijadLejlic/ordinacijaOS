@@ -52,6 +52,7 @@ const KNOWN_ERRORS = [
   "imageConvertFailed",
   "imageNotFound",
   "uploadFailed",
+  "uploadInterrupted",
   "signedUrlFailed",
 ] as const;
 
